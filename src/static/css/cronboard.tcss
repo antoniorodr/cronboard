@@ -2,6 +2,40 @@ CronCreate {
     align: center middle;
 }
 
+#title {
+  padding: 1;
+  color: $primary;
+}
+
+CronTable {
+    align: center middle;
+    height: auto;
+    margin: 2;
+    border: round $primary;
+}
+
+CronTabs {
+  padding-left: 1;
+  padding-right: 1;
+}
+
+#error {
+  color: $error;
+  padding-top: 1;
+}
+
+#label_desc {
+        margin-top: 1;
+    }
+
+.success {
+        color: $success;
+    }
+
+.error {
+        color: $error;
+    }
+
 #dialog {
     align: center middle;
     width: 60%;

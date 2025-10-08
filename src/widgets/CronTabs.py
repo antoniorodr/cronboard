@@ -4,7 +4,11 @@ from textual.widgets import Tabs
 
 class CronTabs(Tabs):
     BINDINGS = [
-        Binding("l", "next_tab", "Right"),
+        Binding(
+            "l",
+            "next_tab",
+            "Right",
+        ),
         Binding("h", "previous_tab", "Left"),
     ]
 

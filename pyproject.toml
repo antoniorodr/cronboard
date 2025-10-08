@@ -1,12 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cronboard"
+authors = [
+  { name = "Antonio Rodriguez", email = "kontakt@antoniorodriguez.no" },
+]
+description = "A terminal-based dashboard for managing cron jobs"
 version = "0.1.0"
-description = "Add your description here"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
-    "cronexpr>=0.30.0",
-    "python-crontab>=3.3.0",
-    "textual>=6.2.1",
-    "textual-dev>=1.7.0",
+  "cron-descriptor>=2.0.6",
+  "cronexpr>=0.30.0",
+  "paramiko>=4.0.0",
+  "python-crontab>=3.3.0",
+  "textual>=6.2.1",
+  "textual-dev>=1.7.0",
 ]
+
+[project.scripts]
+cronboard = "app:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
