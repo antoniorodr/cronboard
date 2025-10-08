@@ -1,0 +1,76 @@
+CronCreate {
+    align: center middle;
+}
+
+#dialog {
+    align: center middle;
+    width: 60%;
+    height: auto;
+    max-width: 80;
+    min-height: 20;
+    background: $surface;
+    border: thick $primary;
+}
+
+#content {
+    align: center middle;
+    width: 100%;
+    height: auto;
+    padding: 2;
+}
+
+#content Label {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#label1 {
+    color: $text;
+    text-style: bold;
+}
+
+#label2 {
+    color: $text-muted;
+    margin-bottom: 1;
+}
+
+#label_special {
+    color: $accent;
+    text-style: bold;
+    margin-top: 1;
+    margin-bottom: 0;
+}
+
+#label_asterisk, #label_comma, #label_dash, #label_slash {
+    color: $text-muted;
+    text-style: italic;
+    margin-bottom: 0;
+    padding-left: 2;
+}
+
+#label_slash {
+    margin-bottom: 2;
+}
+
+#label3 {
+    color: $text;
+    text-style: bold;
+    margin-top: 2;
+}
+
+#expression {
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#button-row {
+    align: center middle;
+    width: 100%;
+    height: auto;
+    margin-top: 2;
+}
+
+#button-row Button {
+    margin: 0 1;
+}

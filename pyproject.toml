@@ -1,0 +1,12 @@
+[project]
+name = "cronboard"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cronexpr>=0.30.0",
+    "python-crontab>=3.3.0",
+    "textual>=6.2.1",
+    "textual-dev>=1.7.0",
+]
