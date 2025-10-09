@@ -4,7 +4,7 @@ from textual.widgets import Footer, Label, Tabs
 from widgets.CronTable import CronTable
 from textual.containers import Container
 from widgets.CronTabs import CronTabs
-from widgets.CronCreate import CronCreate
+from widgets.CronCreator import CronCreator
 
 
 class CronBoard(App):
@@ -54,7 +54,16 @@ class CronBoard(App):
             self.ssh.display = True
 
     def action_create_cronjob_keybind(self) -> None:
-        self.push_screen(CronCreate())
+        self.push_screen(CronCreator())
+
+    def action_edit_cronjob_keybind(
+        self, identificator: str, expression: str, command: str
+    ) -> None:
+        self.push_screen(
+            CronCreator(
+                identificator=identificator, expression=expression, command=command
+            )
+        )
 
     def get_version(self) -> str:
         pyproject_path = Path(__file__).parent.parent / "pyproject.toml"

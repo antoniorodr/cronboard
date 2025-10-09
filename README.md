@@ -1,9 +1,8 @@
 <div align="center" id="top"> 
-  <img src="./.github/app.gif" alt="CronBoard" />
+  <img src="src/static/cronboard.png" alt="CronBoard" height=200 />
 
 &#xa0;
 
-  <!-- <a href="https://CronBoard.netlify.app">Demo</a> -->
 </div>
 
 <h1 align="center">CronBoard</h1>
@@ -35,7 +34,7 @@
   <a href="#sparkles-features">Features</a> &#xa0; | &#xa0;
   <a href="#rocket-technologies">Technologies</a> &#xa0; | &#xa0;
   <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
-  <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
+  <a href="#checkered_flag-starting">Installation</a> &#xa0; | &#xa0;
   <a href="#memo-license">License</a> &#xa0; | &#xa0;
   <a href="https://github.com/antoniorodr" target="_blank">Author</a>
 </p>
@@ -44,44 +43,43 @@
 
 ## :dart: About
 
-Describe your project
+CronBoard is a terminal application that allows you to manage and schedule cronjobs on local and remote servers (not yet implemented). With CronBoard, you can easily add, edit, and delete cronjobs, as well as view their status.
 
 ## :sparkles: Features
 
-:heavy_check_mark: Feature 1;\
-:heavy_check_mark: Feature 2;\
-:heavy_check_mark: Feature 3;
+:heavy_check_mark: Manage your cronjobs from the terminal;\
+:heavy_check_mark: Schedule tasks with ease;\
+:heavy_check_mark: Connect to multiple servers;\
 
 ## :rocket: Technologies
 
 The following tools were used in this project:
 
-- [Expo](https://expo.io/)
-- [Node.js](https://nodejs.org/en/)
-- [React](https://pt-br.reactjs.org/)
-- [React Native](https://reactnative.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
+- [Textual](https://textual.textualize.io)
+- [Python crontab](https://pypi.org/project/python-crontab/)
+- [Pycronexpr](https://github.com/CodyRay/pycronexpr)
+- [Cron descriptor](https://github.com/Salamek/cron-descriptor)
 
 ## :white_check_mark: Requirements
 
 Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) and [Node](https://nodejs.org/en/) installed.
 
-## :checkered_flag: Starting
+## :checkered_flag: Installation
+
+#### Manual Installation
 
 ```bash
-# Clone this project
-$ git clone https://github.com/antoniorodr/CronBoard
+git clone https://github.com/antoniorodr/cronboard
 
-# Access
-$ cd CronBoard
+cd cronboard
 
-# Install dependencies
-$ yarn
+pip install .
+```
 
-# Run the project
-$ yarn start
+#### Installation using [uv](https://docs.astral.sh/uv/)
 
-# The server will initialize in the <http://localhost:3000>
+```bash
+uv tool install git+https://github.com/antoniorodr/cronboard
 ```
 
 ## :memo: License

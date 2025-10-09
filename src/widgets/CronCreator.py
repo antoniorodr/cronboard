@@ -7,7 +7,14 @@ import cronexpr
 from cron_descriptor import Options, ExpressionDescriptor
 
 
-class CronCreate(ModalScreen):
+class CronCreator(ModalScreen):
+    def __init__(self, expression=None, command=None, identificator=None) -> None:
+        super().__init__()
+        self.expression = expression
+        self.command = command
+        self.identificator = identificator
+        self.cron = CronTab(user=True)
+
     def compose(self) -> ComposeResult:
         yield Grid(
             Vertical(
@@ -20,12 +27,23 @@ class CronCreate(ModalScreen):
                     "Enter a valid cron expression (remember whitespaces):", id="label1"
                 ),
                 Label("Minute - Hour - Day - Month - Weekday", id="label2"),
-                Input(placeholder="* * * * *", id="expression"),
+                Input(
+                    value="" if not self.expression else self.expression,
+                    placeholder="* * * * *",
+                    id="expression",
+                ),
                 Label("", id="label_desc"),
                 Label("Enter the command to execute:", id="label3"),
                 Input(
+                    value="" if self.command is None else self.command,
                     placeholder="e.g., python3 /usr/bin/python</path/to/script.py>",
                     id="command",
+                ),
+                Label("Enter a identificator", id="label4"),
+                Input(
+                    value="" if self.identificator is None else self.identificator,
+                    placeholder="e.g., backup-job-1",
+                    id="identificator",
                 ),
                 Horizontal(
                     Button("Save", variant="primary", id="save"),
@@ -54,20 +72,33 @@ class CronCreate(ModalScreen):
             self.app.pop_screen()
             return
 
+        identificator_input = self.query_one("#identificator", Input)
         expression_input = self.query_one("#expression", Input)
         command_input = self.query_one("#command", Input)
         expression = expression_input.value
         command = command_input.value
-
+        identificator = identificator_input.value
         content = self.query_one("#content", Vertical)
+
+        if not identificator:
+            error_label = Label("Identificator cannot be empty.", id="error")
+            content.mount(error_label)
+            return
 
         try:
             cronexpr.next_fire(expression)
 
-            cron = CronTab(user=True)
-            cron_job = cron.new(command=command)
-            cron_job.setall(expression)
-            cron.write()
+            cron = self.cron
+            job = self.find_if_cronjob_exists(identificator, command)
+
+            if job:
+                job.set_command(command)
+                job.setall(expression)
+                cron.write()
+            else:
+                cron_job = cron.new(command=command, comment=identificator)
+                cron_job.setall(expression)
+                cron.write()
 
             self.app.pop_screen()
 
@@ -98,3 +129,9 @@ class CronCreate(ModalScreen):
             label_desc.update("Invalid cron expression")
             label_desc.remove_class("success")
             label_desc.add_class("error")
+
+    def find_if_cronjob_exists(self, identificator: str, cmd: str):
+        for job in self.cron:
+            if job.comment == identificator and job.command == cmd:
+                return job
+        return None

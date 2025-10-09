@@ -1,4 +1,4 @@
-CronCreate {
+CronCreator {
     align: center middle;
 }
 
@@ -76,7 +76,7 @@ CronTabs {
     margin-bottom: 0;
 }
 
-#label_asterisk, #label_comma, #label_dash, #label_slash {
+#label_asterisk {
     color: $text-muted;
     text-style: italic;
     margin-bottom: 0;
@@ -92,6 +92,14 @@ CronTabs {
     text-style: bold;
     margin-top: 2;
 }
+
+#label4 {
+    color: $text;
+    text-style: bold;
+    margin-top: 2;
+    margin-bottom: 1;
+}
+
 
 #expression {
     width: 100%;
