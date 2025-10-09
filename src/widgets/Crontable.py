@@ -20,11 +20,12 @@ class CronTable(DataTable):
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
         self.add_columns(
-            "Identificator", "Expression", "Action", "Last Run", "Next Run", "Status"
+            "Identificator", "Expression", "Command", "Last Run", "Next Run", "Status"
         )
         self.load_crontabs()
 
     def load_crontabs(self):
+        print("load_crontabs: refresh triggered")
         self.clear()
 
         for job in self.cron:
@@ -46,6 +47,8 @@ class CronTable(DataTable):
             self.add_row(
                 identificator, expr, cmd, str(last_dt), str(next_dt), active_status
             )
+
+        self.refresh()
 
     def action_create_cronjob_keybind(self) -> None:
         """Handle create cronjob action by calling the main app's method."""

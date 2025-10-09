@@ -2,6 +2,11 @@ CronCreator {
     align: center middle;
 }
 
+CronDeletionConfirmation {
+    align: center middle;
+}
+
+
 #title {
   padding: 1;
   color: $primary;
