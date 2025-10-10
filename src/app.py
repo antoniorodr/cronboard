@@ -100,13 +100,17 @@ class CronBoard(App):
 
         self.push_screen(CronSSHModal(), check_connection)
 
-    def action_create_cronjob(self, cron: CronTab) -> None:
+    def action_create_cronjob(
+        self, cron: CronTab, remote=False, ssh_client=None
+    ) -> None:
         def check_save(save: bool | None) -> None:
             if save:
                 self.local_table.action_refresh()
                 self.ssh_table.action_refresh() if self.ssh_table else None
 
-        self.push_screen(CronCreator(cron), check_save)
+        self.push_screen(
+            CronCreator(cron, remote=remote, ssh_client=ssh_client), check_save
+        )
 
     def action_delete_cronjob(self, job) -> None:
         def check_delete(deleted: bool | None) -> None:
@@ -116,11 +120,18 @@ class CronBoard(App):
         self.push_screen(CronDeleteConfirmation(job), check_delete)
 
     def action_edit_cronjob(
-        self, cron: CronTab, identificator: str, expression: str, command: str
+        self,
+        cron: CronTab,
+        identificator: str,
+        expression: str,
+        command: str,
+        remote=False,
+        ssh_client=None,
     ) -> None:
         def check_save(save: bool | None) -> None:
             if save:
                 self.local_table.action_refresh()
+                self.ssh_table.action_refresh() if self.ssh_table else None
 
         self.push_screen(
             CronCreator(
@@ -128,6 +139,8 @@ class CronBoard(App):
                 identificator=identificator,
                 expression=expression,
                 command=command,
+                remote=remote,
+                ssh_client=ssh_client,
             ),
             check_save,
         )

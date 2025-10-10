@@ -8,12 +8,22 @@ from cron_descriptor import Options, ExpressionDescriptor
 
 
 class CronCreator(ModalScreen[bool]):
-    def __init__(self, cron, expression=None, command=None, identificator=None) -> None:
+    def __init__(
+        self,
+        cron,
+        expression=None,
+        command=None,
+        identificator=None,
+        remote=False,
+        ssh_client=None,
+    ) -> None:
         super().__init__()
         self.expression = expression
         self.command = command
         self.identificator = identificator
         self.cron: CronTab = cron
+        self.remote = remote
+        self.ssh_client = ssh_client
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -93,11 +103,11 @@ class CronCreator(ModalScreen[bool]):
             if job:
                 job.set_command(command)
                 job.setall(expression)
-                self.cron.write()
+                self.write_cron_changes()
             else:
                 cron_job = self.cron.new(command=command, comment=identificator)
                 cron_job.setall(expression)
-                self.cron.write()
+                self.write_cron_changes()
 
             self.dismiss(True)
 
@@ -128,6 +138,28 @@ class CronCreator(ModalScreen[bool]):
             label_desc.update("Invalid cron expression")
             label_desc.remove_class("success")
             label_desc.add_class("error")
+
+    def write_cron_changes(self):
+        """Write cron changes to appropriate destination (local or remote)"""
+        if self.remote and self.ssh_client:
+            # Write to remote server
+            try:
+                new_crontab_content = self.cron.render()
+                stdin, stdout, stderr = self.ssh_client.exec_command("crontab -")
+                stdin.write(new_crontab_content)
+                stdin.channel.shutdown_write()
+
+                exit_status = stdin.channel.recv_exit_status()
+                errors = stderr.read().decode().strip()
+
+                if errors or exit_status != 0:
+                    raise Exception(f"Failed to write remote crontab: {errors}")
+
+            except Exception as e:
+                print(f"❌ Error writing remote crontab: {e}")
+                raise
+        else:
+            self.cron.write()
 
     def find_if_cronjob_exists(self, identificator: str, cmd: str):
         for job in self.cron:
