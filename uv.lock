@@ -267,6 +267,7 @@ name = "cronboard"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "bcrypt" },
     { name = "cron-descriptor" },
     { name = "dt-croniter" },
     { name = "paramiko" },
@@ -279,6 +280,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "bcrypt", specifier = ">=5.0.0" },
     { name = "cron-descriptor", specifier = ">=2.0.6" },
     { name = "dt-croniter", specifier = ">=6.0.1" },
     { name = "paramiko", specifier = ">=4.0.0" },

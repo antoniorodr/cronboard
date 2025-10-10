@@ -13,6 +13,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
+  "bcrypt>=5.0.0",
   "cron-descriptor>=2.0.6",
   "dt-croniter>=6.0.1",
   "paramiko>=4.0.0",
@@ -35,3 +36,6 @@ package-dir = { "" = "src" }
 
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
+
+[tool.setuptools.package-data]
+"cronboard" = ["static/css/*.tcss"]

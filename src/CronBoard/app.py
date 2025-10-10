@@ -15,7 +15,7 @@ from cronboard_widgets.CronSSHModal import CronSSHModal
 class CronBoard(App):
     """A Textual App to manage cron jobs."""
 
-    BASE_DIR = Path(__file__).parent.parent
+    BASE_DIR = Path(__file__).resolve().parent
     CSS_PATH = BASE_DIR / "static" / "css" / "cronboard.tcss"
 
     BINDINGS = [
