@@ -4,12 +4,12 @@ import tomlkit
 from pathlib import Path
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Label, Tabs
-from widgets.CronTable import CronTable
+from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
-from widgets.CronTabs import CronTabs
-from widgets.CronCreator import CronCreator
-from widgets.CronDeleteConfirmation import CronDeleteConfirmation
-from widgets.CronSSHModal import CronSSHModal
+from cronboard_widgets.CronTabs import CronTabs
+from cronboard_widgets.CronCreator import CronCreator
+from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
+from cronboard_widgets.CronSSHModal import CronSSHModal
 
 
 class CronBoard(App):

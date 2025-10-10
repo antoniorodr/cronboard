@@ -3,8 +3,8 @@ from crontab import CronTab
 from textual.widgets import Button, Label, Input
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
-import cronexpr
 from cron_descriptor import Options, ExpressionDescriptor
+from datetime import datetime
 
 
 class CronCreator(ModalScreen[bool]):
@@ -96,8 +96,6 @@ class CronCreator(ModalScreen[bool]):
             return
 
         try:
-            cronexpr.next_fire(expression)
-
             job = self.find_if_cronjob_exists(identificator, command)
 
             if job:
@@ -111,7 +109,7 @@ class CronCreator(ModalScreen[bool]):
 
             self.dismiss(True)
 
-        except ValueError:
+        except (ValueError, KeyError):
             if not self.query("#error"):
                 error_label = Label(
                     "Invalid cron expression. Please try again.", id="error"

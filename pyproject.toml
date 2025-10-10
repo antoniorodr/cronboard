@@ -14,7 +14,7 @@ license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
   "cron-descriptor>=2.0.6",
-  "cronexpr>=0.30.0",
+  "dt-croniter>=6.0.1",
   "paramiko>=4.0.0",
   "pytest>=8.4.2",
   "python-crontab>=3.3.0",
@@ -26,10 +26,8 @@ dependencies = [
 [project.scripts]
 cronboard = "cronboard.app:main"
 
-
 [tool.setuptools]
 package-dir = { "" = "src" }
-packages = ["cronboard", "widgets"]
 
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]

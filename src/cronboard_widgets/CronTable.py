@@ -1,7 +1,7 @@
 from crontab import CronTab
 from textual.widgets import DataTable
-import cronexpr
 from textual.binding import Binding
+from datetime import datetime
 
 
 class CronTable(DataTable):
@@ -50,12 +50,13 @@ class CronTable(DataTable):
             identificator = job.comment if job.comment else "No ID"
             try:
                 active_status = "Active" if job.is_enabled() else "Paused"
+                schedule = job.schedule(date_from=datetime.now())
                 next_dt = (
-                    cronexpr.next_fire(expr).strftime("%d.%m.%Y at %H:%M")
+                    schedule.get_next().strftime("%d.%m.%Y at %H:%M")
                     if active_status == "Active"
                     else "Paused"
                 )
-                last_dt = cronexpr.prev_fire(expr).strftime("%d.%m.%Y at %H:%M")
+                last_dt = schedule.get_prev().strftime("%d.%m.%Y at %H:%M")
 
                 if active_status == "Inactive":
                     next_dt = "Stopped"
@@ -97,7 +98,9 @@ class CronTable(DataTable):
 
     def action_delete_cronjob_keybind(self, job) -> None:
         used_cron = self.ssh_cron if self.remote and self.ssh_client else self.cron
-        self.app.action_delete_cronjob(job, cron=used_cron, remote=self.remote, ssh_client=self.ssh_client)
+        self.app.action_delete_cronjob(
+            job, cron=used_cron, remote=self.remote, ssh_client=self.ssh_client
+        )
 
     def action_refresh(self) -> None:
         """Refresh the cronjob list."""

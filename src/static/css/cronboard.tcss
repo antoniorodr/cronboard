@@ -101,8 +101,9 @@ CronTabs {
     color: $text;
     text-style: bold;
     margin-top: 2;
-    margin-bottom: 1;
+    padding-top: 2;
 }
+
 
 
 #expression {

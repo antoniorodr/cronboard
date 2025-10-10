@@ -268,7 +268,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "cron-descriptor" },
-    { name = "cronexpr" },
+    { name = "dt-croniter" },
     { name = "paramiko" },
     { name = "pytest" },
     { name = "python-crontab" },
@@ -280,29 +280,13 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cron-descriptor", specifier = ">=2.0.6" },
-    { name = "cronexpr", specifier = ">=0.30.0" },
+    { name = "dt-croniter", specifier = ">=6.0.1" },
     { name = "paramiko", specifier = ">=4.0.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "python-crontab", specifier = ">=3.3.0" },
     { name = "textual", specifier = ">=6.2.1" },
     { name = "textual-dev", specifier = ">=1.7.0" },
     { name = "tomlkit", specifier = ">=0.13.3" },
-]
-
-[[package]]
-name = "cronexpr"
-version = "0.30.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/01/2a/72d9b939fa00a9e77c613e7d7cee361a81d9df2d036493a522517d083a46/cronexpr-0.30.0.tar.gz", hash = "sha256:994660fdf9195bc2456e69fa447fb06d8256cdfd7fe8829be82add10b9f3e9ac", size = 9350, upload-time = "2024-09-11T03:46:03.278Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/1b/a0a5ac3cc99268cda3a438ca9b55d12567180cc26d3191291b4343a8ee06/cronexpr-0.30.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:dc186d1a3b99cbaed6363c1ee79b5eeff724835cc4c12f39188b6db981681d1f", size = 59131, upload-time = "2024-09-11T03:45:19.649Z" },
-    { url = "https://files.pythonhosted.org/packages/d8/1f/27b43b778594d86c6b419ff4cd2b015c49c0ff204796b47e9626acdf1f87/cronexpr-0.30.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:da9db9656be179baa3b30f4484998faa8d7a9f491b467b4a620daba5ea29a2d0", size = 56335, upload-time = "2024-09-11T03:45:20.863Z" },
-    { url = "https://files.pythonhosted.org/packages/6c/7b/4249bb448829498c3e7783e66d188993c085b4294c8d5f9808071e163e60/cronexpr-0.30.0-cp313-cp313-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:a7038afad7d188ddc98caca3891640d556425f6c10de97de0da64dd7a9126974", size = 93819, upload-time = "2024-09-11T03:45:21.759Z" },
-    { url = "https://files.pythonhosted.org/packages/4b/71/1516e363a4b1386c0c35d716e0b798272415c1da215c9b2c6bdf0a99516e/cronexpr-0.30.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ac76e65edc8491048c4a86d1785f12952a80f1df1bdf6662114573856a2ea921", size = 88083, upload-time = "2024-09-11T03:45:22.642Z" },
-    { url = "https://files.pythonhosted.org/packages/05/81/8c00fbeda05eff7fb226563f5ae6beb57da122b4729d5bb8961e9c0eaae3/cronexpr-0.30.0-cp313-cp313-musllinux_1_2_i686.whl", hash = "sha256:99aefb61623915657fe29db28d0b407e2f748776d25acf31d4d45b2289947f8f", size = 1159363, upload-time = "2024-09-11T03:45:23.949Z" },
-    { url = "https://files.pythonhosted.org/packages/ae/a6/44d54958f03a147a64169f534733f38e056bdad967e4ca38188b49f1ec97/cronexpr-0.30.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:11ee708ff4da288a1e22757f4425e031809603efac6437fd33a4f91bff0993e9", size = 1062004, upload-time = "2024-09-11T03:45:25.815Z" },
-    { url = "https://files.pythonhosted.org/packages/bd/fa/c6cf80efef0e15e969c6aace48fcbee8c9bdfe51c14cb9a24f3a1f7e0a8d/cronexpr-0.30.0-cp313-cp313-win32.whl", hash = "sha256:591719b48ccf6c95b3aa784f3de9e0f9e8d720ed76d4ae52a39d94f173dd0413", size = 60132, upload-time = "2024-09-11T03:45:27.173Z" },
-    { url = "https://files.pythonhosted.org/packages/7b/74/721872a84b05e0a424ac24c2dce09571605d72c9b32947545bdaecbc43e5/cronexpr-0.30.0-cp313-cp313-win_amd64.whl", hash = "sha256:866aad7bd871bf9dec694f2b747861d3dc3681debc3bf2ef0bc78346418da574", size = 64461, upload-time = "2024-09-11T03:45:28.073Z" },
 ]
 
 [[package]]
@@ -359,6 +343,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/15/52/ea7e2b1910f547baed566c866fbb86de2402e501a89ecb4871ea7f169a81/cryptography-46.0.2-cp38-abi3-win32.whl", hash = "sha256:0b507c8e033307e37af61cb9f7159b416173bdf5b41d11c4df2e499a1d8e007c", size = 3036711, upload-time = "2025-10-01T00:28:47.096Z" },
     { url = "https://files.pythonhosted.org/packages/71/9e/171f40f9c70a873e73c2efcdbe91e1d4b1777a03398fa1c4af3c56a2477a/cryptography-46.0.2-cp38-abi3-win_amd64.whl", hash = "sha256:f9b2dc7668418fb6f221e4bf701f716e05e8eadb4f1988a2487b11aedf8abe62", size = 3500007, upload-time = "2025-10-01T00:28:48.967Z" },
     { url = "https://files.pythonhosted.org/packages/3e/7c/15ad426257615f9be8caf7f97990cf3dcbb5b8dd7ed7e0db581a1c4759dd/cryptography-46.0.2-cp38-abi3-win_arm64.whl", hash = "sha256:91447f2b17e83c9e0c89f133119d83f94ce6e0fb55dd47da0a959316e6e9cfa1", size = 2918153, upload-time = "2025-10-01T00:28:51.003Z" },
+]
+
+[[package]]
+name = "dt-croniter"
+version = "6.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+    { name = "pytz" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/de/8e/173c5cc010ab08e8e8b1528772b790f431757ce3e4c7fdae7b4c5fc35edd/dt-croniter-6.0.1.tar.gz", hash = "sha256:098a544670fa08afee3cc98499b9c5f0747846265a27cdce87ad5958806d4aa2", size = 67317, upload-time = "2025-01-24T15:45:21.703Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0d/a9/80541cebf3811e4eff10be420d9d5d04fad5d47444598d5d5e9898e48c3d/dt_croniter-6.0.1-py2.py3-none-any.whl", hash = "sha256:cc104d8921b7633e10c8c97b42b74252e1f57ce8645f8d30161ded9567eb6dae", size = 26382, upload-time = "2025-01-24T15:45:19.341Z" },
 ]
 
 [[package]]
@@ -869,6 +866,27 @@ wheels = [
 ]
 
 [[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432, upload-time = "2024-03-01T18:36:20.211Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", size = 229892, upload-time = "2024-03-01T18:36:18.57Z" },
+]
+
+[[package]]
+name = "pytz"
+version = "2025.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884, upload-time = "2025-03-25T02:25:00.538Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225, upload-time = "2025-03-25T02:24:58.468Z" },
+]
+
+[[package]]
 name = "rich"
 version = "14.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -879,6 +897,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fe/75/af448d8e52bf1d8fa6a9d089ca6c07ff4453d86c65c145d0a300bb073b9b/rich-14.1.0.tar.gz", hash = "sha256:e497a48b844b0320d45007cdebfeaeed8db2a4f4bcf49f15e455cfc4af11eaa8", size = 224441, upload-time = "2025-07-25T07:32:58.125Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e3/30/3c4d035596d3cf444529e0b2953ad0466f6049528a879d27534700580395/rich-14.1.0-py3-none-any.whl", hash = "sha256:536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f", size = 243368, upload-time = "2025-07-25T07:32:56.73Z" },
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
 ]
 
 [[package]]
