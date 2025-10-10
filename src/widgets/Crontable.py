@@ -13,7 +13,7 @@ class CronTable(DataTable):
         Binding("c", "create_cronjob_keybind", "Create"),
         Binding("D", "delete_cronjob", "Delete"),
         Binding("r", "refresh", "Refresh"),
-        Binding("d", "deactivate_cronjob", "Deactivate"),
+        Binding("p", "pause_cronjob", "Pause Toggle"),
         Binding("e", "edit_cronjob", "Edit"),
     ]
 
@@ -29,39 +29,42 @@ class CronTable(DataTable):
         )
         self.load_crontabs()
 
+    def parse_cron(self, cron):
+        for job in cron:
+            expr = job.slices.render()
+            cmd = job.command
+            identificator = job.comment if job.comment else "No ID"
+            try:
+                active_status = "Active" if job.is_enabled() else "Paused"
+                next_dt = (
+                    cronexpr.next_fire(expr).strftime("%d.%m.%Y at %H:%M")
+                    if active_status == "Active"
+                    else "Paused"
+                )
+                last_dt = cronexpr.prev_fire(expr).strftime("%d.%m.%Y at %H:%M")
+
+                if active_status == "Inactive":
+                    next_dt = "Stopped"
+
+            except ValueError as e:
+                next_dt = f"ERR: {e}"
+                last_dt = f"ERR: {e}"
+                active_status = "Inactive"
+            self.add_row(
+                identificator, expr, cmd, str(last_dt), str(next_dt), active_status
+            )
+
     def load_crontabs(self):
         self.clear()
 
         if self.remote and self.ssh_client:
             stdin, stdout, stderr = self.ssh_client.exec_command("crontab -l")
             crontab_content = stdout.read().decode()
-            for line in crontab_content.splitlines():
-                if not line.strip() or line.strip().startswith("#"):
-                    continue
-                parts = line.split()
-                expr = " ".join(parts[:5])
-                cmd = " ".join(parts[5:])
-                self.add_row(expr, cmd)
+            cron = CronTab(tab=crontab_content)
+            self.parse_cron(cron)
+
         else:
-            for job in self.cron:
-                expr = job.slices.render()
-                cmd = job.command
-                identificator = job.comment if job.comment else "No ID"
-                try:
-                    next_dt = cronexpr.next_fire(expr).strftime("%d.%m.%Y at %H:%M")
-                    last_dt = cronexpr.prev_fire(expr).strftime("%d.%m.%Y at %H:%M")
-                    active_status = "Active" if job.is_enabled() else "Inactive"
-
-                    if active_status == "Inactive":
-                        next_dt = "Stopped"
-
-                except ValueError as e:
-                    next_dt = f"ERR: {e}"
-                    last_dt = f"ERR: {e}"
-                    active_status = "Inactive"
-                self.add_row(
-                    identificator, expr, cmd, str(last_dt), str(next_dt), active_status
-                )
+            self.parse_cron(self.cron)
 
     def action_create_cronjob_keybind(self) -> None:
         """Handle create cronjob action by calling the main app's method."""
@@ -80,7 +83,7 @@ class CronTable(DataTable):
         self.cron = CronTab(user=True)
         self.load_crontabs()
 
-    def action_deactivate_cronjob(self) -> None:
+    def action_pause_cronjob(self) -> None:
         if self.cursor_row is None:
             return
 
