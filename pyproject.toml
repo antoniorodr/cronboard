@@ -23,6 +23,10 @@ dependencies = [
   "tomlkit>=0.13.3",
 ]
 
+[project.urls]
+Repository = "https://github.com/antoniorodr/cronboard"
+Issues = "https://github.com/antoniorodr/cronboard/issues"
+
 [project.scripts]
 cronboard = "cronboard.app:main"
 

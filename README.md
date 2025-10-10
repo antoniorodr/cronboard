@@ -57,7 +57,7 @@ The following tools were used in this project:
 
 - [Textual](https://textual.textualize.io)
 - [Python crontab](https://pypi.org/project/python-crontab/)
-- [Pycronexpr](https://github.com/CodyRay/pycronexpr)
+- [Paramiko](https://github.com/paramiko/paramiko)
 - [Cron descriptor](https://github.com/Salamek/cron-descriptor)
 
 ## :white_check_mark: Requirements
@@ -80,10 +80,11 @@ cd cronboard
 pip install .
 ```
 
-#### Installation using [uv](https://docs.astral.sh/uv/)
+#### Homebrew Installation
 
 ```bash
-uv tool install git+https://github.com/antoniorodr/cronboard
+brew tap antoniorodr/cronboard
+brew install antoniorodr/cronboard/cronboard
 ```
 
 ## :memo: License
