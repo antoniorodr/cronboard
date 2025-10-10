@@ -5,6 +5,7 @@ from widgets.CronTable import CronTable
 from textual.containers import Container
 from widgets.CronTabs import CronTabs
 from widgets.CronCreator import CronCreator
+from widgets.CronDeleteConfirmation import CronDeleteConfirmation
 
 
 class CronBoard(App):
@@ -53,16 +54,32 @@ class CronBoard(App):
             self.local_table.display = False
             self.ssh.display = True
 
-    def action_create_cronjob_keybind(self) -> None:
-        self.push_screen(CronCreator())
+    def action_create_cronjob(self) -> None:
+        def check_save(save: bool | None) -> None:
+            if save:
+                self.local_table.action_refresh()
 
-    def action_edit_cronjob_keybind(
+        self.push_screen(CronCreator(), check_save)
+
+    def action_delete_cronjob(self, job) -> None:
+        def check_delete(deleted: bool | None) -> None:
+            if deleted:
+                self.local_table.action_refresh()
+
+        self.push_screen(CronDeleteConfirmation(job), check_delete)
+
+    def action_edit_cronjob(
         self, identificator: str, expression: str, command: str
     ) -> None:
+        def check_save(save: bool | None) -> None:
+            if save:
+                self.local_table.action_refresh()
+
         self.push_screen(
             CronCreator(
                 identificator=identificator, expression=expression, command=command
-            )
+            ),
+            check_save,
         )
 
     def get_version(self) -> str:

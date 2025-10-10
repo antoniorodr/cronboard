@@ -2,6 +2,7 @@ from crontab import CronTab
 from textual.widgets import DataTable
 import cronexpr
 from textual.binding import Binding
+from .CronDeleteConfirmation import CronDeleteConfirmation
 
 
 class CronTable(DataTable):
@@ -25,7 +26,6 @@ class CronTable(DataTable):
         self.load_crontabs()
 
     def load_crontabs(self):
-        print("load_crontabs: refresh triggered")
         self.clear()
 
         for job in self.cron:
@@ -48,16 +48,17 @@ class CronTable(DataTable):
                 identificator, expr, cmd, str(last_dt), str(next_dt), active_status
             )
 
-        self.refresh()
-
     def action_create_cronjob_keybind(self) -> None:
         """Handle create cronjob action by calling the main app's method."""
-        self.app.action_create_cronjob_keybind()
+        self.app.action_create_cronjob()
 
     def action_edit_cronjob_keybind(self, identificator, expression, command) -> None:
-        self.app.action_edit_cronjob_keybind(
+        self.app.action_edit_cronjob(
             identificator=identificator, expression=expression, command=command
         )
+
+    def action_delete_cronjob_keybind(self, job) -> None:
+        self.app.action_delete_cronjob(job)
 
     def action_refresh(self) -> None:
         """Refresh the cronjob list."""
@@ -116,9 +117,7 @@ class CronTable(DataTable):
         job_to_delete = self.find_if_cronjob_exists(identificator, cmd)
 
         if job_to_delete:
-            self.cron.remove(job_to_delete)
-            self.cron.write()
-            self.load_crontabs()
+            self.action_delete_cronjob_keybind(job_to_delete)
 
     def find_if_cronjob_exists(self, identificator: str, cmd: str):
         for job in self.cron:

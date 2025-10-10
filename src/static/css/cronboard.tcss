@@ -2,7 +2,7 @@ CronCreator {
     align: center middle;
 }
 
-CronDeletionConfirmation {
+CronDeleteConfirmation {
     align: center middle;
 }
 

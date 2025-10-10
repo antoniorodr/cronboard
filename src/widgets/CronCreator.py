@@ -7,7 +7,7 @@ import cronexpr
 from cron_descriptor import Options, ExpressionDescriptor
 
 
-class CronCreator(ModalScreen):
+class CronCreator(ModalScreen[bool]):
     def __init__(self, expression=None, command=None, identificator=None) -> None:
         super().__init__()
         self.expression = expression
@@ -69,7 +69,7 @@ class CronCreator(ModalScreen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id != "save":
-            self.app.pop_screen()
+            self.dismiss(False)
             return
 
         identificator_input = self.query_one("#identificator", Input)
@@ -100,7 +100,7 @@ class CronCreator(ModalScreen):
                 cron_job.setall(expression)
                 cron.write()
 
-            self.app.pop_screen()
+            self.dismiss(True)
 
         except ValueError:
             if not self.query("#error"):
