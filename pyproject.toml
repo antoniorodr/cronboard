@@ -20,6 +20,7 @@ dependencies = [
   "python-crontab>=3.3.0",
   "textual>=6.2.1",
   "textual-dev>=1.7.0",
+  "tomlkit>=0.13.3",
 ]
 
 [project.scripts]

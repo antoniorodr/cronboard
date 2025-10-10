@@ -1,3 +1,5 @@
+import tomllib
+import tomlkit
 from pathlib import Path
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Label, Tabs
@@ -6,6 +8,7 @@ from textual.containers import Container
 from widgets.CronTabs import CronTabs
 from widgets.CronCreator import CronCreator
 from widgets.CronDeleteConfirmation import CronDeleteConfirmation
+from widgets.CronSSHModal import CronSSHModal
 
 
 class CronBoard(App):
@@ -20,6 +23,7 @@ class CronBoard(App):
 
     def compose(self) -> ComposeResult:
         version = self.get_version()
+        self.config_path = Path.home() / ".config/cronboard/config.toml"
         yield Label(f"CronBoard v{version}", id="title")
         yield Footer()
         self.tabs = CronTabs("Local cronjobs", "SSH cronjobs")
@@ -28,31 +32,72 @@ class CronBoard(App):
         yield self.content_container
 
     def on_mount(self) -> None:
-        self.theme = "catppuccin-mocha"
-
+        config = self.load_config()
+        saved_theme = config.get("theme", "catppuccin-mocha")
+        self.theme = saved_theme
+        self.ssh_connected = False
+        self.ssh_client = None
+        self.ssh_table = None
         self.local_table = CronTable(id="local-crontable")
-        self.ssh = Label("SSH cronjobs view (not implemented)", id="ssh-placeholder")
-
         self.content_container.mount(self.local_table)
-        self.content_container.mount(self.ssh)
-
         self.local_table.display = True
-        self.ssh.display = False
+
+    def load_config(self):
+        if self.config_path.exists():
+            try:
+                with self.config_path.open("rb") as f:
+                    return tomllib.load(f)
+            except Exception as e:
+                print(f"Warning: Failed to load config: {e}")
+        return {}
+
+    def watch_theme(self, theme: str):
+        try:
+            self.config_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.config_path.open("w") as f:
+                f.write(tomlkit.dumps({"theme": theme}))
+        except Exception as e:
+            print(f"Warning: Failed to save theme: {e}")
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         tab_label = event.tab.label
         if tab_label == "Local cronjobs":
             self.show_tab_content(0)
         elif tab_label == "SSH cronjobs":
-            self.show_tab_content(1)
+            if not self.ssh_connected:
+
+                def on_ssh_connected(result):
+                    if result:
+                        self.ssh_client = result
+                        self.ssh_connected = True
+                        self.ssh_table = CronTable(
+                            remote=True, ssh_client=self.ssh_client, id="ssh-crontable"
+                        )
+                        self.content_container.mount(self.ssh_table)
+                        self.show_tab_content(1)
+                    else:
+                        self.ssh_connected = False
+
+                self.push_screen(CronSSHModal(), on_ssh_connected)
+            else:
+                self.show_tab_content(1)
 
     def show_tab_content(self, index: int) -> None:
         if index == 0:
             self.local_table.display = True
-            self.ssh.display = False
+            if self.ssh_table:
+                self.ssh_table.display = False
         elif index == 1:
             self.local_table.display = False
-            self.ssh.display = True
+            if self.ssh_table:
+                self.ssh_table.display = True
+
+    def action_ssh_connect(self) -> None:
+        def check_connection(connected: bool | None) -> None:
+            if connected:
+                self.ssh_connected = True
+
+        self.push_screen(CronSSHModal(), check_connection)
 
     def action_create_cronjob(self) -> None:
         def check_save(save: bool | None) -> None:

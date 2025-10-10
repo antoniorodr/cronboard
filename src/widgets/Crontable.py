@@ -2,7 +2,6 @@ from crontab import CronTab
 from textual.widgets import DataTable
 import cronexpr
 from textual.binding import Binding
-from .CronDeleteConfirmation import CronDeleteConfirmation
 
 
 class CronTable(DataTable):
@@ -18,6 +17,11 @@ class CronTable(DataTable):
         Binding("e", "edit_cronjob", "Edit"),
     ]
 
+    def __init__(self, remote=False, ssh_client=None, **kwargs):
+        super().__init__(**kwargs)
+        self.remote = remote
+        self.ssh_client = ssh_client
+
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
         self.add_columns(
@@ -28,25 +32,36 @@ class CronTable(DataTable):
     def load_crontabs(self):
         self.clear()
 
-        for job in self.cron:
-            expr = job.slices.render()
-            cmd = job.command
-            identificator = job.comment if job.comment else "No ID"
-            try:
-                next_dt = cronexpr.next_fire(expr).strftime("%d.%m.%Y at %H:%M")
-                last_dt = cronexpr.prev_fire(expr).strftime("%d.%m.%Y at %H:%M")
-                active_status = "Active" if job.is_enabled() else "Inactive"
+        if self.remote and self.ssh_client:
+            stdin, stdout, stderr = self.ssh_client.exec_command("crontab -l")
+            crontab_content = stdout.read().decode()
+            for line in crontab_content.splitlines():
+                if not line.strip() or line.strip().startswith("#"):
+                    continue
+                parts = line.split()
+                expr = " ".join(parts[:5])
+                cmd = " ".join(parts[5:])
+                self.add_row(expr, cmd)
+        else:
+            for job in self.cron:
+                expr = job.slices.render()
+                cmd = job.command
+                identificator = job.comment if job.comment else "No ID"
+                try:
+                    next_dt = cronexpr.next_fire(expr).strftime("%d.%m.%Y at %H:%M")
+                    last_dt = cronexpr.prev_fire(expr).strftime("%d.%m.%Y at %H:%M")
+                    active_status = "Active" if job.is_enabled() else "Inactive"
 
-                if active_status == "Inactive":
-                    next_dt = "Stopped"
+                    if active_status == "Inactive":
+                        next_dt = "Stopped"
 
-            except ValueError as e:
-                next_dt = f"ERR: {e}"
-                last_dt = f"ERR: {e}"
-                active_status = "Inactive"
-            self.add_row(
-                identificator, expr, cmd, str(last_dt), str(next_dt), active_status
-            )
+                except ValueError as e:
+                    next_dt = f"ERR: {e}"
+                    last_dt = f"ERR: {e}"
+                    active_status = "Inactive"
+                self.add_row(
+                    identificator, expr, cmd, str(last_dt), str(next_dt), active_status
+                )
 
     def action_create_cronjob_keybind(self) -> None:
         """Handle create cronjob action by calling the main app's method."""

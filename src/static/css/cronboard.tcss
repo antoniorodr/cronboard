@@ -1,11 +1,6 @@
-CronCreator {
+CronCreator, CronDeleteConfirmation, CronSSHModal {
     align: center middle;
 }
-
-CronDeleteConfirmation {
-    align: center middle;
-}
-
 
 #title {
   padding: 1;
@@ -62,6 +57,10 @@ CronTabs {
     text-align: center;
     width: 100%;
     margin-bottom: 1;
+}
+
+#hostname, #username, #password {
+  margin-bottom: 1;
 }
 
 #label1 {
