@@ -17,6 +17,7 @@ class CronSSHModal(ModalScreen):
                     placeholder="Hostname (e.g. localhost:2222)",
                     id="hostname",
                 ),
+                Label("AND", id="label_andor"),
                 Input(
                     placeholder="Username",
                     id="username",
@@ -24,6 +25,11 @@ class CronSSHModal(ModalScreen):
                 Input(
                     placeholder="Password",
                     id="password",
+                ),
+                Label("OR", id="label_or"),
+                Input(
+                    placeholder="Private Key (e.g. /home/user/.ssh/id_rsa)",
+                    id="privatekey",
                 ),
                 Horizontal(
                     Button("Connect", variant="primary", id="connect"),
@@ -44,6 +50,7 @@ class CronSSHModal(ModalScreen):
             host_info = self.query_one("#hostname", Input).value.strip()
             username = self.query_one("#username", Input).value.strip()
             password = self.query_one("#password", Input).value.strip()
+            privatkey_path = self.query_one("#privatekey", Input).value.strip()
 
             try:
                 hostname, port = host_info.split(":")
@@ -55,11 +62,22 @@ class CronSSHModal(ModalScreen):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
-                client.connect(
-                    hostname=hostname, port=port, username=username, password=password
-                )
-                stdin, stdout, stderr = client.exec_command("crontab -l")
-                crontab_content = stdout.read().decode()
+                if privatkey_path:
+                    private_key = paramiko.RSAKey.from_private_key_file(privatkey_path)
+                    client.connect(
+                        hostname=hostname,
+                        port=port,
+                        username="root",
+                        pkey=private_key,
+                    )
+                else:
+                    client.connect(
+                        hostname=hostname,
+                        port=port,
+                        username=username,
+                        password=password,
+                    )
+
                 self.dismiss(client)
             except paramiko.AuthenticationException:
                 print("❌ Authentication failed")

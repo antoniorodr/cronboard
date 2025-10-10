@@ -8,12 +8,12 @@ from cron_descriptor import Options, ExpressionDescriptor
 
 
 class CronCreator(ModalScreen[bool]):
-    def __init__(self, expression=None, command=None, identificator=None) -> None:
+    def __init__(self, cron, expression=None, command=None, identificator=None) -> None:
         super().__init__()
         self.expression = expression
         self.command = command
         self.identificator = identificator
-        self.cron = CronTab(user=True)
+        self.cron: CronTab = cron
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -88,17 +88,16 @@ class CronCreator(ModalScreen[bool]):
         try:
             cronexpr.next_fire(expression)
 
-            cron = self.cron
             job = self.find_if_cronjob_exists(identificator, command)
 
             if job:
                 job.set_command(command)
                 job.setall(expression)
-                cron.write()
+                self.cron.write()
             else:
-                cron_job = cron.new(command=command, comment=identificator)
+                cron_job = self.cron.new(command=command, comment=identificator)
                 cron_job.setall(expression)
-                cron.write()
+                self.cron.write()
 
             self.dismiss(True)
 

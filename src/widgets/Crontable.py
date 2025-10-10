@@ -27,6 +27,14 @@ class CronTable(DataTable):
         self.add_columns(
             "Identificator", "Expression", "Command", "Last Run", "Next Run", "Status"
         )
+        _, self.stdout, _ = (
+            self.ssh_client.exec_command("crontab -l")
+            if self.remote and self.ssh_client
+            else (None, None, None)
+        )
+        self.crontab_content = self.stdout.read().decode() if self.stdout else ""
+        self.ssh_cron: CronTab = CronTab(tab=self.crontab_content)
+
         self.load_crontabs()
 
     def parse_cron(self, cron):
@@ -58,17 +66,15 @@ class CronTable(DataTable):
         self.clear()
 
         if self.remote and self.ssh_client:
-            stdin, stdout, stderr = self.ssh_client.exec_command("crontab -l")
-            crontab_content = stdout.read().decode()
-            cron = CronTab(tab=crontab_content)
-            self.parse_cron(cron)
+            self.parse_cron(self.ssh_cron)
 
         else:
             self.parse_cron(self.cron)
 
     def action_create_cronjob_keybind(self) -> None:
         """Handle create cronjob action by calling the main app's method."""
-        self.app.action_create_cronjob()
+        used_cron = self.ssh_cron if self.remote and self.ssh_client else self.cron
+        self.app.action_create_cronjob(used_cron)
 
     def action_edit_cronjob_keybind(self, identificator, expression, command) -> None:
         self.app.action_edit_cronjob(
@@ -142,3 +148,20 @@ class CronTable(DataTable):
             if job.comment == identificator and job.command == cmd:
                 return job
         return None
+
+    def write_remote_crontab(self):
+        """Writes the current SSH cron table back to the remote server."""
+        if not (self.remote and self.ssh_client):
+            return
+
+        # Serialize current cron to string
+        new_crontab_content = self.ssh_cron.render()
+
+        # Upload to server via `crontab -`
+        stdin, stdout, stderr = self.ssh_client.exec_command("crontab -")
+        stdin.write(new_crontab_content)
+        stdin.channel.shutdown_write()
+
+        errors = stderr.read().decode().strip()
+        if errors:
+            print(f"❌ Failed to write remote crontab: {errors}")
