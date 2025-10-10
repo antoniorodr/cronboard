@@ -26,8 +26,10 @@ dependencies = [
 [project.scripts]
 cronboard = "cronboard.app:main"
 
+
 [tool.setuptools]
 package-dir = { "" = "src" }
+packages = ["cronboard", "widgets"]
 
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
