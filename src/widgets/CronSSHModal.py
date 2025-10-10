@@ -26,7 +26,7 @@ class CronSSHModal(ModalScreen):
                     placeholder="Password",
                     id="password",
                 ),
-                Label("OR", id="label_or"),
+                Label("OR (Not yet implemented)", id="label_or"),
                 Input(
                     placeholder="Private Key (e.g. /home/user/.ssh/id_rsa)",
                     id="privatekey",
@@ -41,6 +41,15 @@ class CronSSHModal(ModalScreen):
             id="dialog",
         )
 
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if self.query("#error"):
+            label_error = self.query_one("#error")
+            label_error.remove()
+
+        error_labels = self.query("#error")
+        for label in error_labels:
+            label.remove()
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
             self.dismiss(False)
@@ -51,18 +60,23 @@ class CronSSHModal(ModalScreen):
             username = self.query_one("#username", Input).value.strip()
             password = self.query_one("#password", Input).value.strip()
             privatkey_path = self.query_one("#privatekey", Input).value.strip()
+            content = self.query_one("#content", Vertical)
 
             try:
                 hostname, port = host_info.split(":")
                 port = int(port)
             except ValueError:
-                print("Invalid host format. Use host:port")
-                return
+                if not self.query("#error"):
+                    error_label = Label(
+                        "Invalid host format. Use host:port", id="error"
+                    )
+                    content.mount(error_label)
 
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
                 if privatkey_path:
+                    return
                     private_key = paramiko.RSAKey.from_private_key_file(privatkey_path)
                     client.connect(
                         hostname=hostname,
@@ -80,9 +94,13 @@ class CronSSHModal(ModalScreen):
 
                 self.dismiss(client)
             except paramiko.AuthenticationException:
-                print("❌ Authentication failed")
+                if not self.query("#error"):
+                    error_label = Label("Authentication failed", id="error")
+                    content.mount(error_label)
                 client.close()
 
             except Exception as e:
-                print(f"❌ SSH error: {e}")
+                if not self.query("#error"):
+                    error_label = Label("Authentication failed", id="error")
+                    content.mount(error_label)
                 client.close()
