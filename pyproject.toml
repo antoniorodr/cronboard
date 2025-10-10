@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cronboard = "app:main"
+cronboard = "cronboard.app:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
