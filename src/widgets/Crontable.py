@@ -96,7 +96,8 @@ class CronTable(DataTable):
         )
 
     def action_delete_cronjob_keybind(self, job) -> None:
-        self.app.action_delete_cronjob(job)
+        used_cron = self.ssh_cron if self.remote and self.ssh_client else self.cron
+        self.app.action_delete_cronjob(job, cron=used_cron, remote=self.remote, ssh_client=self.ssh_client)
 
     def action_refresh(self) -> None:
         """Refresh the cronjob list."""

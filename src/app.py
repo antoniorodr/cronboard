@@ -112,12 +112,13 @@ class CronBoard(App):
             CronCreator(cron, remote=remote, ssh_client=ssh_client), check_save
         )
 
-    def action_delete_cronjob(self, job) -> None:
+    def action_delete_cronjob(self, job, cron=None, remote=False, ssh_client=None) -> None:
         def check_delete(deleted: bool | None) -> None:
             if deleted:
                 self.local_table.action_refresh()
+                self.ssh_table.action_refresh() if self.ssh_table else None
 
-        self.push_screen(CronDeleteConfirmation(job), check_delete)
+        self.push_screen(CronDeleteConfirmation(job, cron=cron, remote=remote, ssh_client=ssh_client), check_delete)
 
     def action_edit_cronjob(
         self,

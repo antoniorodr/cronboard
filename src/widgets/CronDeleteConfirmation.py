@@ -6,10 +6,12 @@ from textual.screen import ModalScreen
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
-    def __init__(self, job) -> None:
+    def __init__(self, job, cron=None, remote=False, ssh_client=None) -> None:
         super().__init__()
         self.job = job
-        self.cron = CronTab(user=True)
+        self.cron = cron if cron else CronTab(user=True)
+        self.remote = remote
+        self.ssh_client = ssh_client
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -34,6 +36,40 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             return
 
         self.cron.remove(self.job)
-        self.cron.write()
+
+        if self.remote and self.ssh_client:
+            self.write_remote_crontab()
+        else:
+            self.cron.write()
 
         self.dismiss(True)
+
+    def write_remote_crontab(self):
+        """Writes the current SSH cron table back to the remote server."""
+        if not (self.remote and self.ssh_client and self.cron):
+            return False
+
+        try:
+            new_crontab_content = self.cron.render()
+
+            stdin, _, stderr = self.ssh_client.exec_command("crontab -")
+            stdin.write(new_crontab_content)
+            stdin.channel.shutdown_write()
+
+            exit_status = stdin.channel.recv_exit_status()
+            errors = stderr.read().decode().strip()
+
+            if errors:
+                print(f"❌ Failed to write remote crontab: {errors}")
+                return False
+
+            if exit_status != 0:
+                print(f"❌ Command failed with exit status: {exit_status}")
+                return False
+
+            print("✅ Remote crontab updated successfully")
+            return True
+
+        except Exception as e:
+            print(f"❌ Error writing remote crontab: {e}")
+            return False
