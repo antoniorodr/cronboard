@@ -96,6 +96,12 @@ brew tap antoniorodr/cronboard
 brew install antoniorodr/cronboard/cronboard
 ```
 
+#### Installation using [uv](https://docs.astral.sh/uv/)
+
+```bash
+uv tool install git+https://github.com/antoniorodr/cronboard
+```
+
 ## :bookmark_tabs: Getting Started
 
 One installed, you can run the application using the following command:
