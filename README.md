@@ -1,5 +1,5 @@
 <div align="center" id="top"> 
-  <img src="cronboard.png" alt="Cronboard" height=200 />
+  <img src="./.github/cronboard.png" alt="Cronboard" height=200 />
 
 &#xa0;
 
@@ -48,7 +48,12 @@ Cronboard is a terminal application that allows you to manage and schedule cronj
 
 ## :computer: Demo
 
-[![asciicast](https://asciinema.org/a/748165.svg)](https://asciinema.org/a/748165)
+<div align="center" id="top">
+  <img src="./.github/cronboard.gif" alt="lexy" />
+
+&#xa0;
+
+</div>
 
 ## :sparkles: Features
 
