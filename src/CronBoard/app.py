@@ -1,4 +1,5 @@
 import tomllib
+from importlib.metadata import version, PackageNotFoundError
 from crontab import CronTab
 import tomlkit
 from pathlib import Path
@@ -174,17 +175,11 @@ class CronBoard(App):
             check_save,
         )
 
-    def get_version(self) -> str:
-        pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
+    def get_version(self):
         try:
-            with pyproject_path.open("r") as f:
-                for line in f:
-                    if line.startswith("version"):
-                        return line.split("=")[1].strip().replace('"', "")
-        except FileNotFoundError:
-            print("Warning: pyproject.toml not found.")
-            return "Unknown version"
-        return "Unknown version"
+            return version("cronboard")
+        except PackageNotFoundError:
+            return "Unknown"
 
 
 def main():
