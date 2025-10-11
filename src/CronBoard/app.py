@@ -175,7 +175,7 @@ class CronBoard(App):
         )
 
     def get_version(self) -> str:
-        pyproject_path = Path(__file__).parent.parent.parent / "pyproject.toml"
+        pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
         try:
             with pyproject_path.open("r") as f:
                 for line in f:
