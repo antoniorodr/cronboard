@@ -3,7 +3,7 @@ from crontab import CronTab
 import tomlkit
 from pathlib import Path
 from textual.app import App, ComposeResult
-from textual.widgets import Footer, Label, Tabs
+from textual.widgets import Footer, Label, Tabs, Tab
 from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
@@ -28,7 +28,9 @@ class CronBoard(App):
         self.config_path = Path.home() / ".config/cronboard/config.toml"
         yield Label(f"CronBoard v{version}", id="title")
         yield Footer()
-        self.tabs = CronTabs("Local cronjobs", "SSH cronjobs")
+        self.tabs = CronTabs(
+            Tab("Local cronjobs", id="local"), Tab("SSH cronjobs"), id="ssh"
+        )
         yield self.tabs
         self.content_container = Container(id="tab-content")
         yield self.content_container
@@ -101,6 +103,24 @@ class CronBoard(App):
 
         self.push_screen(CronSSHModal(), check_connection)
 
+    def action_disconnect_ssh(self) -> None:
+        """Disconnect SSH connection and return to local cron tab."""
+        if self.ssh_client:
+            try:
+                self.ssh_client.close()
+            except Exception as e:
+                print(f"Warning: Error closing SSH connection: {e}")
+
+        self.ssh_client = None
+        self.ssh_connected = False
+
+        if self.ssh_table:
+            self.ssh_table.remove()
+            self.ssh_table = None
+
+        self.tabs.active = "local"
+        self.show_tab_content(0)
+
     def action_create_cronjob(
         self, cron: CronTab, remote=False, ssh_client=None
     ) -> None:
@@ -155,13 +175,14 @@ class CronBoard(App):
         )
 
     def get_version(self) -> str:
-        pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
+        pyproject_path = Path(__file__).parent.parent.parent / "pyproject.toml"
         try:
             with pyproject_path.open("r") as f:
                 for line in f:
                     if line.startswith("version"):
                         return line.split("=")[1].strip().replace('"', "")
         except FileNotFoundError:
+            print("Warning: pyproject.toml not found.")
             return "Unknown version"
         return "Unknown version"
 

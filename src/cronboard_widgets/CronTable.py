@@ -11,6 +11,7 @@ class CronTable(DataTable):
         Binding("j", "cursor_down", "Down"),
         Binding("k", "cursor_up", "Up"),
         Binding("c", "create_cronjob_keybind", "Create"),
+        Binding("d", "disconnect_ssh", "Disconnect SSH"),
         Binding("D", "delete_cronjob", "Delete"),
         Binding("r", "refresh", "Refresh"),
         Binding("p", "pause_cronjob", "Pause Toggle"),
@@ -185,6 +186,11 @@ class CronTable(DataTable):
             if job.comment == identificator and job.command == cmd:
                 return job
         return None
+
+    def action_disconnect_ssh(self) -> None:
+        """Disconnect SSH connection and return to local cron tab."""
+        if self.remote and self.ssh_client:
+            self.app.action_disconnect_ssh()
 
     def write_remote_crontab(self):
         """Writes the current SSH cron table back to the remote server."""

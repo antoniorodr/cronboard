@@ -25,6 +25,7 @@ class CronSSHModal(ModalScreen):
                 Input(
                     placeholder="Password",
                     id="password",
+                    password=True,
                 ),
                 Label("OR (Not yet implemented)", id="label_or"),
                 Input(
@@ -77,13 +78,13 @@ class CronSSHModal(ModalScreen):
             try:
                 if privatkey_path:
                     return
-                    private_key = paramiko.RSAKey.from_private_key_file(privatkey_path)
-                    client.connect(
-                        hostname=hostname,
-                        port=port,
-                        username="root",
-                        pkey=private_key,
-                    )
+                    # private_key = paramiko.RSAKey.from_private_key_file(privatkey_path)
+                    # client.connect(
+                    #     hostname=hostname,
+                    #     port=port,
+                    #     username="root",
+                    #     pkey=private_key,
+                    # )
                 else:
                     client.connect(
                         hostname=hostname,

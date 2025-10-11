@@ -1,30 +1,30 @@
 <div align="center" id="top"> 
-  <img src="src/cronboard/static/cronboard.png" alt="CronBoard" height=200 />
+  <img src="src/cronboard/static/cronboard.png" alt="Cronboard" height=200 />
 
 &#xa0;
 
 </div>
 
-<h1 align="center">CronBoard</h1>
+<h1 align="center">Cronboard</h1>
 
 <p align="center">
-  <img alt="Github top language" src="https://img.shields.io/github/languages/top/antoniorodr/CronBoard?color=56BEB8">
+  <img alt="Github top language" src="https://img.shields.io/github/languages/top/antoniorodr/Cronboard?color=56BEB8">
 
-  <img alt="Github language count" src="https://img.shields.io/github/languages/count/antoniorodr/CronBoard?color=56BEB8">
+  <img alt="Github language count" src="https://img.shields.io/github/languages/count/antoniorodr/Cronboard?color=56BEB8">
 
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/antoniorodr/CronBoard?color=56BEB8">
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/antoniorodr/Cronboard?color=56BEB8">
 
-  <img alt="License" src="https://img.shields.io/github/license/antoniorodr/CronBoard?color=56BEB8">
+  <img alt="License" src="https://img.shields.io/github/license/antoniorodr/Cronboard?color=56BEB8">
 
-  <img alt="Github issues" src="https://img.shields.io/github/issues/antoniorodr/CronBoard?color=56BEB8" />
+  <img alt="Github issues" src="https://img.shields.io/github/issues/antoniorodr/Cronboard?color=56BEB8" />
 
-  <img alt="Github forks" src="https://img.shields.io/github/forks/antoniorodr/CronBoard?color=56BEB8" />
+  <img alt="Github forks" src="https://img.shields.io/github/forks/antoniorodr/Cronboard?color=56BEB8" />
 
-  <img alt="Github stars" src="https://img.shields.io/github/stars/antoniorodr/CronBoard?color=56BEB8" /> 
+  <img alt="Github stars" src="https://img.shields.io/github/stars/antoniorodr/Cronboard?color=56BEB8" /> 
 </p>
 
 <h4 align="center">
-	🚧  CronBoard 🚀 Under construction...  🚧
+	🚧  Cronboard 🚀 Under construction...  🚧
 </h4>
 
 <hr>
@@ -43,13 +43,17 @@
 
 ## :dart: About
 
-CronBoard is a terminal application that allows you to manage and schedule cronjobs on local and remote servers (not yet implemented). With CronBoard, you can easily add, edit, and delete cronjobs, as well as view their status.
+Cronboard is a terminal application that allows you to manage and schedule cronjobs on local and remote servers (not yet implemented). With Cronboard, you can easily add, edit, and delete cronjobs, as well as view their status.
 
 ## :sparkles: Features
 
-:heavy_check_mark: Manage your cronjobs from the terminal;\
-:heavy_check_mark: Schedule tasks with ease;\
-:heavy_check_mark: Connect to multiple servers;\
+:heavy_check_mark: Check cron jobs;
+:heavy_check_mark: Create cron jobs with validation and human-readable feedback;
+:heavy_check_mark: Pause and resume cron jobs;
+:heavy_check_mark: Edit existing cron jobs;
+:heavy_check_mark: Delete cron jobs;
+:heavy_check_mark: View formatted last and next run times;
+:heavy_check_mark: Connect to servers using SSH;
 
 ## :rocket: Technologies
 
