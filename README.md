@@ -1,5 +1,5 @@
 <div align="center" id="top"> 
-  <img src="src/static/cronboard.png" alt="CronBoard" height=200 />
+  <img src="src/cronboard/static/cronboard.png" alt="CronBoard" height=200 />
 
 &#xa0;
 
