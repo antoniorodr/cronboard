@@ -17,20 +17,18 @@ class CronSSHModal(ModalScreen):
                     placeholder="Hostname (e.g. localhost:2222)",
                     id="hostname",
                 ),
-                Label("AND", id="label_andor"),
                 Input(
                     placeholder="Username",
                     id="username",
+                ),
+                Label(
+                    "Use password if you are not using SSH key",
+                    id="label_andor",
                 ),
                 Input(
                     placeholder="Password",
                     id="password",
                     password=True,
-                ),
-                Label("OR (Not yet implemented)", id="label_or"),
-                Input(
-                    placeholder="Private Key (e.g. /home/user/.ssh/id_rsa)",
-                    id="privatekey",
                 ),
                 Horizontal(
                     Button("Connect", variant="primary", id="connect"),
@@ -60,7 +58,6 @@ class CronSSHModal(ModalScreen):
             host_info = self.query_one("#hostname", Input).value.strip()
             username = self.query_one("#username", Input).value.strip()
             password = self.query_one("#password", Input).value.strip()
-            privatkey_path = self.query_one("#privatekey", Input).value.strip()
             content = self.query_one("#content", Vertical)
 
             try:
@@ -74,17 +71,16 @@ class CronSSHModal(ModalScreen):
                     content.mount(error_label)
 
             client = paramiko.SSHClient()
+            client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
             try:
-                if privatkey_path:
-                    return
-                    # private_key = paramiko.RSAKey.from_private_key_file(privatkey_path)
-                    # client.connect(
-                    #     hostname=hostname,
-                    #     port=port,
-                    #     username="root",
-                    #     pkey=private_key,
-                    # )
+                if not password:
+                    client.connect(
+                        hostname=hostname,
+                        port=port,
+                        username=username,
+                    )
                 else:
                     client.connect(
                         hostname=hostname,
@@ -98,10 +94,12 @@ class CronSSHModal(ModalScreen):
                 if not self.query("#error"):
                     error_label = Label("Authentication failed", id="error")
                     content.mount(error_label)
+                    print("SSH authentication failed")
                 client.close()
 
             except Exception as e:
                 if not self.query("#error"):
                     error_label = Label("Authentication failed", id="error")
                     content.mount(error_label)
+                    print(f"SSH connection error: {e}")
                 client.close()

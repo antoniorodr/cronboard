@@ -4,7 +4,8 @@ from textual.widgets import Button, Label, Input
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from cron_descriptor import Options, ExpressionDescriptor
-from datetime import datetime
+
+# TODO: Autocompletion using https://github.com/darrenburns/textual-autocomplete
 
 
 class CronCreator(ModalScreen[bool]):

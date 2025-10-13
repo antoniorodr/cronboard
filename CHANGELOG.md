@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 13.10.2025
+
+### Added
+
+- Connection to remote servers via SSH using SSH keys.
+
 ## [0.1.1] - 11.10.2025
 
 ### Added
@@ -23,5 +29,6 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.1.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.1
 [0.1.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.0

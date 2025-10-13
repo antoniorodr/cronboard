@@ -8,7 +8,7 @@ authors = [
   { name = "Antonio Rodriguez", email = "kontakt@antoniorodriguez.no" },
 ]
 description = "A terminal-based dashboard for managing cron jobs"
-version = "0.1.1"
+version = "0.1.2"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13"
@@ -21,6 +21,7 @@ dependencies = [
   "pytest>=8.4.2",
   "python-crontab>=3.3.0",
   "textual>=6.2.1",
+  "textual-autocomplete>=4.0.6",
   "textual-dev>=1.7.0",
   "tomlkit>=0.13.3",
 ]
