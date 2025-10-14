@@ -107,6 +107,12 @@ brew install antoniorodr/cronboard/cronboard
 uv tool install git+https://github.com/antoniorodr/cronboard
 ```
 
+#### AUR Installation
+
+```bash
+yay -S cronboard
+```
+
 ## :bookmark_tabs: Getting Started
 
 One installed, you can run the application using the following command:
