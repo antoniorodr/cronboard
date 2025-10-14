@@ -23,7 +23,6 @@ dependencies = [
   "textual>=6.2.1",
   "textual-autocomplete>=4.0.6",
   "textual-dev>=1.7.0",
-  "tomlkit>=0.13.3",
 ]
 
 [project.urls]
