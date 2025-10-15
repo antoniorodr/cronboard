@@ -2,7 +2,6 @@ from textual.app import ComposeResult
 from textual.widgets import Button, Label, Input
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
-import paramiko
 
 
 class CronSSHModal(ModalScreen):
@@ -10,7 +9,7 @@ class CronSSHModal(ModalScreen):
         yield Grid(
             Vertical(
                 Label(
-                    "Connect to a remote server via SSH to manage cron jobs",
+                    "Add a remote server into the tree view",
                     id="label1",
                 ),
                 Input(
@@ -31,7 +30,7 @@ class CronSSHModal(ModalScreen):
                     password=True,
                 ),
                 Horizontal(
-                    Button("Connect", variant="primary", id="connect"),
+                    Button("Add Server", variant="primary", id="add"),
                     Button("Cancel", variant="error", id="cancel"),
                     id="button-row",
                 ),
@@ -54,7 +53,7 @@ class CronSSHModal(ModalScreen):
             self.dismiss(False)
             return
 
-        if event.button.id == "connect":
+        if event.button.id == "add":
             host_info = self.query_one("#hostname", Input).value.strip()
             username = self.query_one("#username", Input).value.strip()
             password = self.query_one("#password", Input).value.strip()
@@ -70,36 +69,12 @@ class CronSSHModal(ModalScreen):
                     )
                     content.mount(error_label)
 
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            server = {
+                "hostname": hostname,
+                "port": port,
+                "username": username,
+                "password": password,
+                "ssh_key": True if not password else False,
+            }
 
-            try:
-                if not password:
-                    client.connect(
-                        hostname=hostname,
-                        port=port,
-                        username=username,
-                    )
-                else:
-                    client.connect(
-                        hostname=hostname,
-                        port=port,
-                        username=username,
-                        password=password,
-                    )
-
-                self.dismiss(client)
-            except paramiko.AuthenticationException:
-                if not self.query("#error"):
-                    error_label = Label("Authentication failed", id="error")
-                    content.mount(error_label)
-                    print("SSH authentication failed")
-                client.close()
-
-            except Exception as e:
-                if not self.query("#error"):
-                    error_label = Label("Authentication failed", id="error")
-                    content.mount(error_label)
-                    print(f"SSH connection error: {e}")
-                client.close()
+            self.dismiss(server)

@@ -2,9 +2,18 @@ CronCreator, CronDeleteConfirmation, CronSSHModal {
     align: center middle;
 }
 
+#servers-grid {
+  align: center middle;
+}
+
 #title {
   padding: 1;
   color: $primary;
+}
+
+#servers-tree {
+  width: 18%;
+  border: round $primary;
 }
 
 CronTable {
@@ -17,6 +26,14 @@ CronTable {
 CronTabs {
   padding-left: 1;
   padding-right: 1;
+}
+
+#disconnected {
+    width: 100%;
+    text-align: center;
+    color: $primary;
+    padding: 1;
+    text-style: bold;
 }
 
 #error {
@@ -103,7 +120,6 @@ CronTabs {
     margin-top: 2;
     padding-top: 2;
 }
-
 
 
 #expression {

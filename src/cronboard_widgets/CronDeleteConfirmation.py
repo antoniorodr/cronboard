@@ -6,20 +6,39 @@ from textual.screen import ModalScreen
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
-    def __init__(self, job, cron=None, remote=False, ssh_client=None) -> None:
+    def __init__(
+        self,
+        job=None,
+        cron=None,
+        remote=False,
+        ssh_client=None,
+        server=None,
+        message=None,
+    ) -> None:
         super().__init__()
+        self.server = server
         self.job = job
         self.cron = cron if cron else CronTab(user=True)
         self.remote = remote
         self.ssh_client = ssh_client
+        self.message = message
 
     def compose(self) -> ComposeResult:
+        if self.message:
+            display_message = self.message
+        elif self.server:
+            display_message = (
+                f"Are you sure you want to delete the server '{self.server}' ?"
+            )
+        elif self.job:
+            deletion = self.job.comment if self.job.comment else "this job"
+            display_message = f"Are you sure you want to delete '{deletion}' ?"
+        else:
+            display_message = "Are you sure you want to proceed with deletion?"
+
         yield Grid(
             Vertical(
-                Label(
-                    f"Are you sure you want to delete '{self.job.comment}' ?",
-                    id="label1",
-                ),
+                Label(display_message, id="label1", classes="message"),
                 Horizontal(
                     Button("Delete", variant="primary", id="delete"),
                     Button("Cancel", variant="error", id="cancel"),
@@ -35,13 +54,13 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             self.dismiss(False)
             return
 
-        self.cron.remove(self.job)
+        if self.job and self.cron:
+            self.cron.remove(self.job)
 
-        if self.remote and self.ssh_client:
-            self.write_remote_crontab()
-        else:
-            self.cron.write()
-
+            if self.remote and self.ssh_client:
+                self.write_remote_crontab()
+            else:
+                self.cron.write()
         self.dismiss(True)
 
     def write_remote_crontab(self):

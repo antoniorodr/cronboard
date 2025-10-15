@@ -11,7 +11,6 @@ class CronTable(DataTable):
         Binding("j", "cursor_down", "Down"),
         Binding("k", "cursor_up", "Up"),
         Binding("c", "create_cronjob_keybind", "Create"),
-        Binding("d", "disconnect_ssh", "Disconnect SSH"),
         Binding("D", "delete_cronjob", "Delete"),
         Binding("r", "refresh", "Refresh"),
         Binding("p", "pause_cronjob", "Pause Toggle"),

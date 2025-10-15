@@ -10,7 +10,7 @@ from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-from cronboard_widgets.CronSSHModal import CronSSHModal
+from cronboard_widgets.CronServers import CronServers
 
 
 class CronBoard(App):
@@ -30,7 +30,8 @@ class CronBoard(App):
         yield Label(f"CronBoard v{version}", id="title")
         yield Footer()
         self.tabs = CronTabs(
-            Tab("Local cronjobs", id="local"), Tab("SSH cronjobs"), id="ssh"
+            Tab("Local", id="local"),
+            Tab("Servers", id="servers"),
         )
         yield self.tabs
         self.content_container = Container(id="tab-content")
@@ -40,9 +41,7 @@ class CronBoard(App):
         config = self.load_config()
         saved_theme = config.get("theme", "catppuccin-mocha")
         self.theme = saved_theme
-        self.ssh_connected = False
-        self.ssh_client = None
-        self.ssh_table = None
+        self.servers = None
         self.local_table = CronTable(id="local-crontable")
         self.content_container.mount(self.local_table)
         self.local_table.display = True
@@ -66,61 +65,22 @@ class CronBoard(App):
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         tab_label = event.tab.label
-        if tab_label == "Local cronjobs":
+        if tab_label == "Local":
             self.show_tab_content(0)
-        elif tab_label == "SSH cronjobs":
-            if not self.ssh_connected:
-
-                def on_ssh_connected(result):
-                    if result:
-                        self.ssh_client = result
-                        self.ssh_connected = True
-                        self.ssh_table = CronTable(
-                            remote=True, ssh_client=self.ssh_client, id="ssh-crontable"
-                        )
-                        self.content_container.mount(self.ssh_table)
-                        self.show_tab_content(1)
-                    else:
-                        self.ssh_connected = False
-
-                self.push_screen(CronSSHModal(), on_ssh_connected)
-            else:
-                self.show_tab_content(1)
+        elif tab_label == "Servers":
+            self.show_tab_content(1)
 
     def show_tab_content(self, index: int) -> None:
         if index == 0:
             self.local_table.display = True
-            if self.ssh_table:
-                self.ssh_table.display = False
+            if self.servers:
+                self.servers.display = False
         elif index == 1:
+            if not self.servers:
+                self.servers = CronServers()
+                self.content_container.mount(self.servers)
             self.local_table.display = False
-            if self.ssh_table:
-                self.ssh_table.display = True
-
-    def action_ssh_connect(self) -> None:
-        def check_connection(connected: bool | None) -> None:
-            if connected:
-                self.ssh_connected = True
-
-        self.push_screen(CronSSHModal(), check_connection)
-
-    def action_disconnect_ssh(self) -> None:
-        """Disconnect SSH connection and return to local cron tab."""
-        if self.ssh_client:
-            try:
-                self.ssh_client.close()
-            except Exception as e:
-                print(f"Warning: Error closing SSH connection: {e}")
-
-        self.ssh_client = None
-        self.ssh_connected = False
-
-        if self.ssh_table:
-            self.ssh_table.remove()
-            self.ssh_table = None
-
-        self.tabs.active = "local"
-        self.show_tab_content(0)
+            self.servers.display = True
 
     def action_create_cronjob(
         self, cron: CronTab, remote=False, ssh_client=None
@@ -128,7 +88,12 @@ class CronBoard(App):
         def check_save(save: bool | None) -> None:
             if save:
                 self.local_table.action_refresh()
-                self.ssh_table.action_refresh() if self.ssh_table else None
+                if (
+                    self.servers
+                    and hasattr(self.servers, "current_cron_table")
+                    and self.servers.current_cron_table
+                ):
+                    self.servers.current_cron_table.action_refresh()
 
         self.push_screen(
             CronCreator(cron, remote=remote, ssh_client=ssh_client), check_save
@@ -140,11 +105,16 @@ class CronBoard(App):
         def check_delete(deleted: bool | None) -> None:
             if deleted:
                 self.local_table.action_refresh()
-                self.ssh_table.action_refresh() if self.ssh_table else None
+                if (
+                    self.servers
+                    and hasattr(self.servers, "current_cron_table")
+                    and self.servers.current_cron_table
+                ):
+                    self.servers.current_cron_table.action_refresh()
 
         self.push_screen(
             CronDeleteConfirmation(
-                job, cron=cron, remote=remote, ssh_client=ssh_client
+                job=job, cron=cron, remote=remote, ssh_client=ssh_client
             ),
             check_delete,
         )
@@ -161,7 +131,12 @@ class CronBoard(App):
         def check_save(save: bool | None) -> None:
             if save:
                 self.local_table.action_refresh()
-                self.ssh_table.action_refresh() if self.ssh_table else None
+                if (
+                    self.servers
+                    and hasattr(self.servers, "current_cron_table")
+                    and self.servers.current_cron_table
+                ):
+                    self.servers.current_cron_table.action_refresh()
 
         self.push_screen(
             CronCreator(

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 15.10.2025
+
+### Modified
+
+- Redesigned the SSH connection interface for better user experience.
+- Refactored codebase to make the new SSH connection interface possible.
+
+### Added
+
+- New `server bookmark` tab to manage and quickly connect to SSH servers.
+- Add and delete servers from the tree view.
+- Connect to a server by clicking `c` in the tree view after adding it.
+- Column view for visibility of the server cron jobs on the same tab.
+- Servers are saved in a `TOML` file located at `~/.config/cronboard/servers.toml`, with the password field encrypted.
+
 ## [0.1.2] - 13.10.2025
 
 ### Added
@@ -29,6 +44,7 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.2.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.0
 [0.1.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.1
 [0.1.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.0
