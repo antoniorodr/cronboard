@@ -10,7 +10,7 @@ license=('MIT')
 depends=('python>=3.13', 'python-bcrypt' 'python-cron-descriptor' 'python-croniter' 'python-dt-croniter' 'python-paramiko' 'python-pytest' 'python-crontab' 'python-textual' 'python-textual-autocomplete' 'python-textual-dev')
 makedepends=('git' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v${pkgver}.tar.gz")
-sha256sums=('8172c91638f557226ab015c6ea013ccd0b14b38264bab68b0a8a4eca2ac4c58e')
+sha256sums=('9e5b0be3ce0ea14f92d1fb16ef0f4e0a5bfbb8f8f0bbf3008123237bdaf508c3')
 
 build() {
   cd $pkgname-$pkgver || exit

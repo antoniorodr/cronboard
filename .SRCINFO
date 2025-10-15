@@ -21,7 +21,7 @@ pkgbase = cronboard
 	depends = python-textual
 	depends = python-textual-autocomplete
 	depends = python-textual-dev
-	source = cronboard-0.1.2.tar.gz::https://github.com/antoniorodr/Cronboard/archive/v0.1.2.tar.gz
-	sha256sums = 8172c91638f557226ab015c6ea013ccd0b14b38264bab68b0a8a4eca2ac4c58e
+	source = cronboard-0.2.0.tar.gz::https://github.com/antoniorodr/Cronboard/archive/v0.2.0.tar.gz
+	sha256sums = 9e5b0be3ce0ea14f92d1fb16ef0f4e0a5bfbb8f8f0bbf3008123237bdaf508c3
 
 pkgname = cronboard
