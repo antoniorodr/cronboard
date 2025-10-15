@@ -1,7 +1,7 @@
 # Maintainer: Antonio Rodriguez <kontakt@antoniorodriguez.no>
 
 pkgname=cronboard
-pkgver=0.1.2
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="A terminal-based dashboard for managing cron jobs"
 arch=('x86_64')
