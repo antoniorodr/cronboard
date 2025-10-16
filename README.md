@@ -125,6 +125,8 @@ That's it! You can now start using Cronboard to manage your cron jobs.
 
 Cronboard is equiped (thanks to [Textual](https://textual.textualize.io)) with a footer that shows you the available commands.
 
+When connecting to a remove server with a SSH key, Cronboard will look for the `known_hosts` file in the default location (`~/.ssh/known_hosts`).
+
 ## :memo: License
 
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
