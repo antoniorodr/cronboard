@@ -14,10 +14,9 @@ pkgbase = cronboard
 	depends = python-bcrypt
 	depends = python-cron-descriptor
 	depends = python-croniter
-	depends = python-dt-croniter
 	depends = python-paramiko
 	depends = python-pytest
-	depends = python-crontab
+	depends = python-python-crontab
 	depends = python-textual
 	depends = python-textual-autocomplete
 	depends = python-textual-dev
@@ -26,3 +25,5 @@ pkgbase = cronboard
 	sha256sums = f9d965cc916aa3d34f09f114a7512a95e7884bcad63ccafad5f7a94def7db83d
 
 pkgname = cronboard
+
+

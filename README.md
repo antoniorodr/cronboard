@@ -63,7 +63,7 @@ Cronboard is a terminal application that allows you to manage and schedule cronj
 :heavy_check_mark: Edit existing cron jobs\
 :heavy_check_mark: Delete cron jobs\
 :heavy_check_mark: View formatted last and next run times\
-:heavy_check_mark: Accepts `special` strings like `@daily`, `@yearly`, `@monthly`, etc.\
+:heavy_check_mark: Accepts `special strings` like `@daily`, `@yearly`, `@monthly`, etc.\
 :heavy_check_mark: Connect to servers using SSH, using password or SSH keys
 
 ## :rocket: Technologies
