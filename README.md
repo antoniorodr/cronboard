@@ -5,8 +5,6 @@
 
 </div>
 
-<h1 align="center">Cronboard</h1>
-
 <p align="center">
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/antoniorodr/Cronboard?color=56BEB8">
 
@@ -24,7 +22,7 @@
 </p>
 
 <h4 align="center">
-	🚧  Cronboard 🚀 Under construction...  🚧
+	🚧 Under developing...  🚧
 </h4>
 
 <hr>
