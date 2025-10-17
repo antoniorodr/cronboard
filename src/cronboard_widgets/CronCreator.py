@@ -32,7 +32,6 @@ class CronCreator(ModalScreen[bool]):
         ssh_client=None,
     ) -> None:
         super().__init__()
-        crontab.SPECIALS_CONVERSION = False
         self.expression = expression
         self.command = command
         self.identificator = identificator

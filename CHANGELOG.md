@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 17.10.2025
+
+### Changed
+
+- Cronboard will now keep the `special strings` as it is when writing back to the crontab, instead of converting them to their equivalent standard cron expression.
+
 ## [0.2.1] - 17.10.2025
 
 ### Added
@@ -54,6 +60,8 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.2.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.2
+[0.2.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.1
 [0.2.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.0
 [0.1.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.1.1
