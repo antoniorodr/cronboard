@@ -1,3 +1,4 @@
+import crontab
 from textual.app import ComposeResult
 from crontab import CronTab
 from textual.widgets import Button, Label, Input
@@ -5,7 +6,19 @@ from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from cron_descriptor import Options, ExpressionDescriptor
 
+
 # TODO: Autocompletion using https://github.com/darrenburns/textual-autocomplete
+
+CRON_ALIASES = {
+    "@reboot": None,
+    "@hourly": "0 * * * *",
+    "@daily": "0 0 * * *",
+    "@weekly": "0 0 * * 0",
+    "@monthly": "0 0 1 * *",
+    "@yearly": "0 0 1 1 *",
+    "@annually": "0 0 1 1 *",
+    "@midnight": "0 0 * * *",
+}
 
 
 class CronCreator(ModalScreen[bool]):
@@ -19,6 +32,7 @@ class CronCreator(ModalScreen[bool]):
         ssh_client=None,
     ) -> None:
         super().__init__()
+        crontab.SPECIALS_CONVERSION = False
         self.expression = expression
         self.command = command
         self.identificator = identificator
@@ -125,6 +139,14 @@ class CronCreator(ModalScreen[bool]):
             return
 
         try:
+            if expr == "@reboot":
+                label_desc.update("Runs at system startup")
+                label_desc.remove_class("error")
+                label_desc.add_class("success")
+                return
+
+            expr = CRON_ALIASES.get(expr, expr)
+
             options = Options()
             options.locale_code = "en"
             options.use_24hour_time_format = True
@@ -141,10 +163,9 @@ class CronCreator(ModalScreen[bool]):
     def write_cron_changes(self):
         """Write cron changes to appropriate destination (local or remote)"""
         if self.remote and self.ssh_client:
-            # Write to remote server
             try:
                 new_crontab_content = self.cron.render()
-                stdin, stdout, stderr = self.ssh_client.exec_command("crontab -")
+                stdin, _, stderr = self.ssh_client.exec_command("crontab -")
                 stdin.write(new_crontab_content)
                 stdin.channel.shutdown_write()
 

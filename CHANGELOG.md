@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 17.10.2025
+
+### Added
+
+- Support for `special strings` in cron expressions, such as `@weekly`, `@yearly`, `@monthly`, as well as the descriptions.
+
+### Fixed
+
+- Fixed missing `tomlkit` dependency in the `prpyoject.toml` file. Closes #6.
+
 ## [0.2.0] - 15.10.2025
 
 ### Modified
