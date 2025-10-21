@@ -199,7 +199,7 @@ class CronTable(DataTable):
         try:
             new_crontab_content = self.ssh_cron.render()
 
-            stdin, stdout, stderr = self.ssh_client.exec_command("crontab -")
+            stdin, _, stderr = self.ssh_client.exec_command("crontab -")
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
 

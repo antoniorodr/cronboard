@@ -19,6 +19,7 @@ dependencies = [
   "dt-croniter>=6.0.1",
   "paramiko>=4.0.0",
   "pytest>=8.4.2",
+  "pytest-asyncio>=1.2.0",
   "python-crontab>=3.3.0",
   "textual>=6.2.1",
   "textual-autocomplete>=4.0.6",
