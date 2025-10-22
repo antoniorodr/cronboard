@@ -62,7 +62,8 @@ Cronboard is a terminal application that allows you to manage and schedule cronj
 :heavy_check_mark: Delete cron jobs\
 :heavy_check_mark: View formatted last and next run times\
 :heavy_check_mark: Accepts `special expressions` like `@daily`, `@yearly`, `@monthly`, etc.\
-:heavy_check_mark: Connect to servers using SSH, using password or SSH keys
+:heavy_check_mark: Connect to servers using SSH, using password or SSH keys \
+:heavy_check_mark: Choose another user to manage cron jobs if you have the permissions to do so (`sudo`)
 
 ## :rocket: Technologies
 
@@ -125,6 +126,8 @@ That's it! You can now start using Cronboard to manage your cron jobs.
 Cronboard is equiped (thanks to [Textual](https://textual.textualize.io)) with a footer that shows you the available commands.
 
 When connecting to a remove server with a SSH key, Cronboard will look for the `known_hosts` file in the default location (`~/.ssh/known_hosts`).
+
+If you choose to manage cron jobs for another user, make sure you have the necessary permissions to do so. This means you will not able to do it if you are not a `sudoer`.
 
 ## :memo: License
 
