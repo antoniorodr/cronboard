@@ -60,7 +60,7 @@ All participation is governed by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Testing
 
-This project uses [pytest](https://docs.pytest.org/en/stable/) for testing. To run the tests:
+This project uses [pytest](https://docs.pytest.org/en/stable/) and [pytest-asyncio](https://pytest-asyncio.readthedocs.io/en/stable/) for testing. To run the tests:
 
 ```bash
 pytest
@@ -70,12 +70,14 @@ To install this tool, run:
 
 ```bash
 uv pip install pytest
+uv pip install pytest-asyncio
 ```
 
 or
 
 ```bash
 pip install pytest
+pip install pytest-asyncio
 ```
 
 ## Commit Style
