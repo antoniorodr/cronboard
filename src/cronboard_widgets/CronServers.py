@@ -46,7 +46,10 @@ class CronServers(Widget):
     def on_mount(self) -> None:
         servers_tree = self.query_one("#servers-tree", Tree)
         for server_id, server_info in self.servers.items():
-            servers_tree.root.add_leaf(f"{server_info['name']}", server_id)
+            servers_tree.root.add_leaf(
+                f"{server_info['name']}: {server_info.get('crontab_user', '')}",
+                server_id,
+            )
         servers_tree.refresh()
 
     def action_connect_server(self) -> None:
@@ -67,6 +70,7 @@ class CronServers(Widget):
             port = server_info["port"]
             username = server_info["username"]
             password = server_info["password"]
+            crontab_user = server_info.get("crontab_user")
 
             if server_info["ssh_key"]:
                 ssh_client.connect(hostname=host, port=port, username=username)
@@ -82,7 +86,7 @@ class CronServers(Widget):
                     pass
 
             self.current_ssh_client = ssh_client
-            self.show_cron_table_for_server(ssh_client, server_info)
+            self.show_cron_table_for_server(ssh_client, server_info, crontab_user)
 
             server_info["connected"] = True
             self.save_servers()
@@ -94,16 +98,20 @@ class CronServers(Widget):
         except Exception as e:
             self.notify(f"Connection error: {e}")
 
-    def show_cron_table_for_server(self, ssh_client, server_info) -> None:
+    def show_cron_table_for_server(self, ssh_client, server_info, crontab_user) -> None:
         if self.current_cron_table:
             self.current_cron_table.ssh_client = ssh_client
             self.current_cron_table.remote = True
+            self.current_cron_table.crontab_user = crontab_user
             self.current_cron_table.action_refresh()
             self.notify(f"Switched to {server_info['name']}")
             return
 
         self.current_cron_table = CronTable(
-            remote=True, ssh_client=ssh_client, id="remote-cron-table"
+            remote=True,
+            ssh_client=ssh_client,
+            id="remote-cron-table",
+            crontab_user=crontab_user,
         )
 
         container = self.query_one("#servers-grid", Grid)
@@ -150,29 +158,18 @@ class CronServers(Widget):
         self.save_servers()
 
     def load_servers(self) -> dict:
-        print(f"🔍 Looking for servers file: {self.servers_path}")
-        print(f"📁 File exists: {self.servers_path.exists()}")
-
         if self.servers_path.exists():
             try:
                 with self.servers_path.open("rb") as f:
                     loaded_servers = tomllib.load(f)
-                print(f"📊 Loaded {len(loaded_servers)} servers from file")
 
-                # ✅ Fix: Correct key name
                 for server_id, server_info in loaded_servers.items():
-                    print(f"🔧 Processing server: {server_id}")
                     if "encrypted_password" in server_info:
-                        encrypted_password = server_info.pop(
-                            "encrypted_password"
-                        )  # ✅ Fixed
+                        encrypted_password = server_info.pop("encrypted_password")
                         if encrypted_password:
                             try:
                                 server_info["password"] = decrypt_password(
                                     encrypted_password
-                                )
-                                print(
-                                    f"🔓 Successfully decrypted password for {server_id}"
                                 )
                             except Exception as e:
                                 print(
@@ -184,7 +181,9 @@ class CronServers(Widget):
                     elif "password" not in server_info:
                         server_info["password"] = None
 
-                print(f"✅ Successfully loaded {len(loaded_servers)} servers")
+                    if "crontab_user" not in server_info:
+                        server_info["crontab_user"] = None
+
                 return loaded_servers
             except Exception as e:
                 print(f"❌ Warning: Failed to load servers: {e}")
@@ -193,16 +192,13 @@ class CronServers(Widget):
         return {}
 
     def save_servers(self) -> None:
-        print(f"💾 Saving {len(self.servers)} servers to {self.servers_path}")
         try:
             self.servers_path.parent.mkdir(parents=True, exist_ok=True)
             toml_safe_servers = {}
             for server_id, server_info in self.servers.items():
-                print(f"📝 Processing server for save: {server_id}")
                 encrypted_password = ""
-                if server_info.get("password"):  # ✅ Added .get() for safety
+                if server_info.get("password"):
                     encrypted_password = encrypt_password(server_info["password"])
-                    print(f"🔒 Encrypted password for {server_id}")
 
                 toml_safe_servers[server_id] = {
                     "name": server_info["name"],
@@ -212,13 +208,15 @@ class CronServers(Widget):
                     "encrypted_password": encrypted_password,
                     "ssh_key": server_info["ssh_key"],
                     "connected": server_info["connected"],
+                    "crontab_user": server_info.get("crontab_user")
+                    if server_info.get("crontab_user")
+                    else server_info["username"],
                 }
 
             with self.servers_path.open("w", encoding="utf-8") as f:
                 tomlkit.dump(toml_safe_servers, f)
-            print(f"✅ Successfully saved {len(toml_safe_servers)} servers")
         except Exception as e:
-            print(f"❌ Error: Failed to save servers: {e}")
+            self.notify(f"❌ Error: Failed to save servers: {e}")
 
     def action_add_server(self) -> None:
         def on_server_added(result):
@@ -228,16 +226,25 @@ class CronServers(Widget):
                 port = result.get("port")
                 username = result.get("username")
                 password = result.get("password") if result.get("password") else None
-                self.add_server_to_tree(name, host, port, username, password)
+                crontab_user = result.get("crontab_user")
+                self.add_server_to_tree(
+                    name, host, port, username, password, crontab_user
+                )
 
         cron_ssh_modal = CronSSHModal()
         self.app.push_screen(cron_ssh_modal, on_server_added)
 
     def add_server_to_tree(
-        self, name: str, host: str, port: str, username: str, password: str | None
+        self,
+        name: str,
+        host: str,
+        port: str,
+        username: str,
+        password: str | None,
+        crontab_user: str | None = None,
     ) -> None:
         servers_tree = self.query_one("#servers-tree", Tree)
-        server_id = f"{username}@{host}"
+        server_id = f"{username}@{host}:{crontab_user}"
         if server_id not in self.servers:
             self.servers[server_id] = {
                 "name": name,
@@ -247,8 +254,11 @@ class CronServers(Widget):
                 "password": password,
                 "ssh_key": True if not password else False,
                 "connected": False,
+                "crontab_user": crontab_user,
             }
-            servers_tree.root.add_leaf(f"{name}", server_id)
+            servers_tree.root.add_leaf(
+                f"{name}: {crontab_user if crontab_user else username}", server_id
+            )
             servers_tree.refresh()
             self.save_servers()
 

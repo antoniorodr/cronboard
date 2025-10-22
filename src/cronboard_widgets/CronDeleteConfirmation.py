@@ -14,6 +14,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         ssh_client=None,
         server=None,
         message=None,
+        crontab_user=None,
     ) -> None:
         super().__init__()
         self.server = server
@@ -22,6 +23,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         self.remote = remote
         self.ssh_client = ssh_client
         self.message = message
+        self.crontab_user = crontab_user
 
     def compose(self) -> ComposeResult:
         if self.message:
@@ -71,7 +73,8 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         try:
             new_crontab_content = self.cron.render()
 
-            stdin, _, stderr = self.ssh_client.exec_command("crontab -")
+            crontab_cmd = f"crontab -u {self.crontab_user} -" if self.crontab_user else "crontab -"
+            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
 

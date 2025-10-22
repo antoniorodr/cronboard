@@ -17,10 +17,11 @@ class CronTable(DataTable):
         Binding("e", "edit_cronjob", "Edit"),
     ]
 
-    def __init__(self, remote=False, ssh_client=None, **kwargs):
+    def __init__(self, remote=False, ssh_client=None, crontab_user=None, **kwargs):
         super().__init__(**kwargs)
         self.remote = remote
         self.ssh_client = ssh_client
+        self.crontab_user = crontab_user
 
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
@@ -29,7 +30,12 @@ class CronTable(DataTable):
         )
 
         if self.remote and self.ssh_client:
-            _, stdout, _ = self.ssh_client.exec_command("crontab -l")
+            crontab_cmd = (
+                f"crontab -u {self.crontab_user} -l"
+                if self.crontab_user
+                else "crontab -l"
+            )
+            _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status = stdout.channel.recv_exit_status()
 
             if exit_status == 1:
@@ -82,7 +88,10 @@ class CronTable(DataTable):
         """Handle create cronjob action by calling the main app's method."""
         used_cron = self.ssh_cron if self.remote and self.ssh_client else self.cron
         self.app.action_create_cronjob(
-            used_cron, remote=self.remote, ssh_client=self.ssh_client
+            used_cron,
+            remote=self.remote,
+            ssh_client=self.ssh_client,
+            crontab_user=self.crontab_user,
         )
 
     def action_edit_cronjob_keybind(self, identificator, expression, command) -> None:
@@ -94,18 +103,28 @@ class CronTable(DataTable):
             command=command,
             remote=self.remote,
             ssh_client=self.ssh_client,
+            crontab_user=self.crontab_user,
         )
 
     def action_delete_cronjob_keybind(self, job) -> None:
         used_cron = self.ssh_cron if self.remote and self.ssh_client else self.cron
         self.app.action_delete_cronjob(
-            job, cron=used_cron, remote=self.remote, ssh_client=self.ssh_client
+            job,
+            cron=used_cron,
+            remote=self.remote,
+            ssh_client=self.ssh_client,
+            crontab_user=self.crontab_user,
         )
 
     def action_refresh(self) -> None:
         """Refresh the cronjob list."""
         if self.remote and self.ssh_client:
-            _, stdout, _ = self.ssh_client.exec_command("crontab -l")
+            crontab_cmd = (
+                f"crontab -u {self.crontab_user} -l"
+                if self.crontab_user
+                else "crontab -l"
+            )
+            _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status = stdout.channel.recv_exit_status()
 
             if exit_status == 1:
@@ -199,7 +218,12 @@ class CronTable(DataTable):
         try:
             new_crontab_content = self.ssh_cron.render()
 
-            stdin, _, stderr = self.ssh_client.exec_command("crontab -")
+            crontab_cmd = (
+                f"crontab -u {self.crontab_user} -"
+                if self.crontab_user
+                else "crontab -"
+            )
+            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
 

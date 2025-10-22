@@ -1,4 +1,3 @@
-import crontab
 from textual.app import ComposeResult
 from crontab import CronTab
 from textual.widgets import Button, Label, Input
@@ -30,6 +29,7 @@ class CronCreator(ModalScreen[bool]):
         identificator=None,
         remote=False,
         ssh_client=None,
+        crontab_user=None,
     ) -> None:
         super().__init__()
         self.expression = expression
@@ -38,6 +38,7 @@ class CronCreator(ModalScreen[bool]):
         self.cron: CronTab = cron
         self.remote = remote
         self.ssh_client = ssh_client
+        self.crontab_user = crontab_user
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -164,7 +165,12 @@ class CronCreator(ModalScreen[bool]):
         if self.remote and self.ssh_client:
             try:
                 new_crontab_content = self.cron.render()
-                stdin, _, stderr = self.ssh_client.exec_command("crontab -")
+                crontab_cmd = (
+                    f"crontab -u {self.crontab_user} -"
+                    if self.crontab_user
+                    else "crontab -"
+                )
+                stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
                 stdin.write(new_crontab_content)
                 stdin.channel.shutdown_write()
 
@@ -172,7 +178,7 @@ class CronCreator(ModalScreen[bool]):
                 errors = stderr.read().decode().strip()
 
                 if errors or exit_status != 0:
-                    raise Exception(f"Failed to write remote crontab: {errors}")
+                    self.notify(f"Failed to write remote crontab: {errors}")
 
             except Exception as e:
                 print(f"❌ Error writing remote crontab: {e}")

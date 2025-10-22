@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 22.10.2025
+
+### Added
+
+- Possibility to connect to remote servers via SSH with a user, but choosing another user (`crontab user`) to manage cron jobs from. To this, the user you login with must have `sudo` privileges.
+- Some tests to control the correct functioning of `Cronboard`.
+
+### Changed
+
+- Refactored some functions to improve code readability and maintainability.
+- How the server is displayed on the tree view, adding the `crontab user` for better identification.
+
+### Breaking Changes
+
+- The server bookmark format has changed to include the `crontab user` field. Old server bookmarks will maybe not work as expected.
+- The server file located in `~/.config/cronboard/servers.toml` will need to be updated to include the new `crontab user` field for each server. Another option is to delete the servers from the tree view and re-add them.
+
 ## [0.2.2] - 17.10.2025
 
 ### Changed
@@ -60,6 +77,7 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.3.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.0
 [0.2.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.2
 [0.2.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.1
 [0.2.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.0

@@ -29,6 +29,14 @@ class CronSSHModal(ModalScreen):
                     id="password",
                     password=True,
                 ),
+                Label(
+                    "Crontab user (optional, for root/sudo access)",
+                    id="label_crontab_user",
+                ),
+                Input(
+                    placeholder="Leave empty for current user",
+                    id="crontab_user",
+                ),
                 Horizontal(
                     Button("Add Server", variant="primary", id="add"),
                     Button("Cancel", variant="error", id="cancel"),
@@ -58,6 +66,7 @@ class CronSSHModal(ModalScreen):
             username = self.query_one("#username", Input).value.strip()
             password = self.query_one("#password", Input).value.strip()
             content = self.query_one("#content", Vertical)
+            crontab_user = self.query_one("#crontab_user", Input).value.strip()
 
             try:
                 hostname, port = host_info.split(":")
@@ -75,6 +84,7 @@ class CronSSHModal(ModalScreen):
                 "username": username,
                 "password": password,
                 "ssh_key": True if not password else False,
+                "crontab_user": crontab_user if crontab_user else None,
             }
 
             self.dismiss(server)
