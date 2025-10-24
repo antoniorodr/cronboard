@@ -64,7 +64,7 @@ class CronCreator(ModalScreen[bool]):
                     placeholder="e.g., python3 /usr/bin/python</path/to/script.py>",
                     id="command",
                 ),
-                Label("Enter a identificator", id="label4"),
+                Label("Enter an ID for the cron job", id="label4"),
                 Input(
                     value="" if self.identificator is None else self.identificator,
                     placeholder="e.g., backup-job-1",
@@ -106,7 +106,7 @@ class CronCreator(ModalScreen[bool]):
         content = self.query_one("#content", Vertical)
 
         if not identificator:
-            error_label = Label("Identificator cannot be empty.", id="error")
+            error_label = Label("ID cannot be empty.", id="error")
             content.mount(error_label)
             return
 

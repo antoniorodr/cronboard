@@ -2,6 +2,7 @@ from crontab import CronTab
 from textual.widgets import DataTable
 from textual.binding import Binding
 from datetime import datetime
+from rich.text import Text
 
 
 class CronTable(DataTable):
@@ -26,7 +27,7 @@ class CronTable(DataTable):
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
         self.add_columns(
-            "Identificator", "Expression", "Command", "Last Run", "Next Run", "Status"
+            "ID", "Expression", "Command", "Last Run", "Next Run", "Status"
         )
 
         if self.remote and self.ssh_client:
@@ -71,8 +72,16 @@ class CronTable(DataTable):
                 next_dt = f"ERR: {e}"
                 last_dt = f"ERR: {e}"
                 active_status = "Inactive"
+
+            if active_status == "Active":
+                status_text = Text(active_status, style="#B8E7B8")
+            elif active_status == "Paused":
+                status_text = Text(active_status, style="#FF6F61")
+            else:
+                status_text = Text(active_status, style="#F6BF00")
+
             self.add_row(
-                identificator, expr, cmd, str(last_dt), str(next_dt), active_status
+                identificator, expr, cmd, str(last_dt), str(next_dt), status_text
             )
 
     def load_crontabs(self):
@@ -143,20 +152,11 @@ class CronTable(DataTable):
 
         row = self.get_row_at(self.cursor_row)
         identificator = row[0]
-        expr = row[1]
         cmd = row[2]
 
         cron_to_use = self.ssh_cron if (self.remote and self.ssh_client) else self.cron
 
-        job_to_toggle = None
-        for job in cron_to_use:
-            if (
-                job.comment == identificator
-                and job.slices.render() == expr
-                and job.command == cmd
-            ):
-                job_to_toggle = job
-                break
+        job_to_toggle = self.find_if_cronjob_exists(identificator, cmd)
 
         if job_to_toggle:
             job_to_toggle.enable(
@@ -201,7 +201,12 @@ class CronTable(DataTable):
         cron_to_use = self.ssh_cron if (self.remote and self.ssh_client) else self.cron
 
         for job in cron_to_use:
-            if job.comment == identificator and job.command == cmd:
+            if (
+                job.comment == identificator
+                and job.command == cmd
+                or job.comment == ""
+                and job.command == cmd
+            ):
                 return job
         return None
 

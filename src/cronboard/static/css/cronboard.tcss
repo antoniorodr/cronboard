@@ -1,57 +1,104 @@
+* {
+    scrollbar-color: $foreground 50%;
+    scrollbar-color-hover: $primary 80%;
+    scrollbar-color-active: $primary;
+    scrollbar-background: $surface-darken-1;
+    scrollbar-background-hover: $surface-darken-1;
+    scrollbar-background-active: $surface-darken-1;
+}
+
 CronCreator, CronDeleteConfirmation, CronSSHModal {
     align: center middle;
 }
 
 #servers-grid {
-  align: center middle;
+    align: center middle;
 }
 
 #title {
-  padding: 1;
-  color: $primary;
+    padding: 1;
+    margin-left: 1;
+    color: $accent;
+    text-style: bold;
 }
 
 #servers-tree {
-  width: 18%;
-  border: round $primary;
+    width: 18%;
+    border: round $primary 50%;
+    
+    &:focus-within {
+        border: round $primary;
+    }
+    
+    & > .tree--cursor {
+        background: $primary 80%;
+        color: $text;
+    }
+    
+    & > .tree--highlight {
+        background: $primary-darken-2;
+    }
 }
 
 CronTable {
     align: center middle;
     height: auto;
     margin: 2;
-    border: round $primary;
+    border: round $primary 50%;
+    
+    &:focus-within {
+        border: round $primary;
+    }
+    
+    & > .datatable--header {
+        background: $surface;
+        color: $text;
+        text-style: bold;
+    }
+    
+    & > .datatable--header-hover {
+        background: $primary-lighten-1;
+    }
+    
+    & > .datatable--cursor {
+        background: $primary 40%;
+        color: $text;
+    }
+    
+    & > .datatable--hover {
+        background: $primary-darken-2;
+    }
 }
 
 CronTabs {
-  padding-left: 1;
-  padding-right: 1;
+    padding-left: 1;
+    padding-right: 1;
 }
 
 #disconnected {
     width: 100%;
     text-align: center;
-    color: $primary;
+    color: $accent;
     padding: 1;
     text-style: bold;
 }
 
 #error {
-  color: $error;
-  padding-top: 1;
+    color: $error;
+    padding-top: 1;
 }
 
 #label_desc {
-        margin-top: 1;
-    }
+    margin-top: 1;
+}
 
 .success {
-        color: $success;
-    }
+    color: $success;
+}
 
 .error {
-        color: $error;
-    }
+    color: $error;
+}
 
 #dialog {
     align: center middle;
@@ -77,7 +124,11 @@ CronTabs {
 }
 
 #hostname, #username, #password {
-  margin-bottom: 1;
+    margin-bottom: 1;
+    
+    &:focus {
+        border: tall $secondary;
+    }
 }
 
 #label1 {
@@ -91,7 +142,7 @@ CronTabs {
 }
 
 #label_special {
-    color: $accent;
+    color: $secondary;
     text-style: bold;
     margin-top: 1;
     margin-bottom: 0;
@@ -121,10 +172,13 @@ CronTabs {
     padding-top: 2;
 }
 
-
 #expression {
     width: 100%;
     margin-bottom: 1;
+    
+    &:focus {
+        border: tall $secondary;
+    }
 }
 
 #button-row {
@@ -137,3 +191,4 @@ CronTabs {
 #button-row Button {
     margin: 0 1;
 }
+

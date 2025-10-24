@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 24.10.2025
+
+### Changed
+
+- Color enhancements for better visibility and user experience.
+- Color change when the cron job is paused and active to improve differentiation.
+- Changes in the algorithm when pausing, resuming, deleting and editing cron jobs to take into account the cron jobs with "No ID" label.
+- Label "Identificator" changed to "ID" for better clarity and spacing.
+
 ## [0.3.0] - 22.10.2025
 
 ### Added
@@ -77,6 +86,7 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.3.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.1
 [0.3.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.0
 [0.2.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.2
 [0.2.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.1
