@@ -22,7 +22,7 @@ pkgbase = cronboard
 	depends = python-textual-dev
   depends = python-tomlkit
 	source = cronboard-0.3.1.tar.gz::https://github.com/antoniorodr/Cronboard/archive/v0.3.1.tar.gz
-	sha256sums = 
+	sha256sums = 0c9a7c63d021054fe35065976306e3cece5e8bbc6c9cfbf8bc6354f947aa01eb
 
 pkgname = cronboard
 
