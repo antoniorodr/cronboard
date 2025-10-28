@@ -40,6 +40,12 @@
 
 <br>
 
+<p align="center">
+  <a title="This tool is Tool of The Week on Terminal Trove, The $HOME of all things in the terminal" href="https://terminaltrove.com/">
+    <img src="https://cdn.terminaltrove.com/media/badges/tool_of_the_week/png/terminal_trove_tool_of_the_week_gold_transparent.png" alt="Terminal Trove Tool of The Week" width="300px" />
+  </a>
+</p>
+
 ## :dart: About
 
 Cronboard is a terminal application that allows you to manage and schedule cronjobs on local and remote servers. With Cronboard, you can easily add, edit, and delete cronjobs, as well as view their status.
