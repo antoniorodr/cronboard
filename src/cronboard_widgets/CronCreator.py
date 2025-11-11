@@ -11,14 +11,12 @@ from textual.cache import LRUCache
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual_autocomplete import (
-    AutoComplete,
     DropdownItem,
     PathAutoComplete,
     TargetState,
 )
 from textual_autocomplete._path_autocomplete import (
     PathDropdownItem,
-    default_path_input_sort_key,
 )
 from cron_descriptor import Options, ExpressionDescriptor
 

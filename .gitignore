@@ -12,10 +12,4 @@ wheels/
 .venv
 
 # dev
-*.db
-*.ini
-todo.md
 .env
-
-# mre for testing stuff
-mre.py
