@@ -6,11 +6,11 @@
 </div>
 
 <p align="center">
-  <img alt="Github top language" src="https://img.shields.io/github/languages/top/antoniorodr/Cronboard?color=56BEB8">
+  <img alt="Github top language" src="https://img.shields.io/github/languages/top/antoniorodr/cronboard?color=56BEB8">
 
   <img alt="Github language count" src="https://img.shields.io/github/languages/count/antoniorodr/Cronboard?color=56BEB8">
 
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/antoniorodr/Cronboard?color=56BEB8">
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/antoniorodr/cronboard?color=56BEB8">
 
   <img alt="License" src="https://img.shields.io/github/license/antoniorodr/Cronboard?color=56BEB8">
 
