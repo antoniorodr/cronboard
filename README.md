@@ -62,6 +62,7 @@ Cronboard is a terminal application that allows you to manage and schedule cronj
 ## :sparkles: Features
 
 :heavy_check_mark: Check cron jobs\
+:heavy_check_mark: Autocompletion for paths when creating or editing cron jobs\
 :heavy_check_mark: Create cron jobs with validation and human-readable feedback\
 :heavy_check_mark: Pause and resume cron jobs\
 :heavy_check_mark: Edit existing cron jobs\
@@ -134,6 +135,12 @@ Cronboard is equiped (thanks to [Textual](https://textual.textualize.io)) with a
 When connecting to a remove server with a SSH key, Cronboard will look for the `known_hosts` file in the default location (`~/.ssh/known_hosts`).
 
 If you choose to manage cron jobs for another user, make sure you have the necessary permissions to do so. This means you will not able to do it if you are not a `sudoer`.
+
+### Autocompletion
+
+The autocompletion feature for paths when creating or editing cron jobs is designed to help you quickly and easily enter file paths.
+
+The default starting point for the autocompletion is the home directory of the user you are managing cron jobs for. You can accept the autocompletion suggestions by pressing the `Tab` key.
 
 ## :memo: License
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 11.11.2025
+
+### Added
+
+- Autocompletion for the `command` field when creating or editing cron jobs, when typing a `PATH` which exists in the system. It closes #1. Merged PR #14. Thanks to @Zaloog for this!
+
+### Changed
+
+- Small change on the `pyproject.toml` file to avoid configuration errors when building the package. Merged PR #13. Thanks @micisse for reporting and solving this!
+
 ## [0.3.1] - 24.10.2025
 
 ### Changed
@@ -86,6 +96,7 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
+[0.4.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.1
 [0.3.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.1
 [0.3.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.0
 [0.2.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.2

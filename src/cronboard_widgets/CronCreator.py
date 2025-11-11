@@ -1,13 +1,8 @@
 import os
-from os import DirEntry
 from pathlib import Path
-from typing import Any, Callable
-
 from textual.app import ComposeResult
 from crontab import CronTab
 from textual.widgets import Button, Label, Input
-from textual.content import Content
-from textual.cache import LRUCache
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual_autocomplete import (
@@ -20,8 +15,6 @@ from textual_autocomplete._path_autocomplete import (
 )
 from cron_descriptor import Options, ExpressionDescriptor
 
-
-# TODO: Autocompletion using https://github.com/darrenburns/textual-autocomplete
 
 CRON_ALIASES = {
     "@reboot": None,
@@ -41,6 +34,7 @@ class CronAutoComplete(PathAutoComplete):
 
         This is called each time the input changes or the cursor position changes/
         """
+        home_path = Path.home()
         current_input_full = target_state.text[: target_state.cursor_position]
         # Hide Autocomplete when entering new command section
         if current_input_full.endswith(" "):
@@ -51,9 +45,9 @@ class CronAutoComplete(PathAutoComplete):
         if "/" in current_input:
             last_slash_index = current_input.rindex("/")
             path_segment = current_input[:last_slash_index] or "/"
-            directory = self.path / path_segment if path_segment != "/" else self.path
+            directory = home_path / path_segment if path_segment != "/" else self.path
         else:
-            directory = self.path
+            directory = home_path
 
         # Use the directory path as the cache key
         cache_key = str(directory)
