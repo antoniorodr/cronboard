@@ -1,0 +1,21 @@
+# python generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+*.coverage
+*.coverage*
+
+# venv
+.venv
+
+# dev
+*.db
+*.ini
+todo.md
+.env
+
+# mre for testing stuff
+mre.py
