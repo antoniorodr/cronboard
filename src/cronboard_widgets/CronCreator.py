@@ -10,8 +10,16 @@ from textual.content import Content
 from textual.cache import LRUCache
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
-from textual_autocomplete import AutoComplete, DropdownItem, PathAutoComplete, TargetState
-from textual_autocomplete._path_autocomplete import PathDropdownItem, default_path_input_sort_key
+from textual_autocomplete import (
+    AutoComplete,
+    DropdownItem,
+    PathAutoComplete,
+    TargetState,
+)
+from textual_autocomplete._path_autocomplete import (
+    PathDropdownItem,
+    default_path_input_sort_key,
+)
 from cron_descriptor import Options, ExpressionDescriptor
 
 
@@ -28,6 +36,7 @@ CRON_ALIASES = {
     "@midnight": "0 0 * * *",
 }
 
+
 class CronAutoComplete(PathAutoComplete):
     def get_candidates(self, target_state: TargetState) -> list[DropdownItem]:
         """Get the candidates for the current path segment.
@@ -40,7 +49,6 @@ class CronAutoComplete(PathAutoComplete):
             return []
         # Get the last segment of the current full input
         current_input = current_input_full.split()[-1] if current_input_full else ""
-
 
         if "/" in current_input:
             last_slash_index = current_input.rindex("/")
@@ -98,9 +106,10 @@ class CronAutoComplete(PathAutoComplete):
 
     def apply_completion(self, value: str, state: TargetState) -> None:
         """Apply the completion by replacing only the current path segment."""
+
         def get_new_path_string(path_input: str, cursor_position: int):
-        # There's a slash before the cursor, so we only want to replace
-        # the text after the last slash with the selected value
+            # There's a slash before the cursor, so we only want to replace
+            # the text after the last slash with the selected value
             try:
                 replace_start_index = path_input.rindex("/", 0, cursor_position)
             except ValueError:
@@ -123,32 +132,76 @@ class CronAutoComplete(PathAutoComplete):
 
         string_before = ""
         string_after = ""
-        first_split_index = 0
-        # Just 2 parts
+        # Exactly two parts to complete
         if len(current_input.split()) == 2:
             first_split_index = current_input.index(" ")
             # completing the first part
-            if cursor_position <= first_split_index+1:
+            if cursor_position <= first_split_index + 1:
                 string_to_replace = current_input[:first_split_index]
-                string_after = current_input[first_split_index+1:]
-                new_value, new_cursor_position = get_new_path_string(path_input=string_to_replace, cursor_position=cursor_position)
+                string_after = current_input[first_split_index + 1 :]
+                new_value, new_cursor_position = get_new_path_string(
+                    path_input=string_to_replace, cursor_position=cursor_position
+                )
             # completing the second part
             else:
                 string_before = current_input[:first_split_index]
-                string_to_replace = current_input[first_split_index+1:]
-                new_value, new_cursor_position = get_new_path_string(path_input=string_to_replace, cursor_position=cursor_position)
+                string_to_replace = current_input[first_split_index + 1 :]
+                new_value, new_cursor_position = get_new_path_string(
+                    path_input=string_to_replace, cursor_position=cursor_position
+                )
                 new_cursor_position += len(string_before) + 1
-        
-        # More than 2 parts
+
+        # More than two parts
         elif len(current_input.split()) > 2:
-            ...
-            #TODO
-        # Only 1 part to complete
+            if current_input.index(" ") >= cursor_position:
+                first_split_index = current_input.index(" ")
+            else:
+                first_split_index = current_input.rindex(" ", 0, cursor_position)
+
+            if current_input.rindex(" ") <= cursor_position:
+                last_split_index = current_input.rindex(" ")
+            else:
+                last_split_index = current_input.index(" ", cursor_position)
+            # completing the first part
+            if cursor_position <= first_split_index + 1:
+                string_to_replace = current_input[:first_split_index]
+                string_after = current_input[first_split_index + 1 :]
+                new_value, new_cursor_position = get_new_path_string(
+                    path_input=string_to_replace, cursor_position=cursor_position
+                )
+            # completing the last part
+            elif first_split_index + 1 < cursor_position < last_split_index + 1:
+                string_before = current_input[:first_split_index]
+                string_to_replace = current_input[
+                    first_split_index + 1 : last_split_index
+                ]
+                string_after = current_input[last_split_index:]
+                new_value, new_cursor_position = get_new_path_string(
+                    path_input=string_to_replace, cursor_position=cursor_position
+                )
+                new_cursor_position += len(string_before) + 1
+            # completing the last part
+            else:
+                string_before = current_input[:first_split_index]
+                string_to_replace = current_input[first_split_index + 1 :]
+                new_value, new_cursor_position = get_new_path_string(
+                    path_input=string_to_replace, cursor_position=cursor_position
+                )
+                new_cursor_position += len(string_before) + 1
+        # Only one part to complete
         else:
-            new_value, new_cursor_position = get_new_path_string(path_input=current_input, cursor_position=cursor_position)
+            new_value, new_cursor_position = get_new_path_string(
+                path_input=current_input, cursor_position=cursor_position
+            )
 
         with self.prevent(Input.Changed):
-            target.value = " ".join([part.strip() for part in [string_before, new_value, string_after] if part])
+            target.value = " ".join(
+                [
+                    part.strip()
+                    for part in [string_before, new_value, string_after]
+                    if part
+                ]
+            )
             target.cursor_position = new_cursor_position
 
     def post_completion(self) -> None:

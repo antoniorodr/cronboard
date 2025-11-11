@@ -73,7 +73,11 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         try:
             new_crontab_content = self.cron.render()
 
-            crontab_cmd = f"crontab -u {self.crontab_user} -" if self.crontab_user else "crontab -"
+            crontab_cmd = (
+                f"crontab -u {self.crontab_user} -"
+                if self.crontab_user
+                else "crontab -"
+            )
             stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
