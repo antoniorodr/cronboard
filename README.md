@@ -104,8 +104,7 @@ pip install .
 #### Homebrew Installation
 
 ```bash
-brew tap antoniorodr/cronboard
-brew install antoniorodr/cronboard/cronboard
+brew install cronboard
 ```
 
 #### Installation using [uv](https://docs.astral.sh/uv/)
