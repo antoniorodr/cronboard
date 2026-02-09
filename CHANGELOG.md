@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 09.02.2026
+
+Thanks to @it-education-md for this fix.
+
+### Fixed
+
+- Fixed a bug in **Add Server** where host-only input (without port) could raise an `UnboundLocalError`. Fixes #16.
+  - The parser now safely accepts both `host` and `host:port`
+  - Defaults to port **22** when no port is provided
+  - Validates port range and surfaces clear input errors instead of crashing
+
+### Tests
+
+- Added pytest coverage for server parsing in `src/test/cronboard_test.py`
+
 ## [0.4.0] - 11.11.2025
 
 ### Added

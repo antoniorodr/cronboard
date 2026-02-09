@@ -91,7 +91,7 @@ class CronAutoComplete(PathAutoComplete):
 
         if "/" in current_input:
             last_slash_index = current_input.rindex("/")
-            search_string = current_input[last_slash_index + 1 :]
+            search_string = current_input[last_slash_index + 1:]
             return search_string
         else:
             return current_input
@@ -130,14 +130,14 @@ class CronAutoComplete(PathAutoComplete):
             # completing the first part
             if cursor_position <= first_split_index + 1:
                 string_to_replace = current_input[:first_split_index]
-                string_after = current_input[first_split_index + 1 :]
+                string_after = current_input[first_split_index + 1:]
                 new_value, new_cursor_position = get_new_path_string(
                     path_input=string_to_replace, cursor_position=cursor_position
                 )
             # completing the second part
             else:
                 string_before = current_input[:first_split_index]
-                string_to_replace = current_input[first_split_index + 1 :]
+                string_to_replace = current_input[first_split_index + 1:]
                 new_value, new_cursor_position = get_new_path_string(
                     path_input=string_to_replace, cursor_position=cursor_position
                 )
@@ -157,7 +157,7 @@ class CronAutoComplete(PathAutoComplete):
             # completing the first part
             if cursor_position <= first_split_index + 1:
                 string_to_replace = current_input[:first_split_index]
-                string_after = current_input[first_split_index + 1 :]
+                string_after = current_input[first_split_index + 1:]
                 new_value, new_cursor_position = get_new_path_string(
                     path_input=string_to_replace, cursor_position=cursor_position
                 )
@@ -165,7 +165,7 @@ class CronAutoComplete(PathAutoComplete):
             elif first_split_index + 1 < cursor_position < last_split_index + 1:
                 string_before = current_input[:first_split_index]
                 string_to_replace = current_input[
-                    first_split_index + 1 : last_split_index
+                    first_split_index + 1: last_split_index
                 ]
                 string_after = current_input[last_split_index:]
                 new_value, new_cursor_position = get_new_path_string(
@@ -175,7 +175,7 @@ class CronAutoComplete(PathAutoComplete):
             # completing the last part
             else:
                 string_before = current_input[:first_split_index]
-                string_to_replace = current_input[first_split_index + 1 :]
+                string_to_replace = current_input[first_split_index + 1:]
                 new_value, new_cursor_position = get_new_path_string(
                     path_input=string_to_replace, cursor_position=cursor_position
                 )
