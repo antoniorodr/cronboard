@@ -5,6 +5,26 @@ from textual.screen import ModalScreen
 
 
 class CronSSHModal(ModalScreen):
+    @staticmethod
+    def _parse_host_info(host_info: str) -> tuple[str, int]:
+        host_info = host_info.strip()
+        if not host_info:
+            raise ValueError("Empty host")
+
+        if ":" in host_info:
+            hostname, port_str = host_info.rsplit(":", 1)
+            if not hostname or not port_str:
+                raise ValueError("Invalid host format")
+            try:
+                port = int(port_str)
+            except ValueError as exc:
+                raise ValueError("Invalid port") from exc
+            if port < 1 or port > 65535:
+                raise ValueError("Invalid port")
+            return hostname, port
+
+        return host_info, 22
+
     def compose(self) -> ComposeResult:
         yield Grid(
             Vertical(
@@ -13,7 +33,7 @@ class CronSSHModal(ModalScreen):
                     id="label1",
                 ),
                 Input(
-                    placeholder="Hostname (e.g. localhost:2222)",
+                    placeholder="Hostname (e.g. localhost or localhost:2222)",
                     id="hostname",
                 ),
                 Input(
@@ -69,14 +89,13 @@ class CronSSHModal(ModalScreen):
             crontab_user = self.query_one("#crontab_user", Input).value.strip()
 
             try:
-                hostname, port = host_info.split(":")
-                port = int(port)
-            except ValueError:
+                hostname, port = self._parse_host_info(host_info)
+            except ValueError as exc:
                 if not self.query("#error"):
-                    error_label = Label(
-                        "Invalid host format. Use host:port", id="error"
-                    )
+                    message = str(exc) if str(exc) else "Invalid host format"
+                    error_label = Label(message, id="error")
                     content.mount(error_label)
+                return
 
             server = {
                 "hostname": hostname,
