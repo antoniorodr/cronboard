@@ -111,7 +111,8 @@ Initial release with the following features:
 - Delete cron jobs
 - Check "last run" and "next run" times, in a formatted way
 
-[0.4.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.1
+[0.4.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.4.1
+[0.4.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.4.0
 [0.3.1]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.1
 [0.3.0]: https://github.com/antoniorodr/cronboard/releases/tag/v0.3.0
 [0.2.2]: https://github.com/antoniorodr/cronboard/releases/tag/v0.2.2
