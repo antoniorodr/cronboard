@@ -1,0 +1,14 @@
+on: [push]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: yesolutions/mirror-action@master
+        with:
+          REMOTE: "git@codeberg.org:antoniorodr/cronboard.git"
+          GIT_SSH_PRIVATE_KEY: ${{ secrets.CODEBERG_SSH_PRIVATE_KEY }}
+          GIT_SSH_NO_VERIFY_HOST: true
