@@ -50,6 +50,23 @@ class CronTable(DataTable):
 
         self.load_crontabs()
 
+    def check_action(
+            self, action: str, parameters: tuple[object, ...]
+        ) -> bool | None:
+        """Check if an action may run."""
+        is_empty = self.row_count == 0
+
+        if action in ("edit_cronjob", "delete_cronjob",
+                      "pause_cronjob", "cursor_up", "cursor_down", "cursor_left", "cursor_right"):
+            return not is_empty
+        return True
+
+    def on_key(self, event):
+        is_empty = self.row_count == 0
+        if event.key == "space":
+            self.notify(f"empty: {is_empty}")
+
+
     def parse_cron(self, cron):
         for job in cron:
             expr = job.slices.render()
@@ -145,6 +162,7 @@ class CronTable(DataTable):
         else:
             self.cron = CronTab(user=True)
         self.load_crontabs()
+        self.refresh_bindings()
 
     def action_pause_cronjob(self) -> None:
         if self.cursor_row is None:
