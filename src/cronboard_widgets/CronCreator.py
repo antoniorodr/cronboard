@@ -3,6 +3,7 @@ from pathlib import Path
 from textual.app import ComposeResult
 from crontab import CronTab
 from textual.widgets import Button, Label, Input
+from textual.binding import Binding
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual_autocomplete import (
@@ -202,6 +203,14 @@ class CronAutoComplete(PathAutoComplete):
 
 
 class CronCreator(ModalScreen[bool]):
+
+    BINDINGS = [
+        Binding(
+            key="escape",
+            action="close_modal",
+            description="Close"
+        )
+    ]
     def __init__(
         self,
         cron,
@@ -258,6 +267,9 @@ class CronCreator(ModalScreen[bool]):
                     Button("Cancel", variant="error", id="cancel"),
                     id="button-row",
                 )
+
+    async def action_close_modal(self):
+        await self.dismiss(False)
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id != "expression":
