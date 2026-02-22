@@ -1,11 +1,21 @@
 from textual.app import ComposeResult
 from crontab import CronTab
+from textual.binding import Binding
 from textual.widgets import Button, Label
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
+
+    BINDINGS = [
+        Binding(
+            key="escape",
+            action="close_modal",
+            description="Close"
+        )
+    ]
+
     def __init__(
         self,
         job=None,
@@ -50,6 +60,9 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             ),
             id="dialog",
         )
+
+    async def action_close_modal(self):
+        await self.dismiss(False)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id != "delete":
