@@ -38,8 +38,8 @@ class CronBoard(App):
         yield self.content_container
 
     def on_mount(self) -> None:
-        config = self.load_config()
-        saved_theme = config.get("theme", "catppuccin-mocha")
+        self._app_config = self.load_config()
+        saved_theme = self._app_config.get("theme", "catppuccin-mocha")
         self.theme = saved_theme
         self.servers = None
         self.local_table = CronTable(id="local-crontable")
@@ -77,7 +77,7 @@ class CronBoard(App):
                 self.servers.display = False
         elif index == 1:
             if not self.servers:
-                self.servers = CronServers()
+                self.servers = CronServers(config=getattr(self, "_app_config", {}))
                 self.content_container.mount(self.servers)
             self.local_table.display = False
             self.servers.display = True
