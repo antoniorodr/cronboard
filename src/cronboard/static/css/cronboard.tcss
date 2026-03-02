@@ -7,7 +7,8 @@
     scrollbar-background-active: $surface-darken-1;
 }
 
-CronCreator, CronDeleteConfirmation, CronSSHModal {
+CronCreator, CronDeleteConfirmation, CronSSHModal,
+CronHostKeyConfirm, CronHostKeyChanged {
     align: center middle;
 }
 
@@ -190,5 +191,20 @@ CronTabs {
 
 #button-row Button {
     margin: 0 1;
+}
+
+#label_fp, #label_expected, #label_received {
+    color: $text-muted;
+}
+
+#label_hint {
+    color: $warning;
+    text-align: center;
+    width: 100%;
+    margin-top: 1;
+}
+
+#label_host, #label_type {
+    color: $text-muted;
 }
 

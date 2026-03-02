@@ -1,17 +1,26 @@
-from textual.app import ComposeResult
-from textual.containers import Horizontal, Grid
-from textual.widget import Widget
-from textual.widgets import Label, Tree
-from cronboard_widgets.CronTree import CronTree
-from textual.binding import Binding
-from cronboard_widgets.CronSSHModal import CronSSHModal
-from cronboard_widgets.CronTable import CronTable
-from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-import paramiko
+import base64
+import hashlib
+import socket
 from pathlib import Path
+
+import paramiko
 import tomllib
 import tomlkit
+from textual.app import ComposeResult
+from textual.binding import Binding
+from textual.containers import Grid, Horizontal
+from textual.widget import Widget
+from textual.widgets import Label, Tree
+
 from cronboard_encryption.CronEncrypt import decrypt_password, encrypt_password
+from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
+from cronboard_widgets.CronHostKeyChanged import CronHostKeyChanged
+from cronboard_widgets.CronHostKeyConfirm import CronHostKeyConfirm
+from cronboard_widgets.CronSSHModal import CronSSHModal
+from cronboard_widgets.CronTable import CronTable
+from cronboard_widgets.CronTree import CronTree
+
+CRONBOARD_KNOWN_HOSTS = Path.home() / ".config/cronboard/known_hosts"
 
 
 class CronServers(Widget):
@@ -22,12 +31,54 @@ class CronServers(Widget):
         Binding("d", "disconnect_server", "Disconnect Server"),
     ]
 
-    def __init__(self) -> None:
+    def __init__(self, config: dict | None = None) -> None:
         super().__init__()
+        self.config = config or {}
         self.servers_path = Path.home() / ".config/cronboard/servers.toml"
+        self.known_hosts_path = CRONBOARD_KNOWN_HOSTS
         self.servers = self.load_servers()
         self.current_ssh_client = None
         self.current_cron_table = None
+
+    # ------------------------------------------------------------------ #
+    # Host-key helpers
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def format_fingerprint(key: paramiko.PKey) -> str:
+        """Return a human-readable SHA-256 fingerprint for *key*."""
+        digest = hashlib.sha256(key.asbytes()).digest()
+        b64 = base64.b64encode(digest).decode("ascii").rstrip("=")
+        return f"SHA256:{b64}"
+
+    def _load_or_init_host_keys(self) -> paramiko.HostKeys:
+        """Load Cronboard's known_hosts file, creating it first if absent."""
+        self.known_hosts_path.parent.mkdir(parents=True, exist_ok=True)
+        if self.known_hosts_path.exists():
+            return paramiko.HostKeys(str(self.known_hosts_path))
+        host_keys = paramiko.HostKeys()
+        host_keys.save(str(self.known_hosts_path))
+        return host_keys
+
+    def _build_ssh_client(self) -> paramiko.SSHClient:
+        """Return a configured SSHClient with the correct host-key policy."""
+        client = paramiko.SSHClient()
+        client.load_system_host_keys()
+        if self.known_hosts_path.exists():
+            client.load_host_keys(str(self.known_hosts_path))
+
+        permissive = (
+            self.config.get("ssh", {}).get("host_key_policy", "strict") == "permissive"
+        )
+        if permissive:
+            client.set_missing_host_key_policy(paramiko.WarningPolicy)
+        else:
+            client.set_missing_host_key_policy(paramiko.RejectPolicy)
+        return client
+
+    # ------------------------------------------------------------------ #
+    # Compose / mount
+    # ------------------------------------------------------------------ #
 
     def compose(self) -> ComposeResult:
         servers_tree = CronTree("Servers", id="servers-tree")
@@ -52,6 +103,10 @@ class CronServers(Widget):
             )
         servers_tree.refresh()
 
+    # ------------------------------------------------------------------ #
+    # Connect / disconnect
+    # ------------------------------------------------------------------ #
+
     def action_connect_server(self) -> None:
         servers_tree = self.query_one("#servers-tree", Tree)
         if servers_tree.cursor_node and servers_tree.cursor_node != servers_tree.root:
@@ -60,14 +115,12 @@ class CronServers(Widget):
             if server_info:
                 self.connect_to_server(server_info)
 
-    def connect_to_server(self, server_info) -> None:
+    def connect_to_server(self, server_info: dict) -> None:
         try:
-            ssh_client = paramiko.SSHClient()
-            ssh_client.load_system_host_keys()
-            ssh_client.set_missing_host_key_policy(paramiko.WarningPolicy)
+            ssh_client = self._build_ssh_client()
 
             host = server_info["host"]
-            port = server_info["port"]
+            port = int(server_info["port"])
             username = server_info["username"]
             password = server_info["password"]
             crontab_user = server_info.get("crontab_user")
@@ -82,7 +135,7 @@ class CronServers(Widget):
             if self.current_ssh_client:
                 try:
                     self.current_ssh_client.close()
-                except:
+                except Exception:
                     pass
 
             self.current_ssh_client = ssh_client
@@ -90,15 +143,104 @@ class CronServers(Widget):
 
             server_info["connected"] = True
             self.save_servers()
-
             self.notify(f"Connected to {server_info['name']}")
 
+        except paramiko.BadHostKeyException as exc:
+            self._handle_bad_host_key(server_info, exc)
+        except paramiko.SSHException as exc:
+            if "not found in known_hosts" in str(exc):
+                self._handle_unknown_host(server_info)
+            else:
+                self.notify(f"Connection error: {exc}")
         except paramiko.AuthenticationException:
             self.notify("Authentication failed. Please check your credentials.")
-        except Exception as e:
-            self.notify(f"Connection error: {e}")
+        except Exception as exc:
+            self.notify(f"Connection error: {exc}")
 
-    def show_cron_table_for_server(self, ssh_client, server_info, crontab_user) -> None:
+    # ------------------------------------------------------------------ #
+    # Unknown host — trust-on-first-use flow
+    # ------------------------------------------------------------------ #
+
+    def _handle_unknown_host(self, server_info: dict) -> None:
+        host = server_info["host"]
+        port = int(server_info["port"])
+
+        try:
+            sock = socket.create_connection((host, port), timeout=10)
+            transport = paramiko.Transport(sock)
+            transport.start_client(timeout=10)
+            key = transport.get_remote_server_key()
+            transport.close()
+            sock.close()
+        except Exception as exc:
+            self.notify(
+                f"Could not retrieve host key from {host}:{port}: {exc}\n"
+                "Verify the host is reachable and try again."
+            )
+            return
+
+        fingerprint = self.format_fingerprint(key)
+        key_type = key.get_name()
+
+        def on_decision(trust: bool | None) -> None:
+            if not trust:
+                self.notify(
+                    f"Connection to {host} cancelled — host key was not trusted.\n"
+                    "Verify the fingerprint out-of-band before connecting."
+                )
+                return
+
+            host_keys = self._load_or_init_host_keys()
+            storage_name = f"[{host}]:{port}" if port != 22 else host
+            host_keys.add(storage_name, key_type, key)
+            host_keys.save(str(self.known_hosts_path))
+            self.notify(f"Host key for {host} saved. Connecting…")
+            self.connect_to_server(server_info)
+
+        self.app.push_screen(
+            CronHostKeyConfirm(host, port, key_type, fingerprint),
+            on_decision,
+        )
+
+    # ------------------------------------------------------------------ #
+    # Changed host key flow
+    # ------------------------------------------------------------------ #
+
+    def _handle_bad_host_key(
+        self, server_info: dict, exc: paramiko.BadHostKeyException
+    ) -> None:
+        host = server_info["host"]
+        port = int(server_info["port"])
+        expected_fp = self.format_fingerprint(exc.expected_key)
+        received_fp = self.format_fingerprint(exc.key)
+
+        def on_decision(trust: bool | None) -> None:
+            if not trust:
+                self.notify(
+                    f"Connection to {host} cancelled — changed key was not trusted.\n"
+                    "Contact your server admin to verify the new fingerprint."
+                )
+                return
+
+            host_keys = self._load_or_init_host_keys()
+            storage_name = f"[{host}]:{port}" if port != 22 else host
+            host_keys.add(storage_name, exc.key.get_name(), exc.key)
+            host_keys.save(str(self.known_hosts_path))
+            self.notify(f"Updated trusted key for {host}. Reconnecting…")
+            self.connect_to_server(server_info)
+
+        self.app.push_screen(
+            CronHostKeyChanged(host, port, expected_fp, received_fp),
+            on_decision,
+        )
+
+    # ------------------------------------------------------------------ #
+    # Cron table helpers
+    # ------------------------------------------------------------------ #
+
+    def show_cron_table_for_server(
+        self, ssh_client, server_info, crontab_user
+    ) -> None:
         if self.current_cron_table:
             self.current_cron_table.ssh_client = ssh_client
             self.current_cron_table.remote = True
@@ -145,7 +287,7 @@ class CronServers(Widget):
         if self.current_ssh_client:
             try:
                 self.current_ssh_client.close()
-            except:
+            except Exception:
                 pass
             self.current_ssh_client = None
 
@@ -156,6 +298,10 @@ class CronServers(Widget):
             self.notify(f"Disconnected from server {server_info['name']}")
 
         self.save_servers()
+
+    # ------------------------------------------------------------------ #
+    # Persistence
+    # ------------------------------------------------------------------ #
 
     def load_servers(self) -> dict:
         if self.servers_path.exists():
@@ -171,9 +317,9 @@ class CronServers(Widget):
                                 server_info["password"] = decrypt_password(
                                     encrypted_password
                                 )
-                            except Exception as e:
+                            except Exception as exc:
                                 print(
-                                    f"❌ Failed to decrypt password for {server_id}: {e}"
+                                    f"❌ Failed to decrypt password for {server_id}: {exc}"
                                 )
                                 server_info["password"] = None
                         else:
@@ -185,8 +331,8 @@ class CronServers(Widget):
                         server_info["crontab_user"] = None
 
                 return loaded_servers
-            except Exception as e:
-                print(f"❌ Warning: Failed to load servers: {e}")
+            except Exception as exc:
+                print(f"❌ Warning: Failed to load servers: {exc}")
         else:
             print("📝 No servers file found, starting with empty list")
         return {}
@@ -215,11 +361,15 @@ class CronServers(Widget):
 
             with self.servers_path.open("w", encoding="utf-8") as f:
                 tomlkit.dump(toml_safe_servers, f)
-        except Exception as e:
-            self.notify(f"❌ Error: Failed to save servers: {e}")
+        except Exception as exc:
+            self.notify(f"❌ Error: Failed to save servers: {exc}")
+
+    # ------------------------------------------------------------------ #
+    # Add / delete server actions
+    # ------------------------------------------------------------------ #
 
     def action_add_server(self) -> None:
-        def on_server_added(result):
+        def on_server_added(result) -> None:
             if result:
                 name = result.get("username") + "@" + result.get("hostname")
                 host = result.get("hostname")
