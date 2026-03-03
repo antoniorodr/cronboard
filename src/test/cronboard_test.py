@@ -2,20 +2,19 @@ from cronboard.app import CronBoard
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronSSHModal import CronSSHModal
+from cronboard_widgets.CronInputSearch import CronInputSearch
 import pytest
 
 
 @pytest.mark.asyncio
-async def test_change_tab():
-    app = CronBoard()
+async def test_change_tab(app):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         assert app.local_table.has_focus
 
 
 @pytest.mark.asyncio
-async def test_refresh_data():
-    app = CronBoard()
+async def test_refresh_data(app):
     async with app.run_test() as pilot:
         initial_data = app.local_table
         await pilot.press("r")
@@ -24,16 +23,14 @@ async def test_refresh_data():
 
 
 @pytest.mark.asyncio
-async def test_quit_app():
-    app = CronBoard()
+async def test_quit_app(app):
     async with app.run_test() as pilot:
         await pilot.press("ctrl+q")
         assert app.is_running is False
 
 
 @pytest.mark.asyncio
-async def test_create_cronjob():
-    app = CronBoard()
+async def test_create_cronjob(app):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("c")
@@ -41,8 +38,15 @@ async def test_create_cronjob():
 
 
 @pytest.mark.asyncio
-async def test_delete_cronjob():
-    app = CronBoard()
+async def test_search_screen(app):
+    async with app.run_test() as pilot:
+        await pilot.press("tab")
+        await pilot.press("/")
+        assert isinstance(app.screen, CronInputSearch)
+
+
+@pytest.mark.asyncio
+async def test_delete_cronjob(app):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("D")
