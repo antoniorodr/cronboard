@@ -7,8 +7,20 @@
     scrollbar-background-active: $surface-darken-1;
 }
 
-CronCreator, CronDeleteConfirmation, CronSSHModal {
+CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch {
     align: center middle;
+}
+
+#cron-search-input {
+    width: 60%;
+    max-width: 80;
+    background: $surface;
+    border: round $primary;
+    padding: 0 1;
+
+    &:focus {
+        border: round $primary;
+    }
 }
 
 #servers-grid {
@@ -25,16 +37,16 @@ CronCreator, CronDeleteConfirmation, CronSSHModal {
 #servers-tree {
     width: 18%;
     border: round $primary 50%;
-    
+
     &:focus-within {
         border: round $primary;
     }
-    
+
     & > .tree--cursor {
         background: $primary 80%;
         color: $text;
     }
-    
+
     & > .tree--highlight {
         background: $primary-darken-2;
     }
@@ -45,26 +57,26 @@ CronTable {
     height: auto;
     margin: 2;
     border: round $primary 50%;
-    
+
     &:focus-within {
         border: round $primary;
     }
-    
+
     & > .datatable--header {
         background: $surface;
         color: $text;
         text-style: bold;
     }
-    
+
     & > .datatable--header-hover {
         background: $primary-lighten-1;
     }
-    
+
     & > .datatable--cursor {
         background: $primary 40%;
         color: $text;
     }
-    
+
     & > .datatable--hover {
         background: $primary-darken-2;
     }
@@ -125,7 +137,7 @@ CronTabs {
 
 #hostname, #username, #password {
     margin-bottom: 1;
-    
+
     &:focus {
         border: tall $secondary;
     }
@@ -175,7 +187,7 @@ CronTabs {
 #expression {
     width: 100%;
     margin-bottom: 1;
-    
+
     &:focus {
         border: tall $secondary;
     }

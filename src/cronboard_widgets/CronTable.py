@@ -1,12 +1,17 @@
 from crontab import CronTab
 from textual.widgets import DataTable
 from textual.binding import Binding
+from textual.coordinate import Coordinate
 from datetime import datetime
 from rich.text import Text
+from cronboard_widgets.CronInputSearch import CronInputSearch
 
 
 class CronTable(DataTable):
     BINDINGS = [
+        Binding("/", "cron_search", "Search"),
+        Binding("n", "search_next", "Next Match"),
+        Binding("N", "search_prev", "Prev Match"),
         Binding("l", "cursor_right", "Right"),
         Binding("h", "cursor_left", "Left"),
         Binding("j", "cursor_down", "Down"),
@@ -23,6 +28,10 @@ class CronTable(DataTable):
         self.remote = remote
         self.ssh_client = ssh_client
         self.crontab_user = crontab_user
+        self._rows_data: list[tuple] = []
+        self._search_matches: list[int] = []
+        self._search_index: int = -1
+        self._search_query: str = ""
 
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
@@ -55,6 +64,7 @@ class CronTable(DataTable):
         is_empty = self.row_count == 0
 
         if action in (
+            "cron_search",
             "edit_cronjob",
             "delete_cronjob",
             "pause_cronjob",
@@ -104,9 +114,16 @@ class CronTable(DataTable):
             self.add_row(
                 identificator, expr, cmd, str(last_dt), str(next_dt), status_text
             )
+            self._rows_data.append(
+                (identificator, expr, cmd, str(last_dt), str(next_dt), status_text)
+            )
 
     def load_crontabs(self):
         self.clear()
+        self._rows_data = []
+        self._search_matches = []
+        self._search_index = -1
+        self._search_query = ""
 
         if self.remote and self.ssh_client:
             self.parse_cron(self.ssh_cron)
@@ -167,6 +184,82 @@ class CronTable(DataTable):
             self.cron = CronTab(user=True)
         self.load_crontabs()
         self.refresh_bindings()
+
+    def action_cron_search(self) -> None:
+
+        def check_search(search_query: str | None) -> None:
+            if search_query is not None:
+                self.apply_search(search_query)
+
+        self.app.push_screen(CronInputSearch(), check_search)
+
+    def apply_search(self, query: str) -> None:
+        self._search_query = query.lower()
+        self._search_matches = []
+
+        if not query:
+            self._restore_cells()
+            return
+
+        for i, row_data in enumerate(self._rows_data):
+            identificator, expr, cmd = (
+                str(row_data[0]),
+                str(row_data[1]),
+                str(row_data[2]),
+            )
+            if (
+                self._search_query in identificator.lower()
+                or self._search_query in expr.lower()
+                or self._search_query in cmd.lower()
+            ):
+                self._search_matches.append(i)
+
+        if self._search_matches:
+            self._search_index = 0
+            self._highlight_matches()
+            self.move_cursor(row=self._search_matches[0])
+            self.notify(f"{len(self._search_matches)} match(es) for '{query}'")
+        else:
+            self._search_index = -1
+            self.notify(f"No matches for '{query}'")
+
+    def _highlight_text(self, text: str, query: str) -> Text:
+        result = Text(text)
+        q_lower = query.lower()
+        idx = text.lower().find(q_lower)
+        while idx >= 0:
+            result.stylize("bold yellow", idx, idx + len(query))
+            idx = text.lower().find(q_lower, idx + 1)
+        return result
+
+    def _highlight_matches(self) -> None:
+        self._restore_cells()
+        for i in self._search_matches:
+            row_data = self._rows_data[i]
+            for col_idx in range(3):
+                text = str(row_data[col_idx])
+                if self._search_query.lower() in text.lower():
+                    self.update_cell_at(
+                        Coordinate(i, col_idx),
+                        self._highlight_text(text, self._search_query),
+                    )
+
+    def _restore_cells(self) -> None:
+        for i, row_data in enumerate(self._rows_data):
+            for col_idx in range(3):
+                self.update_cell_at(Coordinate(i, col_idx), row_data[col_idx])
+
+    def action_search_next(self) -> None:
+        if not self._search_matches:
+            return
+        self._search_index = (self._search_index + 1) % len(self._search_matches)
+        self.move_cursor(row=self._search_matches[self._search_index])
+
+    def action_search_prev(self) -> None:
+        if not self._search_matches:
+            return
+        self._search_index = (self._search_index - 1) % len(self._search_matches)
+        self.move_cursor(row=self._search_matches[self._search_index])
 
     def action_pause_cronjob(self) -> None:
         if self.cursor_row is None:
