@@ -21,7 +21,7 @@ class CronBoard(App):
     CSS_PATH = BASE_DIR / "static" / "css" / "cronboard.tcss"
 
     BINDINGS = [
-        Binding("ctrl+q", "quit", "Quit", priority=True),
+        Binding("q,ctrl+q", "quit", "Quit", priority=True),
         Binding("Tab", "focus_next", "Change Panel"),
     ]
 
