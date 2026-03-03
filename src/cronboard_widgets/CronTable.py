@@ -10,6 +10,7 @@ from cronboard_widgets.CronInputSearch import CronInputSearch
 class CronTable(DataTable):
     BINDINGS = [
         Binding("/", "cron_search", "Search"),
+        Binding("escape", "clear_search", "Clear Search"),
         Binding("n", "search_next", "Next Match"),
         Binding("N", "search_prev", "Prev Match"),
         Binding("l", "cursor_right", "Right"),
@@ -65,6 +66,7 @@ class CronTable(DataTable):
 
         if action in (
             "cron_search",
+            "clear_search",
             "next_match",
             "prev_match",
             "edit_cronjob",
@@ -195,11 +197,17 @@ class CronTable(DataTable):
 
         self.app.push_screen(CronInputSearch(), check_search)
 
+    def action_clear_search(self) -> None:
+        self._search_query = ""
+        self._search_matches = []
+        self._search_index = -1
+        self._restore_cells()
+
     def apply_search(self, query: str) -> None:
-        self._search_query = query.lower()
+        self._search_query = query.lower() if query else ""
         self._search_matches = []
 
-        if not query:
+        if not self._search_query:
             self._restore_cells()
             return
 
@@ -220,10 +228,12 @@ class CronTable(DataTable):
             self._search_index = 0
             self._highlight_matches()
             self.move_cursor(row=self._search_matches[0])
-            self.notify(f"{len(self._search_matches)} match(es) for '{query}'")
+            self.notify(
+                f"{len(self._search_matches)} match(es) for '{self._search_query}'"
+            )
         else:
             self._search_index = -1
-            self.notify(f"No matches for '{query}'")
+            self.notify(f"No matches for '{self._search_query}'")
 
     def _highlight_text(self, text: str, query: str) -> Text:
         result = Text(text)
