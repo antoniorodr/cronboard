@@ -65,6 +65,8 @@ class CronTable(DataTable):
 
         if action in (
             "cron_search",
+            "next_match",
+            "prev_match",
             "edit_cronjob",
             "delete_cronjob",
             "pause_cronjob",

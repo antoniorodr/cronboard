@@ -71,6 +71,7 @@ Cronboard is a terminal application that allows you to manage and schedule cronj
 :heavy_check_mark: Accepts `special expressions` like `@daily`, `@yearly`, `@monthly`, etc.\
 :heavy_check_mark: Connect to servers using SSH, using password or SSH keys \
 :heavy_check_mark: Choose another user to manage cron jobs if you have the permissions to do so (`sudo`)
+:heavy_check_mark: Search for cron jobs using keywords (case insensitive)
 
 ## :rocket: Technologies
 
