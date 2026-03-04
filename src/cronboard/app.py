@@ -4,6 +4,7 @@ from crontab import CronTab
 import tomlkit
 from pathlib import Path
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.widgets import Footer, Label, Tabs, Tab
 from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
@@ -20,8 +21,8 @@ class CronBoard(App):
     CSS_PATH = BASE_DIR / "static" / "css" / "cronboard.tcss"
 
     BINDINGS = [
-        ("ctrl+q", "quit", "Quit"),
-        ("Tab", "focus_next", "Change Panel"),
+        Binding("q,ctrl+q", "quit", "Quit", priority=True),
+        Binding("Tab", "focus_next", "Change Panel"),
     ]
 
     def compose(self) -> ComposeResult:
