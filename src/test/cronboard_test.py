@@ -1,4 +1,3 @@
-from cronboard.app import CronBoard
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronSSHModal import CronSSHModal
