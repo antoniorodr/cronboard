@@ -2,15 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.3] - 23.02.2026
+## [0.5.0] - 04.03.2026
 
 ### Added
 
-- Added escape binding to close ModalScreen. Thanks to @zaloog for this! Merged PR #22. Fixes #21.
+- Added Binding class with proper priority to app for closing application. Closes #26. Thanks @Zaloog for this!
+- Added cron search functionality (case insensitive) to find cronjobs by identificator, command or expression. Closes #28.
+- Added `esc` binding to clear the search results.
+- Added `q` binding to quit the application.
 
-### Adjusted
+### Tests
 
-- Adjusted Binding visibility. Thanks to @zaloog for this! Merged PR #23. Fixes #20.
+- Improve tests logic and coverage for the new search functionality in `src/test/cronboard_test.py`.
 
 ## [0.4.2] - 17.02.2026
 
@@ -25,9 +28,9 @@ Thanks to @it-education-md for this fix.
 ### Fixed
 
 - Fixed a bug in **Add Server** where host-only input (without port) could raise an `UnboundLocalError`. Fixes #16.
-  - The parser now safely accepts both `host` and `host:port`
-  - Defaults to port **22** when no port is provided
-  - Validates port range and surfaces clear input errors instead of crashing
+    - The parser now safely accepts both `host` and `host:port`
+    - Defaults to port **22** when no port is provided
+    - Validates port range and surfaces clear input errors instead of crashing
 
 ### Tests
 
