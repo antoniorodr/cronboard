@@ -336,19 +336,19 @@ dependencies = [
     { name = "croniter" },
     { name = "dt-croniter" },
     { name = "paramiko" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-mock" },
     { name = "python-crontab" },
     { name = "textual" },
     { name = "textual-autocomplete" },
-    { name = "textual-dev" },
     { name = "tomlkit" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "pytest-cov" },
+    { name = "pytest-mock" },
+    { name = "textual-dev" },
 ]
 
 [package.metadata]
@@ -358,18 +358,20 @@ requires-dist = [
     { name = "croniter", specifier = ">=6.0.0" },
     { name = "dt-croniter", specifier = ">=6.0.1" },
     { name = "paramiko", specifier = ">=4.0.0" },
-    { name = "pytest", specifier = ">=8.4.2" },
-    { name = "pytest-asyncio", specifier = ">=1.2.0" },
-    { name = "pytest-mock", specifier = ">=3.15.1" },
     { name = "python-crontab", specifier = ">=3.3.0" },
     { name = "textual", specifier = ">=6.2.1" },
     { name = "textual-autocomplete", specifier = ">=4.0.6" },
-    { name = "textual-dev", specifier = ">=1.7.0" },
     { name = "tomlkit", specifier = ">=0.13.3" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest-cov", specifier = ">=7.0.0" }]
+dev = [
+    { name = "pytest", specifier = ">=8.4.2" },
+    { name = "pytest-asyncio", specifier = ">=1.2.0" },
+    { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "pytest-mock", specifier = ">=3.15.1" },
+    { name = "textual-dev", specifier = ">=1.7.0" },
+]
 
 [[package]]
 name = "croniter"
