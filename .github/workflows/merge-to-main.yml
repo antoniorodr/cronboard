@@ -1,0 +1,8 @@
+name: test-on-merge-to-main
+on:
+    push:
+        branches:
+            - main
+jobs:
+    run_tests:
+        uses: ./.github/workflows/tests.yml

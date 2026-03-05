@@ -1,0 +1,24 @@
+name: run-tests
+on: [workflow_call]
+jobs:
+    run-tests:
+        name: "Run tests"
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout and setup
+              uses: actions/checkout@v6.0.1
+              with:
+                  submodules: false
+            - name: Setup python
+              uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - name: Install uv
+              uses: astral-sh/setup-uv@b75a909f75acd358c2196fb9a5f1299a9a8868a4
+              with:
+                  version: "0.9.28"
+            - name: uv sync
+              run: uv sync
+            - name: Run tests
+              run: |
+                  uv run pytest -r w tests/
