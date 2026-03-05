@@ -62,7 +62,7 @@ Before contributing, please read through this document to understand how to get 
 
 ## Testing
 
-This project uses [pytest](https://docs.pytest.org/en/stable/), [pytest-asyncio](https://pytest-asyncio.readthedocs.io/en/stable/), and [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) for testing and coverage reporting.
+This project uses [pytest](https://docs.pytest.org/en/stable/), [pytest-asyncio](https://pytest-asyncio.readthedocs.io/en/stable/), [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/), and [pytest-mock](https://pytest-mock.readthedocs.io/en/latest/) for testing and coverage reporting.
 
 Dev dependencies (including `pytest-cov`) are installed automatically when you run:
 
