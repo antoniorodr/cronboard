@@ -18,12 +18,9 @@ dependencies = [
   "croniter>=6.0.0",
   "dt-croniter>=6.0.1",
   "paramiko>=4.0.0",
-  "pytest>=8.4.2",
-  "pytest-asyncio>=1.2.0",
   "python-crontab>=3.3.0",
   "textual>=6.2.1",
   "textual-autocomplete>=4.0.6",
-  "textual-dev>=1.7.0",
   "tomlkit>=0.13.3",
 ]
 
@@ -43,7 +40,13 @@ addopts = "--cov=cronboard --cov=cronboard_widgets --cov=cronboard_encryption --
 
 
 [dependency-groups]
-dev = ["pytest-cov>=7.0.0"]
+dev = [
+  "pytest-cov>=7.0.0",
+  "pytest-mock>=3.15.1",
+  "pytest>=8.4.2",
+  "pytest-asyncio>=1.2.0",
+  "textual-dev>=1.7.0",
+]
 
 [tool.setuptools.package-data]
 "cronboard" = ["static/css/*.tcss"]
