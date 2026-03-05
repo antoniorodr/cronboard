@@ -1,10 +1,10 @@
 import pytest
+from .conftest import make_creator
 from cronboard_widgets.CronCreator import CronCreator
-from conftest import make_creator
 
 
 @pytest.mark.asyncio
-async def test_create_cronjob(app):
+async def test_open_create_cronjob_modal(app):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("c")
@@ -18,7 +18,6 @@ def test_returns_job_when_match(mocker):
 
     creator = make_creator(mocker)
     creator.cron.__iter__ = mocker.MagicMock(return_value=iter([job]))
-
     result = creator.find_if_cronjob_exists("backup-job", "/usr/bin/backup.sh")
     assert result == job
 
