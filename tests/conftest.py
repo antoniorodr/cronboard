@@ -6,7 +6,18 @@ from cronboard_widgets.CronCreator import CronAutoComplete
 
 
 @pytest.fixture
-def app():
+def app(mocker):
+    fake_job = mocker.MagicMock()
+    fake_job.comment = "test-job"
+    fake_job.command = "echo hello"
+    fake_job.render.return_value = "* * * * * echo hello"
+
+    fake_cron = mocker.MagicMock()
+    fake_cron.__iter__ = mocker.MagicMock(side_effect=lambda: iter([fake_job]))
+    mocker.patch("cronboard_widgets.CronTable.CronTab", return_value=fake_cron)
+    mocker.patch(
+        "cronboard_widgets.CronDeleteConfirmation.CronTab", return_value=fake_cron
+    )
     yield CronBoard()
 
 
