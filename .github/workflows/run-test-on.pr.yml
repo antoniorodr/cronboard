@@ -3,3 +3,22 @@ on: pull_request
 jobs:
     run_tests:
         uses: ./.github/workflows/tests.yml
+    notify:
+        needs: run_tests
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - name: Send OK notification
+              if: needs.run_tests.result == 'success'
+              uses: appleboy/telegram-action@2efd23283ae25229a0b4d315d5d33f73b346ef99 # v0.1.1
+              with:
+                  to: ${{ secrets.TELEGRAM_TO }}
+                  token: ${{ secrets.TELEGRAM_TOKEN }}
+                  args: "${{ github.event.repository.name }}: tests passed."
+            - name: Send failure notification
+              if: needs.run_tests.result == 'failure'
+              uses: appleboy/telegram-action@2efd23283ae25229a0b4d315d5d33f73b346ef99 # v0.1.1
+              with:
+                  to: ${{ secrets.TELEGRAM_TO }}
+                  token: ${{ secrets.TELEGRAM_TOKEN }}
+                  args: "${{ github.event.repository.name }}: WARNING: Tests failed."
