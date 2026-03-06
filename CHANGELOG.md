@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 06.03.2026
+
+### Added
+
+- Added and refactored tests. Cronboard have now higher test coverage and better test logic. Tests are located in `tests/`.
+- Added some workflows to automate testing and building of the package. Workflows are located in `.github/workflows/`.
+
+### Changed
+
+- Updated dev dependencies on the `pyproject.toml` file.
+
 ## [0.5.0] - 04.03.2026
 
 ### Added
