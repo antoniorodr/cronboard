@@ -1,0 +1,38 @@
+name: release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up uv
+              uses: astral-sh/setup-uv@v5
+
+            - name: Build package
+              run: uv build
+
+            - name: Extract changelog for version
+              run: |
+                  VERSION="${GITHUB_REF_NAME#v}"
+                  awk "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md \
+                    > /tmp/release_notes.md
+                  echo "Release notes for v${VERSION}:"
+                  cat /tmp/release_notes.md
+
+            - name: Create release
+              uses: ncipollo/release-action@v1
+              with:
+                  tag: ${{ github.ref_name }}
+                  name: ${{ github.ref_name }}
+                  bodyFile: /tmp/release_notes.md
+                  artifacts: dist/*
+                  artifactErrorsFailBuild: true
