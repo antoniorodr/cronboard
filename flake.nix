@@ -53,7 +53,7 @@
             hash = "sha256-K6Lw12e+RIDsrLPksTDPBzQOAzw1APxCT+2RJdJ6RYY=";
           };
 
-          build-system = [ python.pkgs.setuptools ];
+          build-system = [ python.pkgs.hatchling ];
           dependencies = with python.pkgs; [
             textual
             typing-extensions
