@@ -18,30 +18,6 @@
         pkgs = import nixpkgs { inherit system; };
         python = pkgs.python313;
 
-        dt-croniter = python.pkgs.buildPythonPackage {
-          pname = "dt-croniter";
-          version = "6.0.1";
-          pyproject = true;
-
-          src = pkgs.fetchPypi {
-            pname = "dt_croniter";
-            version = "6.0.1";
-            hash = "sha256-CYpURnD6CK/uPMmEmbnF8HR4RiZaJ83Oh61ZWIBtSqI=";
-          };
-
-          build-system = [ python.pkgs.setuptools ];
-          dependencies = with python.pkgs; [
-            python-dateutil
-            pytz
-          ];
-
-          meta = with pkgs.lib; {
-            description = "Timezone-aware croniter extension";
-            homepage = "https://pypi.org/project/dt-croniter/";
-            license = licenses.mit;
-          };
-        };
-
         textual-autocomplete = python.pkgs.buildPythonPackage {
           pname = "textual-autocomplete";
           version = "4.0.6";
@@ -83,7 +59,6 @@
             python-crontab
             textual
             tomlkit
-            dt-croniter
             textual-autocomplete
           ];
 
@@ -102,7 +77,6 @@
           default = cronboard;
           inherit
             cronboard
-            dt-croniter
             textual-autocomplete
             ;
         };
@@ -133,7 +107,6 @@
               ]
               ++ [
                 cron-descriptor
-                dt-croniter
                 textual-autocomplete
               ]
             ))

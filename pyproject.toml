@@ -16,7 +16,6 @@ dependencies = [
   "bcrypt>=5.0.0",
   "cron-descriptor>=2.0.6",
   "croniter>=6.0.0",
-  "dt-croniter>=6.0.1",
   "paramiko>=4.0.0",
   "python-crontab>=3.3.0",
   "textual>=6.2.1",
