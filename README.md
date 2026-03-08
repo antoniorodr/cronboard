@@ -120,6 +120,12 @@ uv tool install git+https://github.com/antoniorodr/cronboard
 yay -S cronboard
 ```
 
+### Nix Installation
+
+```bash
+nix profile add github:antoniorodr/cronboard
+```
+
 ## :bookmark_tabs: Getting Started
 
 One installed, you can run the application using the following command:
