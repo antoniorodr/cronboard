@@ -120,7 +120,7 @@ uv tool install git+https://github.com/antoniorodr/cronboard
 yay -S cronboard
 ```
 
-### Nix Installation
+#### Nix Installation
 
 ```bash
 nix profile add github:antoniorodr/cronboard
