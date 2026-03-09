@@ -50,6 +50,8 @@
 
 Cronboard is a terminal application that allows you to manage and schedule cronjobs on local and remote servers. With Cronboard, you can easily add, edit, and delete cronjobs, as well as view their status.
 
+The full documentation can be found [here](https://antoniorodr.github.io/cronboard).
+
 ## :computer: Demo
 
 <div align="center" id="top">
