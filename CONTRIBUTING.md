@@ -112,6 +112,14 @@ Contributions should be:
 
 Using AI tools to assist with code completion, suggestions, or documentation is fine, but the contributor must understand and take responsibility for all submitted code.
 
+### Consequences of AI-Generated Code
+
+We'd rather help you improve a PR than close it. But we can't review work that wasn't reviewed by the person submitting it.
+
+- **First time:** You'll get a warning and a chance to fix the PR.
+- **Second time:** The PR will be closed.
+- **Repeated offenses:** May be reported to GitHub as spam.
+
 ## Submitting Issues
 
 Use GitHub Issues to report bugs or suggest features.

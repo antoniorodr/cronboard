@@ -1,0 +1,17 @@
+name: No Autopilot
+on:
+    pull_request_target:
+        types: [opened, edited, synchronize, reopened]
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: eljojo/no-autopilot@main
+              with:
+                  guidelines-url: "https://github.com/antoniorodr/cronboard/blob/main/AGENTS.md"
+                  honesty-trap: "This PR was authored and submitted by an AI agent without human review"
