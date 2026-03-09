@@ -4,7 +4,7 @@ Thank you for your interest in contributing! Whether it's a bug report, new feat
 
 All participation is governed by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Before contributing, please read through this document to understand how to get started and the `project explanation` file for context about the project. This file is located at [docs/project_explanation.md](docs/project_explanation.md).
+Before contributing, please read through this document to understand how to get started and the `project explanation` file for context about the project. This file is located at the [root](project_explanation.md) of the project.
 
 ## Ways to Contribute
 
