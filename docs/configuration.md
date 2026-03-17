@@ -21,7 +21,7 @@ Cronboard is built on [Textual](https://textual.textualize.io), which ships with
 
 The active theme is saved automatically whenever you change it inside the application. The default theme is **`catppuccin-mocha`**.
 
-To change the theme, use Textual's built-in theme picker (accessible via the command palette with `Ctrl+P` → `theme`).
+To change the theme, open the command palette with **`Ctrl+P`** (or **`Ctrl+E`** on some setups), type `theme`, and choose a theme. Your choice is written to `config.toml` so it persists across restarts.
 
 ### `config.toml` example
 
