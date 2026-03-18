@@ -16,7 +16,7 @@ The search is **case-insensitive** and matches against:
 
 For example, typing `backup` will match any job whose ID, expression, or command contains “backup”. You don’t need to type the whole word; partial matches count.
 
-![Search prompt open with a query; matching table rows highlighted and next/previous match navigation](images/search.gif)
+![Search prompt open with a query; matching table rows highlighted and next/previous match navigation](../images/search.gif)
 
 ---
 
@@ -24,12 +24,12 @@ For example, typing `backup` will match any job whose ID, expression, or command
 
 After a search is performed, matching rows are highlighted in **bold yellow**. If there is more than one match, move between them with the keys below.
 
-| Key | Action |
-|---|---|
-| `n` | Jump to the **next** match |
+| Key | Action                         |
+| --- | ------------------------------ |
+| `n` | Jump to the **next** match     |
 | `N` | Jump to the **previous** match |
 
-A notification shows the total number of matches found (e.g. *"3 match(es) for 'backup'"*). If there are no matches, you’ll see a message saying so and the table stays unchanged.
+A notification shows the total number of matches found (e.g. _"3 match(es) for 'backup'"_). If there are no matches, you’ll see a message saying so and the table stays unchanged.
 
 ---
 

@@ -10,18 +10,18 @@ Cronboard can connect to remote servers via SSH and manage their cron jobs exact
 2. Press **`a`** to open the **Add Server** dialog.
 3. Fill in the fields:
 
-| Field | Description |
-|---|---|
-| Hostname | Server hostname or IP. Append `:port` for a non-standard port (e.g. `myserver.com:2222`). Defaults to port `22`. |
-| Username | SSH login username |
-| Password | Leave empty to use an SSH key instead |
+| Field        | Description                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Hostname     | Server hostname or IP. Append `:port` for a non-standard port (e.g. `myserver.com:2222`). Defaults to port `22`.    |
+| Username     | SSH login username                                                                                                  |
+| Password     | Leave empty to use an SSH key instead                                                                               |
 | Crontab user | Optional. Manage cron jobs for a different user (requires `sudo` permissions). Leave empty to use the current user. |
 
 4. Click **Add Server**.
 
 Servers are saved persistently in `~/.config/cronboard/servers.toml`. Passwords are stored encrypted (bcrypt), never in plain text.
 
-![Add Server dialog with Hostname, Username, Password, and Crontab user fields](images/remote-connect.gif)
+![Add Server dialog with Hostname, Username, Password, and Crontab user fields](../images/remote-connect.gif)
 
 ---
 

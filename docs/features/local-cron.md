@@ -8,14 +8,14 @@ The **Local** tab shows all cron jobs for the currently logged-in user. Cronboar
 
 All jobs are displayed in a table with the following columns:
 
-| Column | Description |
-|---|---|
-| ID | Comment attached to the job (used as identifier) |
-| Expression | Raw cron expression |
-| Command | Shell command to execute |
-| Last Run | Previous scheduled execution time |
-| Next Run | Next scheduled execution time |
-| Status | `Active` (green), `Paused` (red), or `Inactive` (yellow) |
+| Column     | Description                                              |
+| ---------- | -------------------------------------------------------- |
+| ID         | Comment attached to the job (used as identifier)         |
+| Expression | Raw cron expression                                      |
+| Command    | Shell command to execute                                 |
+| Last Run   | Previous scheduled execution time                        |
+| Next Run   | Next scheduled execution time                            |
+| Status     | `Active` (green), `Paused` (red), or `Inactive` (yellow) |
 
 The table is read from your crontab when you open the app or when you press **`r`** to refresh. If you edit the crontab in another terminal, refresh in Cronboard to see the updates.
 
@@ -25,39 +25,39 @@ The table is read from your crontab when you open the app or when you press **`r
 
 Press **`c`** to open the creation form. The form is the same for both new jobs and edits (when you press **`e`** on an existing job).
 
-![Create cron job form with Expression, Command, and ID fields and live human-readable description](images/create-job.gif)
+![Create cron job form with Expression, Command, and ID fields and live human-readable description](../images/create-job.gif)
 
 ### Fields
 
-| Field | Description |
-|---|---|
-| Expression | A valid cron expression or special alias (see below) |
-| Command | The shell command to run. Supports path autocompletion with `Tab` |
-| ID | A unique identifier stored as a crontab comment |
+| Field      | Description                                                       |
+| ---------- | ----------------------------------------------------------------- |
+| Expression | A valid cron expression or special alias (see below)              |
+| Command    | The shell command to run. Supports path autocompletion with `Tab` |
+| ID         | A unique identifier stored as a crontab comment                   |
 
 ### Cron expression cheatsheet
 
-| Symbol | Meaning |
-|---|---|
-| `*` | Any value |
-| `,` | Value list separator (e.g. `1,3,5`) |
-| `-` | Range of values (e.g. `1-5`) |
-| `/` | Step values (e.g. `*/5`) |
+| Symbol | Meaning                             |
+| ------ | ----------------------------------- |
+| `*`    | Any value                           |
+| `,`    | Value list separator (e.g. `1,3,5`) |
+| `-`    | Range of values (e.g. `1-5`)        |
+| `/`    | Step values (e.g. `*/5`)            |
 
 Format: `Minute  Hour  Day  Month  Weekday`
 
 ### Special aliases
 
-| Alias | Equivalent | Description |
-|---|---|---|
-| `@reboot` | — | Run once at startup |
-| `@hourly` | `0 * * * *` | Every hour |
-| `@daily` / `@midnight` | `0 0 * * *` | Every day at midnight |
-| `@weekly` | `0 0 * * 0` | Every Sunday at midnight |
-| `@monthly` | `0 0 1 * *` | First day of each month |
+| Alias                   | Equivalent  | Description                |
+| ----------------------- | ----------- | -------------------------- |
+| `@reboot`               | —           | Run once at startup        |
+| `@hourly`               | `0 * * * *` | Every hour                 |
+| `@daily` / `@midnight`  | `0 0 * * *` | Every day at midnight      |
+| `@weekly`               | `0 0 * * 0` | Every Sunday at midnight   |
+| `@monthly`              | `0 0 1 * *` | First day of each month    |
 | `@yearly` / `@annually` | `0 0 1 1 *` | Once a year on January 1st |
 
-As you type the expression, a **live description** is shown below the field (e.g. *"At 00:00 on day-of-month 1"*). Use it to confirm the schedule before saving.
+As you type the expression, a **live description** is shown below the field (e.g. _"At 00:00 on day-of-month 1"_). Use it to confirm the schedule before saving.
 
 ---
 

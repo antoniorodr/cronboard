@@ -22,7 +22,7 @@ You manage everything from the terminal: no web UI, no extra services. Your cron
 
 Below is a short overview of Cronboard’s interface. The [Getting Started](getting-started.md) guide walks through each step with more detail and examples.
 
-![Cronboard main window showing the Local tab with a table of cron jobs, expression, command, and status columns](images/overview.gif)
+![Cronboard main window showing the Local tab with a table of cron jobs, expression, command, and status columns](images/interface-overview.gif)
 
 ---
 
