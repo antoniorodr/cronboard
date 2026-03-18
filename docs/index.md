@@ -14,12 +14,24 @@ Cronboard gives you a keyboard-driven TUI (Terminal User Interface) to:
 - Search through jobs using keywords
 - See human-readable descriptions of cron expressions in real time
 
+You manage everything from the terminal: no web UI, no extra services. Your crontab stays the standard system crontab, so existing tools and backups keep working.
+
+---
+
+## See it in action
+
+Below is a short overview of Cronboard’s interface. The [Getting Started](getting-started.md) guide walks through each step with more detail and examples.
+
+![Cronboard main window showing the Local tab with a table of cron jobs, expression, command, and status columns](images/interface-overview.gif)
+
 ---
 
 ## Requirements
 
 - Python **3.13** or later
 - `cron` / `crontab` available on the system
+
+Your system must have `cron` installed and the `crontab` command available (e.g. `crontab -l` runs without error). On macOS and most Linux distributions this is already the case.
 
 ## Quick Start
 
