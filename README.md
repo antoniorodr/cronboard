@@ -11,17 +11,17 @@
 [About](#about) | [Demo](#demo) | [Features](#features) | [Technologies](#technologies) | [Requirements](#requirements) | [Installation](#installation) | [Getting Started](#getting-started)
 
 
-## About
+## ℹ️ About
 
 Cronboard is a terminal application for managing and scheduling cron jobs on local and remote servers. You can add, edit, pause, resume, search, and delete jobs from a Textual-based interface.
 
 Full documentation is available at [antoniorodr.github.io/cronboard](https://antoniorodr.github.io/cronboard).
 
-## Demo
+## 🎬 Demo
 
 ![Cronboard demo](./assets/cronboard.gif)
 
-## Features
+## ✨ Features
 
 - Check cron jobs
 - Autocompletion for paths when creating or editing cron jobs
@@ -35,7 +35,7 @@ Full documentation is available at [antoniorodr.github.io/cronboard](https://ant
 - Manage cron jobs for another user when you have the required `sudo` permissions
 - Search for cron jobs using case-insensitive keywords
 
-## Technologies
+## 🛠️ Technologies
 
 The project is built with:
 
@@ -44,7 +44,7 @@ The project is built with:
 - [Paramiko](https://github.com/paramiko/paramiko)
 - [cron-descriptor](https://github.com/Salamek/cron-descriptor)
 
-## Requirements
+## 📋 Requirements
 
 Before starting, make sure `cron` is installed and available on your machine:
 
@@ -54,7 +54,7 @@ crontab -l
 
 If you install Cronboard with `pip` or `uv`, you also need Python 3.13 or newer.
 
-## Installation
+## 📦 Installation
 
 ### Manual installation
 
@@ -88,7 +88,7 @@ yay -S cronboard
 nix profile add github:antoniorodr/cronboard
 ```
 
-## Getting Started
+## 🚀 Getting Started
 
 Once installed, run:
 
@@ -102,13 +102,13 @@ When connecting to a remote server with an SSH key, Cronboard looks for the `kno
 
 If you choose to manage cron jobs for another user, make sure you have the necessary permissions. In practice, that means you need `sudo` access.
 
-### Autocompletion
+### ⌨️ Autocompletion
 
 Path autocompletion when creating or editing cron jobs helps you enter file paths faster.
 
 The default starting point for autocompletion is the home directory of the user whose cron jobs you are managing. Accept a suggestion with the `Tab` key.
 
-## Do you like my work?
+## ❤️ Do you like my work?
 
 If you find the project useful, you can support it by sponsoring the author:
 
