@@ -1,4 +1,4 @@
-![Cronboard](./assets/cronboard.png)
+# `cronboard`
 [![Terminal Trove Tool of the Week](./assets/terminal-trove-week.png)](https://terminaltrove.com/cronboard/)
 
 > [!caution]
