@@ -106,8 +106,6 @@ The default starting point for autocompletion is the home directory of the user 
 
 ## ❤️ Do you like my work?
 
-If you find the project useful, you can support it by sponsoring the author:
+If you find the project useful, you can support the author here:
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor_on_GitHub-30363D?logo=github&style=for-the-badge)](https://github.com/sponsors/antoniorodr)
-
-[Back to top](#cronboard)
