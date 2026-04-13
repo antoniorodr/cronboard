@@ -38,9 +38,12 @@ def make_query_one(mapping):
     return query_one
 
 
-def test_compose_builds_dialog():
-    modal = CronSSHModal()
+@pytest.fixture
+def modal():
+    return CronSSHModal()
 
+
+def test_compose_builds_dialog(modal):
     widgets = list(modal.compose())
 
     assert len(widgets) == 1
@@ -48,8 +51,7 @@ def test_compose_builds_dialog():
     assert widgets[0].id == "dialog"
 
 
-def test_on_input_changed_removes_existing_errors(mocker):
-    modal = CronSSHModal()
+def test_on_input_changed_removes_existing_errors(mocker, modal):
     error_one = mocker.MagicMock()
     error_two = mocker.MagicMock()
     modal.query = mocker.Mock(side_effect=[[error_one], [error_one, error_two]])
@@ -62,8 +64,7 @@ def test_on_input_changed_removes_existing_errors(mocker):
     error_two.remove.assert_called_once_with()
 
 
-def test_on_button_pressed_cancel_dismisses_false(mocker):
-    modal = CronSSHModal()
+def test_on_button_pressed_cancel_dismisses_false(mocker, modal):
     modal.dismiss = mocker.Mock()
     event = mocker.MagicMock()
     event.button.id = "cancel"
@@ -73,8 +74,7 @@ def test_on_button_pressed_cancel_dismisses_false(mocker):
     modal.dismiss.assert_called_once_with(False)
 
 
-def test_on_button_pressed_add_dismisses_server_data(mocker):
-    modal = CronSSHModal()
+def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
     content = mocker.MagicMock()
@@ -105,8 +105,7 @@ def test_on_button_pressed_add_dismisses_server_data(mocker):
     content.mount.assert_not_called()
 
 
-def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker):
-    modal = CronSSHModal()
+def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker, modal):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
     modal.query_one = make_query_one(
@@ -134,8 +133,8 @@ def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker):
         }
     )
 
-def test_on_button_pressed_does_not_duplicate_existing_error(mocker):
-    modal = CronSSHModal()
+
+def test_on_button_pressed_does_not_duplicate_existing_error(mocker, modal):
     modal.dismiss = mocker.Mock()
     content = mocker.MagicMock()
     modal.query = mocker.Mock(return_value=[mocker.MagicMock()])

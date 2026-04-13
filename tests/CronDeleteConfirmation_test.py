@@ -28,10 +28,25 @@ async def test_delete_cronjob_confirm(app):
         await pilot.press("enter")
         assert not isinstance(app.screen, CronDeleteConfirmation)
 
-
-def test_delete_cronjob_local_write(mocker):
+def create_job_and_cron(mocker):
     job = mocker.MagicMock()
     cron = mocker.MagicMock()
+    return job, cron
+
+def make_remote_command(mocker, stderr_output=b"", exit_status=0):
+
+    stdin = mocker.MagicMock()
+    stdin.channel.recv_exit_status.return_value = exit_status
+
+    stderr = mocker.MagicMock()
+    stderr.read.return_value = stderr_output
+
+    ssh_client = mocker.MagicMock()
+    ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
+    return stdin, stderr, ssh_client
+
+def test_delete_cronjob_local_write(mocker):
+    job, cron = create_job_and_cron(mocker)
     modal = CronDeleteConfirmation(job=job, cron=cron)
     modal.dismiss = mocker.Mock()
     event = mocker.MagicMock()
@@ -45,9 +60,8 @@ def test_delete_cronjob_local_write(mocker):
 
 
 def test_delete_cronjob_remote_write(mocker):
-    job = mocker.MagicMock()
-    cron = mocker.MagicMock()
-    ssh_client = mocker.MagicMock()
+    job, cron = create_job_and_cron(mocker)
+    _, _, ssh_client = make_remote_command(mocker)
     modal = CronDeleteConfirmation(
         job=job, cron=cron, remote=True, ssh_client=ssh_client
     )
@@ -67,12 +81,8 @@ def test_delete_cronjob_remote_write(mocker):
 def test_write_remote_crontab(mocker):
     cron = mocker.MagicMock()
     cron.render.return_value = "* * * * * echo hello"
-    stdin = mocker.MagicMock()
-    stdin.channel.recv_exit_status.return_value = 0
-    stderr = mocker.MagicMock()
-    stderr.read.return_value = b""
-    ssh_client = mocker.MagicMock()
-    ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
+    stdin, stderr, ssh_client = make_remote_command(mocker)
+    
     modal = CronDeleteConfirmation(
         cron=cron, remote=True, ssh_client=ssh_client, crontab_user="root"
     )
@@ -88,12 +98,8 @@ def test_write_remote_crontab(mocker):
 def test_write_remote_crontab_error(mocker):
     cron = mocker.MagicMock()
     cron.render.return_value = "* * * * * echo hello"
-    stdin = mocker.MagicMock()
-    stdin.channel.recv_exit_status.return_value = 0
-    stderr = mocker.MagicMock()
-    stderr.read.return_value = b"permission denied"
-    ssh_client = mocker.MagicMock()
-    ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
+    stdin, stderr, ssh_client = make_remote_command(mocker, stderr_output=b"Error writing crontab", exit_status=1)
+
     modal = CronDeleteConfirmation(cron=cron, remote=True, ssh_client=ssh_client)
 
     result = modal.write_remote_crontab()
