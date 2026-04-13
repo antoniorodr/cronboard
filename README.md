@@ -1,14 +1,8 @@
 ![Cronboard](./assets/cronboard.png)
 [![Terminal Trove Tool of the Week](./assets/terminal-trove-week.png)](https://terminaltrove.com/cronboard/)
 
-[![GitHub top language](https://img.shields.io/github/languages/top/antoniorodr/cronboard?color=56BEB8)](https://github.com/antoniorodr/cronboard)
-[![Repository size](https://img.shields.io/github/repo-size/antoniorodr/cronboard?color=56BEB8)](https://github.com/antoniorodr/cronboard)
-[![License](https://img.shields.io/github/license/antoniorodr/Cronboard?color=56BEB8)](./LICENSE)
-
 > [!caution]
 > **Status:** Under development
-
-[About](#about) | [Demo](#demo) | [Features](#features) | [Technologies](#technologies) | [Requirements](#requirements) | [Installation](#installation) | [Getting Started](#getting-started)
 
 
 ## ℹ️ About
