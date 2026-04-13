@@ -92,9 +92,11 @@ cronboard
 
 Cronboard includes a footer, provided by [Textual](https://textual.textualize.io), that shows the available commands.
 
-When connecting to a remote server with an SSH key, Cronboard looks for the `known_hosts` file in the default location: `~/.ssh/known_hosts`.
+> [!note]
+> When connecting to a remote server with an SSH key, Cronboard looks for the `known_hosts` file in the default location: `~/.ssh/known_hosts`.
 
-If you choose to manage cron jobs for another user, make sure you have the necessary permissions. In practice, that means you need `sudo` access.
+> [!important]
+> If you choose to manage cron jobs for another user, make sure you have the necessary permissions. In practice, that means you need `sudo` access.
 
 ### ⌨️ Autocompletion
 
