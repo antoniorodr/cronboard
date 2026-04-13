@@ -152,7 +152,7 @@ The default starting point for the autocompletion is the home directory of the u
 
 ## :memo: License
 
-This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
+This project is under license from Apache 2.0. For more details, see the [LICENSE](LICENSE.md) file.
 
 ## :eyes: Do you like my work?
 
