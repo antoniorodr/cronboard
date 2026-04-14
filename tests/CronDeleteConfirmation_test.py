@@ -79,7 +79,7 @@ def test_delete_cronjob_remote_write(mocker):
 
 
 def test_write_remote_crontab(mocker):
-    cron = mocker.MagicMock()
+    cron, _ = create_job_and_cron(mocker)
     cron.render.return_value = "* * * * * echo hello"
     stdin, stderr, ssh_client = make_remote_command(mocker)
     
@@ -96,7 +96,7 @@ def test_write_remote_crontab(mocker):
 
 
 def test_write_remote_crontab_error(mocker):
-    cron = mocker.MagicMock()
+    cron, _ = create_job_and_cron(mocker)
     cron.render.return_value = "* * * * * echo hello"
     stdin, stderr, ssh_client = make_remote_command(mocker, stderr_output=b"Error writing crontab", exit_status=1)
 

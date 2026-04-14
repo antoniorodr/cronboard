@@ -38,9 +38,20 @@ def make_query_one(mapping):
     return query_one
 
 
+def create_content(mocker):
+    return mocker.MagicMock()
+
+
 @pytest.fixture
 def modal():
     return CronSSHModal()
+
+
+def create_event(button_id):
+    event = SimpleNamespace()
+    event.button = SimpleNamespace()
+    event.button.id = button_id
+    return event
 
 
 def test_compose_builds_dialog(modal):
@@ -66,8 +77,7 @@ def test_on_input_changed_removes_existing_errors(mocker, modal):
 
 def test_on_button_pressed_cancel_dismisses_false(mocker, modal):
     modal.dismiss = mocker.Mock()
-    event = mocker.MagicMock()
-    event.button.id = "cancel"
+    event = create_event("cancel")
 
     modal.on_button_pressed(event)
 
@@ -77,7 +87,7 @@ def test_on_button_pressed_cancel_dismisses_false(mocker, modal):
 def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
-    content = mocker.MagicMock()
+    content = create_content(mocker)
     modal.query_one = make_query_one(
         {
             "#hostname": SimpleNamespace(value=" node9:2222 "),
@@ -87,8 +97,7 @@ def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
             "#content": content,
         }
     )
-    event = mocker.MagicMock()
-    event.button.id = "add"
+    event = create_event("add")
 
     modal.on_button_pressed(event)
 
@@ -108,17 +117,17 @@ def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
 def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker, modal):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
+    content = create_content(mocker)
     modal.query_one = make_query_one(
         {
             "#hostname": SimpleNamespace(value="node9"),
             "#username": SimpleNamespace(value="test"),
             "#password": SimpleNamespace(value=""),
             "#crontab_user": SimpleNamespace(value=""),
-            "#content": mocker.MagicMock(),
+            "#content": content,
         }
     )
-    event = mocker.MagicMock()
-    event.button.id = "add"
+    event = create_event("add")
 
     modal.on_button_pressed(event)
 
@@ -136,7 +145,7 @@ def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker, modal
 
 def test_on_button_pressed_does_not_duplicate_existing_error(mocker, modal):
     modal.dismiss = mocker.Mock()
-    content = mocker.MagicMock()
+    content = create_content(mocker)
     modal.query = mocker.Mock(return_value=[mocker.MagicMock()])
     modal.query_one = make_query_one(
         {
@@ -147,8 +156,7 @@ def test_on_button_pressed_does_not_duplicate_existing_error(mocker, modal):
             "#content": content,
         }
     )
-    event = mocker.MagicMock()
-    event.button.id = "add"
+    event = create_event("add")
 
     modal.on_button_pressed(event)
 
