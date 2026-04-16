@@ -3,6 +3,7 @@ import pytest_asyncio
 from cronboard.app import CronBoard
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronCreator import CronAutoComplete
+from types import SimpleNamespace
 
 
 @pytest.fixture
@@ -36,3 +37,9 @@ def make_creator(mocker, **kwargs):
     cron = mocker.MagicMock()
     cron.__iter__ = mocker.MagicMock(return_value=iter([]))
     return CronCreator(cron, **kwargs)
+
+def create_event(button_id):
+    event = SimpleNamespace()
+    event.button = SimpleNamespace()
+    event.button.id = button_id
+    return event

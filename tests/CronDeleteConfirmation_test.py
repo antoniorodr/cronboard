@@ -1,6 +1,6 @@
 import pytest
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-
+from .conftest import create_event
 
 @pytest.mark.asyncio
 async def test_open_delete_cronjob_modal(app):
@@ -49,8 +49,7 @@ def test_delete_cronjob_local_write(mocker):
     job, cron = create_job_and_cron(mocker)
     modal = CronDeleteConfirmation(job=job, cron=cron)
     modal.dismiss = mocker.Mock()
-    event = mocker.MagicMock()
-    event.button.id = "delete"
+    event = create_event("delete")
 
     modal.on_button_pressed(event)
 
@@ -67,8 +66,7 @@ def test_delete_cronjob_remote_write(mocker):
     )
     modal.dismiss = mocker.Mock()
     modal.write_remote_crontab = mocker.Mock(return_value=True)
-    event = mocker.MagicMock()
-    event.button.id = "delete"
+    event = create_event("delete")
 
     modal.on_button_pressed(event)
 

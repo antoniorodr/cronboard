@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 import pytest
+from .conftest import create_event
 from cronboard_widgets.CronSSHModal import CronSSHModal
 from textual.containers import Grid
 
@@ -45,14 +46,6 @@ def create_content(mocker):
 @pytest.fixture
 def modal():
     return CronSSHModal()
-
-
-def create_event(button_id):
-    event = SimpleNamespace()
-    event.button = SimpleNamespace()
-    event.button.id = button_id
-    return event
-
 
 def test_compose_builds_dialog(modal):
     widgets = list(modal.compose())
