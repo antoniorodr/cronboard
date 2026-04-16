@@ -1,7 +1,7 @@
 # `cronboard`
 
 >[!important]
->Cronboard was selected as the [Terminal Trove Tool of the Week](https://terminaltrove.com/cronboard/) in October 28th 2024! 
+>Cronboard was selected as the [Terminal Trove Tool of the Week](https://terminaltrove.com/cronboard/) in October 28th 2025! 
 
 > [!caution]
 > **Status:** Under development
