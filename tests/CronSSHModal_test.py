@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 import pytest
-from .conftest import create_event
+from .conftest import create_event, create_content, make_query_one
 from cronboard_widgets.CronSSHModal import CronSSHModal
 from textual.containers import Grid
 
@@ -30,17 +30,6 @@ def test_parse_host_info_strips_whitespace():
 def test_parse_host_info_invalid(value):
     with pytest.raises(ValueError):
         CronSSHModal._parse_host_info(value)
-
-
-def make_query_one(mapping):
-    def query_one(selector, *_args, **_kwargs):
-        return mapping[selector]
-
-    return query_one
-
-
-def create_content(mocker):
-    return mocker.MagicMock()
 
 
 @pytest.fixture

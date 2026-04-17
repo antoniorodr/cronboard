@@ -43,3 +43,30 @@ def create_event(button_id):
     event.button = SimpleNamespace()
     event.button.id = button_id
     return event
+
+def create_job_and_cron(mocker):
+    job = mocker.MagicMock()
+    cron = mocker.MagicMock()
+    return job, cron
+
+def make_remote_command(mocker, stderr_output=b"", exit_status=0):
+
+    stdin = mocker.MagicMock()
+    stdin.channel.recv_exit_status.return_value = exit_status
+
+    stderr = mocker.MagicMock()
+    stderr.read.return_value = stderr_output
+
+    ssh_client = mocker.MagicMock()
+    ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
+    return stdin, stderr, ssh_client
+
+def make_query_one(mapping):
+    def query_one(selector, *_args, **_kwargs):
+        return mapping[selector]
+
+    return query_one
+
+
+def create_content(mocker):
+    return mocker.MagicMock()

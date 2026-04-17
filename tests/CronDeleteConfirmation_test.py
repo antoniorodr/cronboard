@@ -1,6 +1,6 @@
 import pytest
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-from .conftest import create_event
+from .conftest import create_event, create_job_and_cron, make_remote_command
 
 @pytest.mark.asyncio
 async def test_open_delete_cronjob_modal(app):
@@ -28,22 +28,7 @@ async def test_delete_cronjob_confirm(app):
         await pilot.press("enter")
         assert not isinstance(app.screen, CronDeleteConfirmation)
 
-def create_job_and_cron(mocker):
-    job = mocker.MagicMock()
-    cron = mocker.MagicMock()
-    return job, cron
 
-def make_remote_command(mocker, stderr_output=b"", exit_status=0):
-
-    stdin = mocker.MagicMock()
-    stdin.channel.recv_exit_status.return_value = exit_status
-
-    stderr = mocker.MagicMock()
-    stderr.read.return_value = stderr_output
-
-    ssh_client = mocker.MagicMock()
-    ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
-    return stdin, stderr, ssh_client
 
 def test_delete_cronjob_local_write(mocker):
     job, cron = create_job_and_cron(mocker)
