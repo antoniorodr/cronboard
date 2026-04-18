@@ -1,8 +1,9 @@
 import pytest
 from cronboard_widgets.CronInputSearch import CronInputSearch
+from textual.pilot import Pilot
 
 
-async def search_input(pilot):
+async def search_input(pilot: Pilot):
     await pilot.press("tab")
     await pilot.press("/")
     await pilot.press("c")
@@ -13,14 +14,14 @@ async def search_input(pilot):
 
 
 @pytest.mark.asyncio
-async def test_open_search_modal(pilot):
+async def test_open_search_modal(pilot: Pilot):
     await pilot.press("tab")
     await pilot.press("/")
     assert isinstance(pilot.app.screen, CronInputSearch)
 
 
 @pytest.mark.asyncio
-async def test_close_search_modal(pilot):
+async def test_close_search_modal(pilot: Pilot):
     await pilot.press("tab")
     await pilot.press("/")
     await pilot.press("escape")
@@ -28,14 +29,14 @@ async def test_close_search_modal(pilot):
 
 
 @pytest.mark.asyncio
-async def test_search_input(pilot):
+async def test_search_input(pilot: Pilot):
     crontable = pilot.app.query_one("#local-crontable")
     await search_input(pilot)
     assert crontable._search_query == "cron"
 
 
 @pytest.mark.asyncio
-async def test_clean_search_query(pilot):
+async def test_clean_search_query(pilot: Pilot):
     crontable = pilot.app.query_one("#local-crontable")
     await search_input(pilot)
     await pilot.press("escape")

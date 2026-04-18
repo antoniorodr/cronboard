@@ -1,15 +1,16 @@
 import pytest
+from cronboard.app import CronBoard
 
 
 @pytest.mark.asyncio
-async def test_change_tab(app):
+async def test_change_tab(app: CronBoard):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         assert app.local_table.has_focus
 
 
 @pytest.mark.asyncio
-async def test_refresh_data(app):
+async def test_refresh_data(app: CronBoard):
     async with app.run_test() as pilot:
         initial_data = app.local_table
         await pilot.press("r")
@@ -18,7 +19,7 @@ async def test_refresh_data(app):
 
 
 @pytest.mark.asyncio
-async def test_quit_app(app):
+async def test_quit_app(app: CronBoard):
     async with app.run_test() as pilot:
         await pilot.press("ctrl+q")
         assert app.is_running is False
