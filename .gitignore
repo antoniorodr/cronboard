@@ -179,3 +179,6 @@ pyrightconfig.json
 
 # Git-cliff
 cliff.toml
+
+# script
+update_dependencies.py
