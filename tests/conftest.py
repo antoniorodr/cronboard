@@ -1,13 +1,22 @@
 import pytest
+from pytest_mock import MockerFixture
 import pytest_asyncio
 from cronboard.app import CronBoard
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronCreator import CronAutoComplete
 from types import SimpleNamespace
+from cronboard_widgets.CronSSHModal import CronSSHModal
+from collections.abc import AsyncIterator
+from textual.pilot import Pilot
 
 
 @pytest.fixture
-def app(mocker):
+def modal():
+    yield CronSSHModal()
+
+
+@pytest.fixture
+def app(mocker: MockerFixture):
     fake_job = mocker.MagicMock()
     fake_job.comment = "test-job"
     fake_job.command = "echo hello"
@@ -28,28 +37,31 @@ def autocomplete():
 
 
 @pytest_asyncio.fixture
-async def pilot(app):
+async def pilot(app: CronBoard) -> AsyncIterator[Pilot]:
     async with app.run_test() as pilot_impl:
         yield pilot_impl
 
 
-def make_creator(mocker, **kwargs):
+def make_creator(mocker: MockerFixture, **kwargs):
     cron = mocker.MagicMock()
     cron.__iter__ = mocker.MagicMock(return_value=iter([]))
     return CronCreator(cron, **kwargs)
 
-def create_event(button_id):
+
+def create_event(button_id: SimpleNamespace):
     event = SimpleNamespace()
     event.button = SimpleNamespace()
     event.button.id = button_id
     return event
 
-def create_job_and_cron(mocker):
+
+def create_job_and_cron(mocker: MockerFixture):
     job = mocker.MagicMock()
     cron = mocker.MagicMock()
     return job, cron
 
-def make_remote_command(mocker, stderr_output=b"", exit_status=0):
+
+def make_remote_command(mocker: MockerFixture, stderr_output=b"", exit_status=0):
 
     stdin = mocker.MagicMock()
     stdin.channel.recv_exit_status.return_value = exit_status
@@ -61,6 +73,7 @@ def make_remote_command(mocker, stderr_output=b"", exit_status=0):
     ssh_client.exec_command.return_value = (stdin, mocker.MagicMock(), stderr)
     return stdin, stderr, ssh_client
 
+
 def make_query_one(mapping):
     def query_one(selector, *_args, **_kwargs):
         return mapping[selector]
@@ -68,5 +81,5 @@ def make_query_one(mapping):
     return query_one
 
 
-def create_content(mocker):
+def create_content(mocker: MockerFixture):
     return mocker.MagicMock()

@@ -1,9 +1,12 @@
 import pytest
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from .conftest import create_event, create_job_and_cron, make_remote_command
+from cronboard.app import CronBoard
+from pytest_mock import MockerFixture
+
 
 @pytest.mark.asyncio
-async def test_open_delete_cronjob_modal(app):
+async def test_open_delete_cronjob_modal(app: CronBoard):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("D")
@@ -11,7 +14,7 @@ async def test_open_delete_cronjob_modal(app):
 
 
 @pytest.mark.asyncio
-async def test_delete_cronjob_cancel(app):
+async def test_delete_cronjob_cancel(app: CronBoard):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("D")
@@ -21,7 +24,7 @@ async def test_delete_cronjob_cancel(app):
 
 
 @pytest.mark.asyncio
-async def test_delete_cronjob_confirm(app):
+async def test_delete_cronjob_confirm(app: CronBoard):
     async with app.run_test() as pilot:
         await pilot.press("tab")
         await pilot.press("D")
@@ -29,8 +32,7 @@ async def test_delete_cronjob_confirm(app):
         assert not isinstance(app.screen, CronDeleteConfirmation)
 
 
-
-def test_delete_cronjob_local_write(mocker):
+def test_delete_cronjob_local_write(mocker: MockerFixture):
     job, cron = create_job_and_cron(mocker)
     modal = CronDeleteConfirmation(job=job, cron=cron)
     modal.dismiss = mocker.Mock()
@@ -43,7 +45,7 @@ def test_delete_cronjob_local_write(mocker):
     modal.dismiss.assert_called_once_with(True)
 
 
-def test_delete_cronjob_remote_write(mocker):
+def test_delete_cronjob_remote_write(mocker: MockerFixture):
     job, cron = create_job_and_cron(mocker)
     _, _, ssh_client = make_remote_command(mocker)
     modal = CronDeleteConfirmation(
@@ -61,11 +63,11 @@ def test_delete_cronjob_remote_write(mocker):
     modal.dismiss.assert_called_once_with(True)
 
 
-def test_write_remote_crontab(mocker):
+def test_write_remote_crontab(mocker: MockerFixture):
     cron, _ = create_job_and_cron(mocker)
     cron.render.return_value = "* * * * * echo hello"
     stdin, stderr, ssh_client = make_remote_command(mocker)
-    
+
     modal = CronDeleteConfirmation(
         cron=cron, remote=True, ssh_client=ssh_client, crontab_user="root"
     )
@@ -78,10 +80,12 @@ def test_write_remote_crontab(mocker):
     stdin.channel.shutdown_write.assert_called_once_with()
 
 
-def test_write_remote_crontab_error(mocker):
+def test_write_remote_crontab_error(mocker: MockerFixture):
     cron, _ = create_job_and_cron(mocker)
     cron.render.return_value = "* * * * * echo hello"
-    stdin, stderr, ssh_client = make_remote_command(mocker, stderr_output=b"Error writing crontab", exit_status=1)
+    stdin, stderr, ssh_client = make_remote_command(
+        mocker, stderr_output=b"Error writing crontab", exit_status=1
+    )
 
     modal = CronDeleteConfirmation(cron=cron, remote=True, ssh_client=ssh_client)
 
@@ -89,6 +93,3 @@ def test_write_remote_crontab_error(mocker):
 
     assert result is False
     ssh_client.exec_command.assert_called_once_with("crontab -")
-
-
-

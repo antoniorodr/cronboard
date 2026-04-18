@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 import pytest
+from pytest_mock import MockerFixture
 from .conftest import create_event, create_content, make_query_one
 from cronboard_widgets.CronSSHModal import CronSSHModal
 from textual.containers import Grid
@@ -32,11 +33,7 @@ def test_parse_host_info_invalid(value):
         CronSSHModal._parse_host_info(value)
 
 
-@pytest.fixture
-def modal():
-    return CronSSHModal()
-
-def test_compose_builds_dialog(modal):
+def test_compose_builds_dialog(modal: CronSSHModal):
     widgets = list(modal.compose())
 
     assert len(widgets) == 1
@@ -44,7 +41,9 @@ def test_compose_builds_dialog(modal):
     assert widgets[0].id == "dialog"
 
 
-def test_on_input_changed_removes_existing_errors(mocker, modal):
+def test_on_input_changed_removes_existing_errors(
+    mocker: MockerFixture, modal: CronSSHModal
+):
     error_one = mocker.MagicMock()
     error_two = mocker.MagicMock()
     modal.query = mocker.Mock(side_effect=[[error_one], [error_one, error_two]])
@@ -57,7 +56,9 @@ def test_on_input_changed_removes_existing_errors(mocker, modal):
     error_two.remove.assert_called_once_with()
 
 
-def test_on_button_pressed_cancel_dismisses_false(mocker, modal):
+def test_on_button_pressed_cancel_dismisses_false(
+    mocker: MockerFixture, modal: CronSSHModal
+):
     modal.dismiss = mocker.Mock()
     event = create_event("cancel")
 
@@ -66,7 +67,9 @@ def test_on_button_pressed_cancel_dismisses_false(mocker, modal):
     modal.dismiss.assert_called_once_with(False)
 
 
-def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
+def test_on_button_pressed_add_dismisses_server_data(
+    mocker: MockerFixture, modal: CronSSHModal
+):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
     content = create_content(mocker)
@@ -96,7 +99,9 @@ def test_on_button_pressed_add_dismisses_server_data(mocker, modal):
     content.mount.assert_not_called()
 
 
-def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker, modal):
+def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(
+    mocker: MockerFixture, modal: CronSSHModal
+):
     modal.dismiss = mocker.Mock()
     modal.query = mocker.Mock(return_value=[])
     content = create_content(mocker)
@@ -125,7 +130,9 @@ def test_on_button_pressed_add_uses_ssh_key_when_password_is_empty(mocker, modal
     )
 
 
-def test_on_button_pressed_does_not_duplicate_existing_error(mocker, modal):
+def test_on_button_pressed_does_not_duplicate_existing_error(
+    mocker: MockerFixture, modal: CronSSHModal
+):
     modal.dismiss = mocker.Mock()
     content = create_content(mocker)
     modal.query = mocker.Mock(return_value=[mocker.MagicMock()])
