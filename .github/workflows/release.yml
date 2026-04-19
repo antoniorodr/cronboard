@@ -1,4 +1,4 @@
-name: release
+name: Testing, create changelog and release
 
 on:
   push:
@@ -6,34 +6,53 @@ on:
       - "v*"
 
 jobs:
+  test:
+    uses: ./.github/workflows/tests.yml
+  changelog:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      release_body: ${{ steps.git-cliff.outputs.content }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: -vv --latest --strip header
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+      - name: Commit changelog
+        run: |
+          git checkout main
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          set +e
+          git add CHANGELOG.md
+          git commit -m "Update changelog"
+          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git main
   release:
+    needs: changelog
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
-
       - name: Set up uv
         uses: astral-sh/setup-uv@v8.0.0
-
       - name: Build package
         run: uv build
-
-      - name: Extract changelog for version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          awk "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md \
-            > /tmp/release_notes.md
-          echo "Release notes for v${VERSION}:"
-          cat /tmp/release_notes.md
-
       - name: Create release
-        uses: ncipollo/release-action@v1.21.0
+        uses: svenstaro/upload-release-action@v2.11.5
         with:
-          tag: ${{ github.ref_name }}
-          name: Memo - ${{ github.ref_name }}
-          bodyFile: /tmp/release_notes.md
-          artifacts: dist/*
-          artifactErrorsFailBuild: true
-          makeLatest: true
+          file: dist/*
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          release-name: Cronboard - ${{ github.ref_name }}
+          body: ${{ needs.changelog.outputs.release_body }}
