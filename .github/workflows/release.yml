@@ -11,6 +11,8 @@ jobs:
   changelog:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       release_body: ${{ steps.git-cliff.outputs.content }}
     steps:
