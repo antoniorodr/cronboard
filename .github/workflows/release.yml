@@ -42,10 +42,11 @@ jobs:
       - name: Build package
         run: uv build
       - name: Create release
-        uses: svenstaro/upload-release-action@v2
+        uses: ncipollo/release-action@v1.21.0
         with:
-          file: dist/*
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          release-name: Cronboard - ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          name: Cronboard - ${{ github.ref_name }}
           body: ${{ needs.changelog.outputs.release_body }}
+          artifacts: dist/*
+          artifactErrorsFailBuild: true
+          makeLatest: true
