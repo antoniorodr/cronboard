@@ -42,7 +42,7 @@ jobs:
       - name: Build package
         run: uv build
       - name: Create release
-        uses: svenstaro/upload-release-action@v2.11.5
+        uses: svenstaro/upload-release-action@v2
         with:
           file: dist/*
           repo_token: ${{ secrets.GITHUB_TOKEN }}
