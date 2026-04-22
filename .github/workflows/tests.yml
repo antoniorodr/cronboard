@@ -2,7 +2,7 @@ name: run-tests
 on: [workflow_call]
 jobs:
   run-tests:
-    name: "Run tests"
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout and setup
