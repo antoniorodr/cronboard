@@ -25,9 +25,10 @@ class CronServers(Widget):
     def __init__(self) -> None:
         super().__init__()
         self.servers_path = Path.home() / ".config/cronboard/servers.toml"
+        self._load_error: str | None = None
         self.servers = self.load_servers()
         self.current_ssh_client = None
-        self.current_cron_table = None
+        self.current_cron_table
 
     def compose(self) -> ComposeResult:
         servers_tree = CronTree("Servers", id="servers-tree")
@@ -44,6 +45,8 @@ class CronServers(Widget):
         )
 
     def on_mount(self) -> None:
+        if self._load_error:
+            self.notify(f"❌ {self._load_error}", severity="error")
         servers_tree = self.query_one("#servers-tree", Tree)
         for server_id, server_info in self.servers.items():
             servers_tree.root.add_leaf(
@@ -191,7 +194,7 @@ class CronServers(Widget):
 
                 return loaded_servers
             except Exception as e:
-                print(f"❌ Warning: Failed to load servers: {e}")
+                self._load_error = f"Warning: Failed to load servers: {e}"
         else:
             print("📝 No servers file found, starting with empty list")
         return {}
