@@ -142,6 +142,7 @@ class CronServers(Widget):
         self.content_area = disconnected_label
 
     def action_disconnect_server(self) -> None:
+        disconnected_name = None
         if self.current_ssh_client:
             try:
                 self.current_ssh_client.close()
@@ -152,8 +153,12 @@ class CronServers(Widget):
         self.show_disconnected_message()
 
         for server_info in self.servers.values():
+            if server_info.get("connected"):
+                disconnected_name = server_info["name"]
             server_info["connected"] = False
-            self.notify(f"Disconnected from server {server_info['name']}")
+
+        if disconnected_name:
+            self.notify(f"Disconnected from {disconnected_name}")
 
         self.save_servers()
 
