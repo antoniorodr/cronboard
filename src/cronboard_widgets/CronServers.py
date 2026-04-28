@@ -28,6 +28,7 @@ class CronServers(Widget):
         self.servers = self.load_servers()
         self.current_ssh_client = None
         self.current_cron_table = None
+        self.current_server_name = None
 
     def compose(self) -> ComposeResult:
         servers_tree = CronTree("Servers", id="servers-tree")
@@ -86,6 +87,7 @@ class CronServers(Widget):
                     pass
 
             self.current_ssh_client = ssh_client
+            self.current_server_name = server_info["name"]
             self.show_cron_table_for_server(ssh_client, server_info, crontab_user)
 
             server_info["connected"] = True
@@ -153,7 +155,12 @@ class CronServers(Widget):
 
         for server_info in self.servers.values():
             server_info["connected"] = False
-            self.notify(f"Disconnected from server {server_info['name']}")
+
+        connected_server_name = self.current_server_name
+        self.current_server_name = None
+
+        if connected_server_name:
+            self.notify(f"Disconnected from server {connected_server_name}")
 
         self.save_servers()
 
