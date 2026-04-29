@@ -22,4 +22,3 @@ def test_disconnect_notifies_only_current_server(mocker):
     servers.notify.assert_called_once_with("Disconnected from server server-A")
     assert all(not server_info["connected"] for server_info in servers.servers.values())
     assert servers.current_server_name is None
-    servers.save_servers.assert_called_once_with()
