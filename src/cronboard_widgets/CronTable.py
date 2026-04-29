@@ -5,6 +5,11 @@ from textual.coordinate import Coordinate
 from datetime import datetime
 from rich.text import Text
 from cronboard_widgets.CronInputSearch import CronInputSearch
+from cronboard_widgets.CronCommand import (
+    create_user_crontab,
+    remote_crontab_list_command,
+    remote_crontab_write_command,
+)
 
 
 class CronTable(DataTable):
@@ -35,17 +40,13 @@ class CronTable(DataTable):
         self._search_query: str = ""
 
     def on_mount(self) -> None:
-        self.cron: CronTab = CronTab(user=True)
+        self.cron: CronTab = create_user_crontab()
         self.add_columns(
             "ID", "Expression", "Command", "Last Run", "Next Run", "Status"
         )
 
         if self.remote and self.ssh_client:
-            crontab_cmd = (
-                f"crontab -u {self.crontab_user} -l"
-                if self.crontab_user
-                else "crontab -l"
-            )
+            crontab_cmd = remote_crontab_list_command(self.crontab_user)
             _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status = stdout.channel.recv_exit_status()
 
@@ -170,11 +171,7 @@ class CronTable(DataTable):
     def action_refresh(self) -> None:
         """Refresh the cronjob list."""
         if self.remote and self.ssh_client:
-            crontab_cmd = (
-                f"crontab -u {self.crontab_user} -l"
-                if self.crontab_user
-                else "crontab -l"
-            )
+            crontab_cmd = remote_crontab_list_command(self.crontab_user)
             _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status = stdout.channel.recv_exit_status()
 
@@ -185,7 +182,7 @@ class CronTable(DataTable):
 
             self.ssh_cron = CronTab(tab=self.crontab_content)
         else:
-            self.cron = CronTab(user=True)
+            self.cron = create_user_crontab()
         self.load_crontabs()
         self.refresh_bindings()
 
@@ -350,11 +347,7 @@ class CronTable(DataTable):
         try:
             new_crontab_content = self.ssh_cron.render()
 
-            crontab_cmd = (
-                f"crontab -u {self.crontab_user} -"
-                if self.crontab_user
-                else "crontab -"
-            )
+            crontab_cmd = remote_crontab_write_command(self.crontab_user)
             stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
