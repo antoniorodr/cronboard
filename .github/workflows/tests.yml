@@ -10,7 +10,7 @@ jobs:
         with:
           submodules: false
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
       - name: Install uv
