@@ -266,6 +266,10 @@ class CronCreator(ModalScreen[bool]):
         await self.dismiss(False)
 
     def on_input_changed(self, event: Input.Changed) -> None:
+        error_labels = self.query("#error")
+        for label in error_labels:
+            label.remove()
+
         if event.input.id != "expression":
             return
 
@@ -273,13 +277,12 @@ class CronCreator(ModalScreen[bool]):
         expr = event.value.strip()
         self.expression_description(expr, label_desc)
 
-        error_labels = self.query("#error")
-        for label in error_labels:
-            label.remove()
-
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id != "save":
             self.dismiss(False)
+            return
+
+        if self.query("#error"):
             return
 
         identificator_input = self.query_one("#identificator", Input)
