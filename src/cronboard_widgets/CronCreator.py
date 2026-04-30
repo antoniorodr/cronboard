@@ -15,6 +15,7 @@ from textual_autocomplete._path_autocomplete import (
     PathDropdownItem,
 )
 from cron_descriptor import Options, ExpressionDescriptor
+from cronboard_widgets.CronCommand import remote_crontab_write_command
 
 
 CRON_ALIASES = {
@@ -350,11 +351,7 @@ class CronCreator(ModalScreen[bool]):
         if self.remote and self.ssh_client:
             try:
                 new_crontab_content = self.cron.render()
-                crontab_cmd = (
-                    f"crontab -u {self.crontab_user} -"
-                    if self.crontab_user
-                    else "crontab -"
-                )
+                crontab_cmd = remote_crontab_write_command(self.crontab_user)
                 stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
                 stdin.write(new_crontab_content)
                 stdin.channel.shutdown_write()

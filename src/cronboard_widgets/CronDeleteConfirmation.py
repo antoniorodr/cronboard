@@ -1,9 +1,12 @@
 from textual.app import ComposeResult
-from crontab import CronTab
 from textual.binding import Binding
 from textual.widgets import Button, Label
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
+from cronboard_widgets.CronCommand import (
+    create_user_crontab,
+    remote_crontab_write_command,
+)
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
@@ -22,7 +25,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         super().__init__()
         self.server = server
         self.job = job
-        self.cron = cron if cron else CronTab(user=True)
+        self.cron = cron if cron else create_user_crontab()
         self.remote = remote
         self.ssh_client = ssh_client
         self.message = message
@@ -79,11 +82,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         try:
             new_crontab_content = self.cron.render()
 
-            crontab_cmd = (
-                f"crontab -u {self.crontab_user} -"
-                if self.crontab_user
-                else "crontab -"
-            )
+            crontab_cmd = remote_crontab_write_command(self.crontab_user)
             stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()

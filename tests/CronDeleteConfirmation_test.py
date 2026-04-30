@@ -1,5 +1,6 @@
 import pytest
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
+from cronboard_widgets.CronCommand import remote_crontab_write_command
 from .conftest import create_event, create_job_and_cron, make_remote_command
 from cronboard.app import CronBoard
 from pytest_mock import MockerFixture
@@ -75,7 +76,7 @@ def test_write_remote_crontab(mocker: MockerFixture):
     result = modal.write_remote_crontab()
 
     assert result is True
-    ssh_client.exec_command.assert_called_once_with("crontab -u root -")
+    ssh_client.exec_command.assert_called_once_with(remote_crontab_write_command("root"))
     stdin.write.assert_called_once_with("* * * * * echo hello")
     stdin.channel.shutdown_write.assert_called_once_with()
 
@@ -92,4 +93,4 @@ def test_write_remote_crontab_error(mocker: MockerFixture):
     result = modal.write_remote_crontab()
 
     assert result is False
-    ssh_client.exec_command.assert_called_once_with("crontab -")
+    ssh_client.exec_command.assert_called_once_with(remote_crontab_write_command())
