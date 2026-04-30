@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.2] - 2026-04-19
+## [0.5.4] - 30.04.2026
+
+### Fixed
+- Fix error with the release package by @antoniorodr
+
+## [0.5.3] - 29.04.2026
+
+### Changed
+- Update mirror workflow by @antoniorodr
+- Update docs and tests workflows by @antoniorodr
+- Update cliff config by @antoniorodr
+- Update release and tests workflows by @antoniorodr
+
+### Fixed
+- Notify once when disconnecting server by @volcano303
+
+### Removed
+- Delete project explanation file by @antoniorodr
+- Remove unreachable line by @volcano303
+
+### New Contributors
+* @volcano303 made their first contribution
+
+## [0.5.2] - 19.04.2026
 
 ### Added
 - Add typing to tests by @antoniorodr
@@ -17,8 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add nix flake by @antoniorodr
 
 ### Changed
-- Merge branch 'release/workflows'
-- Update uploade-release version
+- Merge branch 'release/workflows' by @antoniorodr
+- Change release workflow action by @antoniorodr
+- Update changelog using git-cliff by @antoniorodr
+- Merge branch 'release/workflows' by @antoniorodr
+- Update uploade-release version by @antoniorodr
 - Merge branch 'release/workflows' by @antoniorodr
 - Merge branch 'release/workflows' by @antoniorodr
 - Update write permissions by @antoniorodr
@@ -78,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * @RunningKuma made their first contribution
 * @bitloi made their first contribution
 
-## [0.5.1] - 2026-03-06
+## [0.5.1] - 06.03.2026
 
 ### Added
 - Add release workflow by @antoniorodr
@@ -97,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update readme and contributing by @antoniorodr
 - Update pyproject for coverage by @antoniorodr
 
-## [0.5.0] - 2026-03-04
+## [0.5.0] - 04.03.2026
 
 ### Added
 - Add q as an additional way to close app by @Zaloog
@@ -119,7 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Create new modal CronInputSearch to search cronjobs by @antoniorodr
 - Update tcss to style the new CronInputSearch modal by @antoniorodr
 
-## [0.4.3] - 2026-02-23
+## [0.4.3] - 23.02.2026
 
 ### Added
 - Add escape binding also to ModalDeleteScreen by @Zaloog
@@ -137,7 +163,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update LICENSE to Apache 2.0 non AI by @antoniorodr
 - Delete aur workflow by @antoniorodr
 
-## [0.4.2] - 2026-02-17
+## [0.4.2] - 17.02.2026
 
 ### Added
 - Add editorconfig file to the project by @antoniorodr
@@ -151,7 +177,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update PKGBUILD and SRCINFO by @antoniorodr
 - Update Changelog by @antoniorodr
 
-## [0.4.1] - 2026-02-09
+## [0.4.1] - 09.02.2026
 
 ### Added
 - Add stale.yml to automate closing and stale status by @antoniorodr
@@ -167,7 +193,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @it-education-md made their first contribution in [#17](https://github.com/antoniorodr/cronboard/pull/17)
 
-## [0.4.0] - 2025-11-11
+## [0.4.0] - 11.11.2025
 
 ### Added
 - Add autocompletion when creating cron jobs by @antoniorodr
@@ -191,7 +217,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * @Zaloog made their first contribution
 * @micisse made their first contribution in [#13](https://github.com/antoniorodr/cronboard/pull/13)
 
-## [0.3.1] - 2025-10-24
+## [0.3.1] - 24.10.2025
 
 ### Added
 - Add documentation file in markdown by @antoniorodr
@@ -202,7 +228,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update CONTRIBUTING file by @antoniorodr
 - Update CONTRIBUTING.md file by @antoniorodr
 
-## [0.3.0] - 2025-10-22
+## [0.3.0] - 22.10.2025
 
 ### Added
 - Added possibility to choose crontab user by @antoniorodr
@@ -216,14 +242,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set GitHub Sponsors username to 'antoniorodr' by @antoniorodr
 - Update README by @antoniorodr
 
-## [0.2.2] - 2025-10-17
+## [0.2.2] - 17.10.2025
 
 ### Changed
 - Change to behold the special expressions as it is when saving the cronjob by @antoniorodr
 - Update README with new logo by @antoniorodr
 - Update readme by @antoniorodr
 
-## [0.2.1] - 2025-10-17
+## [0.2.1] - 17.10.2025
 
 ### Changed
 - Update README for SSH by @antoniorodr
@@ -234,7 +260,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix tomlkit dependency and add support for special strings (@weekly etc) by @antoniorodr
 
-## [0.2.0] - 2025-10-15
+## [0.2.0] - 15.10.2025
 
 ### Added
 - Add .SRCINFO file to AUR by @antoniorodr
@@ -245,7 +271,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update README by @antoniorodr
 - Create pkgbuild and workflow by @antoniorodr
 
-## [0.1.2] - 2025-10-13
+## [0.1.2] - 13.10.2025
 
 ### Added
 - Add ssh connection using ssh key by @antoniorodr
@@ -261,7 +287,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Small fix in version by @antoniorodr
 - Update readme by @antoniorodr
 
-## [0.1.1] - 2025-10-11
+## [0.1.1] - 11.10.2025
 
 ### Changed
 - V0.1.1 release by @antoniorodr
@@ -274,7 +300,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project structure update by @antoniorodr
 - Change email in code of conduct by @antoniorodr
 
-## [0.1.0] - 2025-10-10
+## [0.1.0] - 10.10.2025
 
 ### Added
 - Add SSH connection by @antoniorodr
@@ -297,6 +323,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[0.5.4]: https://github.com/antoniorodr/cronboard/compare/v0.5.3...v0.5.4
+[0.5.3]: https://github.com/antoniorodr/cronboard/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/antoniorodr/cronboard/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/antoniorodr/cronboard/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/antoniorodr/cronboard/compare/v0.4.3...v0.5.0
