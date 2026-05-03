@@ -20,6 +20,7 @@ class CronServers(Widget):
         Binding("D", "delete_server", "Delete Server"),
         Binding("c", "connect_server", "Connect"),
         Binding("d", "disconnect_server", "Disconnect Server"),
+        Binding("J", "jump", "Jump"),
     ]
 
     def __init__(self) -> None:
@@ -300,3 +301,21 @@ class CronServers(Widget):
             message=f"Are you sure you want to delete the server '{server_info['name']}' ?",
         )
         self.app.push_screen(confirmation_modal, on_delete_confirmed)
+
+    def focus_tree(self):
+        try:
+            self._focus_tree()
+        except:
+            self.call_after_refresh(self._focus_tree)
+    
+    def _focus_tree(self):
+        tree = self.query_one("#servers-tree", Tree)
+        if tree:
+            tree.focus()
+
+    def action_jump(self) -> None:
+        servers_tree = self.query_one("#servers-tree", Tree)
+        if servers_tree.has_focus and self.current_cron_table:
+            self.current_cron_table.focus()
+        else:
+            servers_tree.focus()
