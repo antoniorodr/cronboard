@@ -6,7 +6,7 @@ from pathlib import Path
 from textual import events
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Footer, Label, Tabs, Tab, Tree, Button, Input, Checkbox, MaskedInput, RadioButton, Select, Switch, TextArea
+from textual.widgets import Footer, Label, Tabs, Tab, Button, Input, Checkbox, MaskedInput, RadioButton, Select, Switch, TextArea
 from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
