@@ -9,7 +9,6 @@ from cronboard_widgets.CronCreator import CronAutoComplete
 @pytest.mark.asyncio
 async def test_open_create_cronjob_modal(app: CronBoard):
     async with app.run_test() as pilot:
-        await pilot.press("tab")
         await pilot.press("c")
         assert isinstance(app.screen, CronCreator)
 
