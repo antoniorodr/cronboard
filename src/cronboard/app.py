@@ -6,7 +6,20 @@ from pathlib import Path
 from textual import events
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Footer, Label, Tabs, Tab, Button, Input, Checkbox, MaskedInput, RadioButton, Select, Switch, TextArea
+from textual.widgets import (
+    Footer,
+    Label,
+    Tabs,
+    Tab,
+    Button,
+    Input,
+    Checkbox,
+    MaskedInput,
+    RadioButton,
+    Select,
+    Switch,
+    TextArea,
+)
 from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
@@ -14,8 +27,13 @@ from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronServers import CronServers
 
+
 def is_form_element(element):
-    return isinstance(element, (Input, Checkbox, Button, MaskedInput, RadioButton, Select, Switch, TextArea))
+    return isinstance(
+        element,
+        (Input, Checkbox, Button, MaskedInput, RadioButton, Select, Switch, TextArea),
+    )
+
 
 class CronBoard(App):
     """A Textual App to manage cron jobs."""
@@ -25,7 +43,7 @@ class CronBoard(App):
 
     BINDINGS = [
         Binding("q,ctrl+q", "quit", "Quit", priority=True),
-        Binding("Tab", "next_tab_and_focus", "Change Panel"),
+        Binding("Tab", "next_tab_and_focus", "Change Tab"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -90,7 +108,7 @@ class CronBoard(App):
     def on_key(self, event: events.Key) -> None:
         if event.key != "tab":
             return
-        
+
         if is_form_element(self.focused):
             return
 
