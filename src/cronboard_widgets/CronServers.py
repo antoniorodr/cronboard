@@ -20,7 +20,7 @@ class CronServers(Widget):
         Binding("D", "delete_server", "Delete Server"),
         Binding("c", "connect_server", "Connect"),
         Binding("d", "disconnect_server", "Disconnect Server"),
-        Binding("J", "jump", "Jump"),
+        Binding("J", "jump", "Switch Panel"),
     ]
 
     def __init__(self) -> None:
@@ -148,11 +148,10 @@ class CronServers(Widget):
         if self.current_ssh_client:
             try:
                 self.current_ssh_client.close()
+                self.show_disconnected_message()
             except:
                 pass
             self.current_ssh_client = None
-
-        self.show_disconnected_message()
 
         for server_info in self.servers.values():
             server_info["connected"] = False
@@ -162,6 +161,8 @@ class CronServers(Widget):
 
         if connected_server_name:
             self.notify(f"Disconnected from server {connected_server_name}")
+        else:
+            self.notify("You are not connected to any server")
 
         self.save_servers()
 
@@ -307,7 +308,7 @@ class CronServers(Widget):
             self._focus_tree()
         except:
             self.call_after_refresh(self._focus_tree)
-    
+
     def _focus_tree(self):
         tree = self.query_one("#servers-tree", Tree)
         if tree:
