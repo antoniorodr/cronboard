@@ -8,7 +8,6 @@ from pytest_mock import MockerFixture
 @pytest.mark.asyncio
 async def test_open_delete_cronjob_modal(app: CronBoard):
     async with app.run_test() as pilot:
-        await pilot.press("tab")
         await pilot.press("D")
         assert isinstance(app.screen, CronDeleteConfirmation)
 
@@ -16,7 +15,6 @@ async def test_open_delete_cronjob_modal(app: CronBoard):
 @pytest.mark.asyncio
 async def test_delete_cronjob_cancel(app: CronBoard):
     async with app.run_test() as pilot:
-        await pilot.press("tab")
         await pilot.press("D")
         await pilot.press("tab")
         await pilot.press("enter")
@@ -26,7 +24,6 @@ async def test_delete_cronjob_cancel(app: CronBoard):
 @pytest.mark.asyncio
 async def test_delete_cronjob_confirm(app: CronBoard):
     async with app.run_test() as pilot:
-        await pilot.press("tab")
         await pilot.press("D")
         await pilot.press("enter")
         assert not isinstance(app.screen, CronDeleteConfirmation)

@@ -1,3 +1,4 @@
+import pytest
 from cronboard_widgets.CronServers import CronServers
 
 
