@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from textual.app import ComposeResult
 from crontab import CronTab
-from textual.widgets import Button, Label, Input
+from textual.widgets import Button, Label, Input, RadioButton, RadioSet
 from textual.binding import Binding
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
@@ -15,7 +15,7 @@ from textual_autocomplete._path_autocomplete import (
     PathDropdownItem,
 )
 from cron_descriptor import Options, ExpressionDescriptor
-
+from cronboard.services.logging.cron_wrapper import has_wrapper, wrap_command, command_without_wrapper
 
 CRON_ALIASES = {
     "@reboot": None,
@@ -219,6 +219,7 @@ class CronCreator(ModalScreen[bool]):
         self.expression = expression
         self.command = command
         self.identificator = identificator
+        self.log_enabled = has_wrapper(command) if command else False
         self.cron: CronTab = cron
         self.remote = remote
         self.ssh_client = ssh_client
@@ -233,7 +234,7 @@ class CronCreator(ModalScreen[bool]):
                 yield Label("- = range of values", id="label_dash")
                 yield Label("/ = step values", id="label_slash")
                 yield Label(
-                    "Enter a valid cron expression (remember whitespaces):", id="label1"
+                    "Enter a valid cron expression (remember whitespaces):", classes="form-label"
                 )
                 yield Label("Minute - Hour - Day - Month - Weekday", id="label2")
                 yield Input(
@@ -242,33 +243,60 @@ class CronCreator(ModalScreen[bool]):
                     id="expression",
                 )
                 yield Label("", id="label_desc")
-                yield Label("Enter the command to execute:", id="label3")
+                yield Label("Enter the command to execute:", classes="form-label mt-2")
                 command_input = Input(
-                    value="" if self.command is None else self.command,
+                    value="" if self.command is None else command_without_wrapper(self.command),
                     placeholder="e.g., python3 /usr/bin/python</path/to/script.py>",
                     id="command",
                 )
                 yield command_input
                 yield CronAutoComplete(target=command_input)
-                yield Label("Enter an ID for the cron job", id="label4")
+                yield Label("Enter an ID for the cron job", classes="form-label mt-2 pt-2")
                 yield Input(
                     value="" if self.identificator is None else self.identificator,
                     placeholder="e.g., backup-job-1",
                     id="identificator",
+                )
+                yield Label("Tick if you want to enable logging", classes="form-label mt-2 pt-2")
+                yield RadioSet(
+                    RadioButton("Enable logging", id="enable", value=self.log_enabled),
+                    RadioButton("Disable logging", id="disable", value=not self.log_enabled),
                 )
                 yield Horizontal(
                     Button("Save", variant="primary", id="save"),
                     Button("Cancel", variant="error", id="cancel"),
                     id="button-row",
                 )
+                yield Label("", id="error")
 
     async def action_close_modal(self):
         await self.dismiss(False)
 
+    def _show_error(self, message: str):
+        error_label = self.query_one("#error")
+        error_label.update(message)
+        error_label.display = True
+
+    def _clear_error(self):
+        error_label = self.query_one("#error")
+        error_label.update("")
+        error_label.display = False
+
+    def _has_error(self):
+        error_label = self.query_one("#error")
+        return bool(error_label.display)
+
     def on_input_changed(self, event: Input.Changed) -> None:
-        error_labels = self.query("#error")
-        for label in error_labels:
-            label.remove()
+        self._clear_error()
+        if event.input.id == "identificator":
+            ident = event.value.strip()
+            if not ident:
+                self._show_error("ID cannot be empty.")
+                return
+
+            if " " in ident:
+                self._show_error("ID cannot contain spaces. e.g., backup_job_1")
+                return
 
         if event.input.id != "expression":
             return
@@ -277,12 +305,18 @@ class CronCreator(ModalScreen[bool]):
         expr = event.value.strip()
         self.expression_description(expr, label_desc)
 
+    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        if event.pressed.id == "enable":
+            self.log_enabled = True
+        else:
+            self.log_enabled = False
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id != "save":
             self.dismiss(False)
             return
 
-        if self.query("#error"):
+        if self._has_error():
             return
 
         identificator_input = self.query_one("#identificator", Input)
@@ -294,11 +328,16 @@ class CronCreator(ModalScreen[bool]):
         content = self.query_one("#content", Vertical)
 
         if not identificator:
-            error_label = Label("ID cannot be empty.", id="error")
-            content.mount(error_label)
+            self._show_error("ID cannot be empty.")
+            return
+
+        if " " in identificator:
+            self._show_error("ID cannot contain spaces. e.g., backup_job_1")
             return
 
         try:
+            if self.log_enabled:
+                command = wrap_command(command, identificator)
             job = self.find_if_cronjob_exists(identificator, command)
 
             if job:
@@ -313,11 +352,7 @@ class CronCreator(ModalScreen[bool]):
             self.dismiss(True)
 
         except (ValueError, KeyError):
-            if not self.query("#error"):
-                error_label = Label(
-                    "Invalid cron expression. Please try again.", id="error"
-                )
-                content.mount(error_label)
+            self._show_error("Invalid cron expression. Please try again.")
 
     def expression_description(self, expr: str, label_desc: Label) -> None:
         if not expr:

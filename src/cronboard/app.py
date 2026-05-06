@@ -16,6 +16,7 @@ from textual.widgets import (
     Checkbox,
     MaskedInput,
     RadioButton,
+    RadioSet,
     Select,
     Switch,
     TextArea,
@@ -31,7 +32,7 @@ from cronboard_widgets.CronServers import CronServers
 def is_form_element(element):
     return isinstance(
         element,
-        (Input, Checkbox, Button, MaskedInput, RadioButton, Select, Switch, TextArea),
+        (Input, Checkbox, Button, MaskedInput, RadioButton, RadioSet, Select, Switch, TextArea),
     )
 
 
