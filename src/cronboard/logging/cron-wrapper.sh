@@ -19,7 +19,9 @@ LOG_FILE="$LOG_DIR/${JOB_NAME}_${TIMESTAMP}.log"
   echo ""
 } > "$LOG_FILE"
 
-"$@" >> "$LOG_FILE" 2>&1
+{
+  "$@"
+} >> "$LOG_FILE" 2> >(sed 's/^.*: line [0-9]\+: //g' >> "$LOG_FILE")
 EXIT_CODE=$?
 
 {
