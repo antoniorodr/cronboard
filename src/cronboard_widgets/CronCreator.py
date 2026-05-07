@@ -336,15 +336,12 @@ class CronCreator(ModalScreen[bool]):
             return
 
         try:
+
+            job = self.find_if_cronjob_exists(identificator, command_without_wrapper(command))
+            if not job:
+                job = self.find_if_cronjob_exists(identificator, wrap_command(command, identificator, self.ssh_client if self.remote and self.ssh_client else None))
             if self.log_enabled:
-                command = wrap_command(command, identificator)
-            job = self.find_if_cronjob_exists(identificator, command)
-
-            if not job:
-                job = self.find_if_cronjob_exists(identificator, command_without_wrapper(command))
-            if not job:
-                job = self.find_if_cronjob_exists(identificator, wrap_command(command, identificator))
-
+                command = wrap_command(command, identificator, self.ssh_client if self.remote and self.ssh_client else None)
             if job:
                 job.set_command(command)
                 job.setall(expression)

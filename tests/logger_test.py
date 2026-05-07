@@ -48,6 +48,65 @@ def test_get_log_files_returns_dict(mocker: MockerFixture):
     }
 
 
+def test_get_log_files_ssh_returns_filtered_logs(mocker: MockerFixture):
+    ssh = mocker.Mock()
+
+    # Mock "echo $HOME"
+    stdout_home = mocker.Mock()
+    stdout_home.read.return_value = b"/home/test\n"
+
+    # Mock "ls"
+    stdout_ls = mocker.Mock()
+    stdout_ls.read.return_value = b"""app1_a.log
+app1_b.log
+app2_c.log
+random.txt
+"""
+
+    stderr = mocker.Mock()
+    stderr.read.return_value = b""
+
+    ssh.exec_command.side_effect = [
+        (None, stdout_home, stderr),  # echo $HOME
+        (None, stdout_ls, stderr),    # ls
+    ]
+
+    from cronboard.services.logging.logger import get_log_files
+
+    result = get_log_files("app1", ssh=ssh)
+
+    assert result == {
+        "app1_a": "/home/test/.cronboard/logs/app1_a.log",
+        "app1_b": "/home/test/.cronboard/logs/app1_b.log",
+    }
+
+
+def test_get_log_files_ssh_no_matching_logs(mocker: MockerFixture):
+    ssh = mocker.Mock()
+
+    stdout_home = mocker.Mock()
+    stdout_home.read.return_value = b"/home/test\n"
+
+    stdout_ls = mocker.Mock()
+    stdout_ls.read.return_value = b"""other.log
+file.txt
+"""
+
+    stderr = mocker.Mock()
+    stderr.read.return_value = b""
+
+    ssh.exec_command.side_effect = [
+        (None, stdout_home, stderr),
+        (None, stdout_ls, stderr),
+    ]
+
+    from cronboard.services.logging.logger import get_log_files
+
+    result = get_log_files("app1", ssh=ssh)
+
+    assert result == {}
+
+
 def test_read_log_file_returns_no_logs_when_missing(mocker: MockerFixture):
     mock_file = mocker.patch("cronboard.services.logging.logger.Path")
 
@@ -73,3 +132,39 @@ def test_read_log_file_returns_lines(mocker: MockerFixture):
     result = read_log_file("/fake/path.log", ssh=None)
 
     assert result == ["line1\n", "line2\n", "line3\n"]
+
+
+def test_read_log_file_ssh_success(mocker: MockerFixture):
+    ssh = mocker.Mock()
+
+    stdout = mocker.Mock()
+    stdout.read.return_value = b"line1\nline2\n"
+
+    stderr = mocker.Mock()
+    stderr.read.return_value = b""
+
+    ssh.exec_command.return_value = (None, stdout, stderr)
+
+    from cronboard.services.logging.logger import read_log_file
+
+    result = read_log_file("/remote/log.log", ssh=ssh)
+
+    assert result == ["line1\n", "line2\n"]
+
+
+def test_read_log_file_ssh_file_missing(mocker: MockerFixture):
+    ssh = mocker.Mock()
+
+    stdout = mocker.Mock()
+    stdout.read.return_value = b""
+
+    stderr = mocker.Mock()
+    stderr.read.return_value = b"some error"
+
+    ssh.exec_command.return_value = (None, stdout, stderr)
+
+    from cronboard.services.logging.logger import read_log_file
+
+    result = read_log_file("/remote/missing.log", ssh=ssh)
+
+    assert result == ["No logs found"]

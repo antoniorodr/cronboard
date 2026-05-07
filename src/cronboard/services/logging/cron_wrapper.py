@@ -56,13 +56,14 @@ def install_wrapper_local():
 
 
 def install_wrapper_remote(ssh: paramiko.SSHClient):
-    if is_wrapper_installed_remote(ssh):
-        return
     stdin, stdout, stderr = ssh.exec_command("echo $HOME")
     home = stdout.read().decode().strip()
 
     remote_dir = f"{home}/{WRAPPER_DIST_DIR}"
     remote_file = f"{home}/{WRAPPER_DIST}"
+
+    if is_wrapper_installed_remote(ssh):
+        return remote_file
 
     sftp = ssh.open_sftp()
 

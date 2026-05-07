@@ -15,10 +15,10 @@ class LogList(Widget):
             self.log_path = log_path
             super().__init__()
 
-    def __init__(self, identificator: str, *args, **kwargs):
+    def __init__(self, identificator: str, ssh_client=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.identificator = identificator
-        self.log_paths = get_log_files(identificator)
+        self.log_paths = get_log_files(identificator, ssh_client)
         self.logs = list(self.log_paths.keys())
 
     def compose(self):
@@ -55,9 +55,10 @@ class LogView(Widget):
         Binding("j", "jump", "Switch Panel"),
     ]
 
-    def __init__(self, identificator: str) -> None:
+    def __init__(self, identificator: str, ssh_client=None) -> None:
         super().__init__()
-        self.log_list = LogList(identificator=identificator, id="log-list")
+        self.ssh_client = ssh_client
+        self.log_list = LogList(identificator=identificator, id="log-list", ssh_client=ssh_client)
         self.log_output = Log(classes="focusable")
 
     def compose(self) -> ComposeResult:
@@ -92,7 +93,7 @@ class LogView(Widget):
     def show_log(self, event: LogList.LogSelected):
         self.log_output.clear()
 
-        for line in read_log_file(event.log_path):
+        for line in read_log_file(event.log_path, self.ssh_client):
             self.log_output.write_line(line)
 
 
@@ -104,7 +105,7 @@ class LogViewModal(ModalScreen[bool]):
         self.ssh_client = ssh_client
     def compose(self) -> ComposeResult:
         dialog = Grid(
-            LogView(identificator=self.identificator),
+            LogView(identificator=self.identificator, ssh_client=self.ssh_client),
             id="dialog",
         )
 

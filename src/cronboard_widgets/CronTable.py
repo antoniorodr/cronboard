@@ -308,9 +308,9 @@ class CronTable(DataTable):
         expr = row[1]
         cmd = row[2]
 
-        job_to_edit = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator))
+        job_to_edit = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
         if job_to_edit:
-            self.action_edit_cronjob_keybind(identificator, expr, wrap_command(cmd, identificator))
+            self.action_edit_cronjob_keybind(identificator, expr, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
             return
 
         if not job_to_edit:
@@ -330,7 +330,9 @@ class CronTable(DataTable):
         job_to_delete = self.find_if_cronjob_exists(identificator, cmd)
 
         if job_to_delete is None:
-            job_to_delete = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator))
+            job_to_delete = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+        if job_to_delete is None:
+            job_to_delete = self.find_if_cronjob_exists(identificator, command_without_wrapper(cmd))
 
         if job_to_delete:
             self.action_delete_cronjob_keybind(job_to_delete)
@@ -397,5 +399,5 @@ class CronTable(DataTable):
         identificator = row[0]
 
         self.app.push_screen(
-            LogViewModal(identificator=identificator),
+            LogViewModal(identificator=identificator, ssh_client=self.ssh_client if self.remote and self.ssh_client else None),
         )
