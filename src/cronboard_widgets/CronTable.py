@@ -5,7 +5,8 @@ from textual.coordinate import Coordinate
 from datetime import datetime
 from rich.text import Text
 from cronboard_widgets.CronInputSearch import CronInputSearch
-
+from cronboard.services.logging.cron_wrapper import has_wrapper, wrap_command, command_without_wrapper
+from cronboard.widgets.LogView import LogViewModal
 
 class CronTable(DataTable):
     BINDINGS = [
@@ -22,6 +23,7 @@ class CronTable(DataTable):
         Binding("r", "refresh", "Refresh"),
         Binding("p", "pause_cronjob", "Pause Toggle"),
         Binding("e", "edit_cronjob", "Edit"),
+        Binding("L", "view_logs", "View Logs"),
     ]
 
     def __init__(self, remote=False, ssh_client=None, crontab_user=None, **kwargs):
@@ -37,7 +39,7 @@ class CronTable(DataTable):
     def on_mount(self) -> None:
         self.cron: CronTab = CronTab(user=True)
         self.add_columns(
-            "ID", "Expression", "Command", "Last Run", "Next Run", "Status"
+            "ID", "Expression", "Command", "Log Enabled", "Last Run", "Next Run", "Status"
         )
 
         if self.remote and self.ssh_client:
@@ -88,7 +90,8 @@ class CronTable(DataTable):
     def parse_cron(self, cron):
         for job in cron:
             expr = job.slices.render()
-            cmd = job.command
+            cmd = command_without_wrapper(job.command)
+            log_enabled = has_wrapper(job.command)
             identificator = job.comment if job.comment else "No ID"
             try:
                 active_status = "Active" if job.is_enabled() else "Paused"
@@ -116,10 +119,10 @@ class CronTable(DataTable):
                 status_text = Text(active_status, style="#F6BF00")
 
             self.add_row(
-                identificator, expr, cmd, str(last_dt), str(next_dt), status_text
+                identificator, expr, cmd, str(log_enabled), str(last_dt), str(next_dt), status_text
             )
             self._rows_data.append(
-                (identificator, expr, cmd, str(last_dt), str(next_dt), status_text)
+                (identificator, expr, cmd, str(log_enabled), str(last_dt), str(next_dt), status_text)
             )
 
     def load_crontabs(self):
@@ -305,8 +308,13 @@ class CronTable(DataTable):
         expr = row[1]
         cmd = row[2]
 
-        job_to_edit = self.find_if_cronjob_exists(identificator, cmd)
+        job_to_edit = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+        if job_to_edit:
+            self.action_edit_cronjob_keybind(identificator, expr, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+            return
 
+        if not job_to_edit:
+            job_to_edit = self.find_if_cronjob_exists(identificator, cmd)
         if job_to_edit:
             self.action_edit_cronjob_keybind(identificator, expr, cmd)
 
@@ -320,6 +328,11 @@ class CronTable(DataTable):
         cmd = row[2]
 
         job_to_delete = self.find_if_cronjob_exists(identificator, cmd)
+
+        if job_to_delete is None:
+            job_to_delete = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+        if job_to_delete is None:
+            job_to_delete = self.find_if_cronjob_exists(identificator, command_without_wrapper(cmd))
 
         if job_to_delete:
             self.action_delete_cronjob_keybind(job_to_delete)
@@ -376,3 +389,15 @@ class CronTable(DataTable):
         except Exception as e:
             print(f"❌ Error writing remote crontab: {e}")
             return False
+
+    def action_view_logs(self) -> None:
+        """View logs for the selected cronjob."""
+        if self.cursor_row is None:
+            return
+
+        row = self.get_row_at(self.cursor_row)
+        identificator = row[0]
+
+        self.app.push_screen(
+            LogViewModal(identificator=identificator, ssh_client=self.ssh_client if self.remote and self.ssh_client else None),
+        )

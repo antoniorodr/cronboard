@@ -7,7 +7,7 @@
     scrollbar-background-active: $surface-darken-1;
 }
 
-CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch {
+CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch, LogViewModal {
     align: center middle;
 }
 
@@ -34,7 +34,15 @@ CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch {
     text-style: bold;
 }
 
-#servers-tree {
+.focusable {
+    border: round $primary 50%;
+
+    &:focus-within {
+        border: round $primary;
+    }
+}
+
+#servers-tree, #log-list {
     width: 18%;
     border: round $primary 50%;
 
@@ -143,11 +151,6 @@ CronTabs {
     }
 }
 
-#label1 {
-    color: $text;
-    text-style: bold;
-}
-
 #label2 {
     color: $text-muted;
     margin-bottom: 1;
@@ -171,19 +174,6 @@ CronTabs {
     margin-bottom: 2;
 }
 
-#label3 {
-    color: $text;
-    text-style: bold;
-    margin-top: 2;
-}
-
-#label4 {
-    color: $text;
-    text-style: bold;
-    margin-top: 2;
-    padding-top: 2;
-}
-
 #expression {
     width: 100%;
     margin-bottom: 1;
@@ -204,3 +194,15 @@ CronTabs {
     margin: 0 1;
 }
 
+.form-label {
+    color: $text;
+    text-style: bold;
+}
+
+.mt-2 {
+    margin-top: 2;
+}
+
+.pt-2 {
+    padding-top: 2;
+}
