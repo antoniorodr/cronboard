@@ -7,7 +7,7 @@
     scrollbar-background-active: $surface-darken-1;
 }
 
-CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch {
+CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch, LogViewModal {
     align: center middle;
 }
 
@@ -34,7 +34,15 @@ CronCreator, CronDeleteConfirmation, CronSSHModal, CronInputSearch {
     text-style: bold;
 }
 
-#servers-tree {
+.focusable {
+    border: round $primary 50%;
+
+    &:focus-within {
+        border: round $primary;
+    }
+}
+
+#servers-tree, #log-list {
     width: 18%;
     border: round $primary 50%;
 

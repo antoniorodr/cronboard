@@ -69,6 +69,7 @@ class CronBoard(App):
         self.content_container.mount(self.local_table)
         self.local_table.display = True
         self.set_focus(self.local_table)
+        self.tab_disabled = False
 
     def load_config(self):
         if self.config_path.exists():
@@ -106,8 +107,18 @@ class CronBoard(App):
             self.local_table.display = False
             self.servers.display = True
 
+    def disable_tab(self):
+        self.tab_disabled = True
+
+    def enable_tab(self):
+        self.tab_disabled = False
+
     def on_key(self, event: events.Key) -> None:
         if event.key != "tab":
+            return
+
+        if self.tab_disabled:
+            event.prevent_default()
             return
 
         if is_form_element(self.focused):

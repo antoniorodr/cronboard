@@ -340,6 +340,11 @@ class CronCreator(ModalScreen[bool]):
                 command = wrap_command(command, identificator)
             job = self.find_if_cronjob_exists(identificator, command)
 
+            if not job:
+                job = self.find_if_cronjob_exists(identificator, command_without_wrapper(command))
+            if not job:
+                job = self.find_if_cronjob_exists(identificator, wrap_command(command, identificator))
+
             if job:
                 job.set_command(command)
                 job.setall(expression)
