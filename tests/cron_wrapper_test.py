@@ -1,9 +1,81 @@
-import os
 import stat
 from pathlib import Path
 import pytest
+import paramiko
 from pytest_mock import MockerFixture
 import cronboard.services.logging.cron_wrapper as mod
+
+def test_get_remote_home_success(
+    mocker: MockerFixture
+):
+    ssh_mock = mocker.Mock()
+
+    stdout_mock = mocker.Mock()
+    stdout_mock.read.return_value = b"/home/testuser\n"
+
+    stderr_mock = mocker.Mock()
+    stderr_mock.read.return_value = b""
+
+    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+
+    result = mod.get_remote_home(ssh_mock)
+
+    assert result == "/home/testuser"
+    ssh_mock.exec_command.assert_called_once_with("echo $HOME")
+
+def test_get_remote_home_stderr_error(
+    mocker: MockerFixture
+):
+    ssh_mock = mocker.Mock()
+
+    stdout_mock = mocker.Mock()
+    stdout_mock.read.return_value = b"/home/testuser\n"
+
+    stderr_mock = mocker.Mock()
+    stderr_mock.read.return_value = b"some error"
+
+    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+
+    result = mod.get_remote_home(ssh_mock)
+
+    assert result is None
+
+def test_get_remote_home_empty_output(
+    mocker: MockerFixture
+):
+    ssh_mock = mocker.Mock()
+
+    stdout_mock = mocker.Mock()
+    stdout_mock.read.return_value = b"\n"
+
+    stderr_mock = mocker.Mock()
+    stderr_mock.read.return_value = b""
+
+    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+
+    result = mod.get_remote_home(ssh_mock)
+
+    assert result is None
+
+def test_get_remote_home_ssh_exception(
+    mocker: MockerFixture
+):
+    ssh_mock = mocker.Mock()
+    ssh_mock.exec_command.side_effect = paramiko.SSHException("connection failed")
+
+    result = mod.get_remote_home(ssh_mock)
+
+    assert result is None
+
+def test_get_remote_home_generic_exception(
+    mocker: MockerFixture
+):
+    ssh_mock = mocker.Mock()
+    ssh_mock.exec_command.side_effect = Exception("boom")
+
+    result = mod.get_remote_home(ssh_mock)
+
+    assert result is None
 
 def test_is_wrapper_installed_local_true(
     mocker: MockerFixture, tmp_path
@@ -18,7 +90,7 @@ def test_is_wrapper_installed_local_true(
 
     mocker.patch.object(mod, "WRAPPER_SOURCE", wrapper_source)
 
-    result = mod.install_wrapper_local()
+    mod.install_wrapper_local()
 
     assert mod.is_wrapper_installed_local() is True
 
@@ -39,13 +111,15 @@ def test_is_wrapper_installed_remote_true(
 
     def exec_command(cmd):
         mock_stdout = mocker.Mock()
+        mock_stderr = mocker.Mock()
+        mock_stderr.read.return_value = b""  # no error
 
         if cmd == "echo $HOME":
             mock_stdout.read.return_value = b"/home/user\n"
         else:
             mock_stdout.read.return_value = b"OK\n"
 
-        return (None, mock_stdout, None)
+        return (None, mock_stdout, mock_stderr)
 
     ssh.exec_command.side_effect = exec_command
 
@@ -105,7 +179,10 @@ def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_pa
     stdout = mocker.Mock()
     stdout.read.return_value = b"/remote/home/user\n"
 
-    ssh.exec_command.return_value = (mocker.Mock(), stdout, mocker.Mock())
+    stderr = mocker.Mock()
+    stderr.read.return_value = b""  # no error
+
+    ssh.exec_command.return_value = (mocker.Mock(), stdout, stderr)
 
     sftp = mocker.Mock()
     ssh.open_sftp.return_value = sftp
@@ -136,11 +213,25 @@ def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_pa
 def test_install_wrapper_remote_closes_sftp_even_if_put_raises(
     mocker: MockerFixture
 ):
-    ssh = mocker.Mock(spec=["exec_command", "open_sftp"])
+    ssh = mocker.Mock()
 
-    stdout = mocker.Mock()
-    stdout.read.return_value = b"/remote/home/user\n"
-    ssh.exec_command.return_value = (mocker.Mock(), stdout, mocker.Mock())
+    def exec_command(cmd):
+        stdout = mocker.Mock()
+        stderr = mocker.Mock()
+        stderr.read.return_value = b""
+
+        if cmd == "echo $HOME":
+            stdout.read.return_value = b"/remote/home/user\n"
+
+        elif "test -f" in cmd:
+            stdout.read.return_value = b"MISSING\n"
+
+        else:
+            stdout.read.return_value = b""
+
+        return (None, stdout, stderr)
+
+    ssh.exec_command.side_effect = exec_command
 
     sftp = mocker.Mock()
     sftp.put.side_effect = RuntimeError("upload failed")
@@ -148,10 +239,8 @@ def test_install_wrapper_remote_closes_sftp_even_if_put_raises(
 
     mocker.patch.object(mod, "WRAPPER_SOURCE", Path("/local/cron-wrapper.sh"))
 
-    with pytest.raises(RuntimeError, match="upload failed"):
-        mod.install_wrapper_remote(ssh)
-
-    sftp.close.assert_called_once_with()
+    assert mod.install_wrapper_remote(ssh) is None
+    sftp.close.assert_called_once()
 
 
 def test_install_wrapper_calls_local_when_ssh_is_none(
@@ -172,10 +261,15 @@ def test_install_wrapper_calls_remote_when_ssh_provided(
     assert res == "/remote/path"
     mock_remote.assert_called_once_with(ssh)
 
-def test_wrap_command_basic(mocker: MockerFixture):
-    mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
+@pytest.fixture
+def mock_bash(mocker):
+    return mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
 
+@pytest.fixture
+def mock_wrapper_installed(mocker):
+    return mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
+
+def test_wrap_command_basic(mock_bash, mock_wrapper_installed):
     res = mod.wrap_command("echo hello", "job-1")
 
     assert res == "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
@@ -190,134 +284,100 @@ def test_wrap_command_fallback_bash(mocker: MockerFixture):
     assert res == "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
 
 
-def test_wrap_command_with_already_wrapped_command(mocker: MockerFixture):
-    mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_wrap_command_with_already_wrapped_command(mock_bash, mock_wrapper_installed):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
     res = mod.wrap_command(cmd, "job-1")
 
     assert res == cmd
 
 
-def test_wrap_command_includes_identificator(mocker: MockerFixture):
-    mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_wrap_command_includes_identificator(mock_bash, mock_wrapper_installed):
     res = mod.wrap_command("echo hello", "job-42")
 
     assert res == "/bin/bash /tmp/cron-wrapper.sh job-42 echo hello"
 
 
-def test_has_wrapper_valid(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_has_wrapper_valid(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
     assert mod.has_wrapper(cmd) is True
 
 
-def test_has_wrapper_missing_identificator(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_has_wrapper_missing_identificator(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh echo hello" # echo is identificator here
     assert mod.has_wrapper(cmd) is True
 
 
-def test_has_wrapper_wrong_bash(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_has_wrapper_wrong_bash(mock_bash):
     cmd = "/usr/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
     assert mod.has_wrapper(cmd) is False
 
 
-def test_has_wrapper_non_wrapper1(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_has_wrapper_non_wrapper1(mock_bash):
     cmd = "/bin/bash /tmp/not-wrapper.sh job-1 echo hello"
     assert mod.has_wrapper(cmd) is False
 
-def test_has_wrapper_non_wrapper2(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_has_wrapper_non_wrapper2(mock_bash):
     cmd = "echo hello"
     assert mod.has_wrapper(cmd) is False
 
 
-def test_command_without_wrapper_valid(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_valid(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello world"
     res = mod.command_without_wrapper(cmd)
 
     assert res == "echo hello world"
 
 
-def test_command_without_wrapper_wrong_bash(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_wrong_bash(mock_bash):
     cmd = "/usr/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_non_wrapper(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_non_wrapper(mock_bash):
     cmd = "/bin/bash /tmp/not-wrapper.sh job-1 echo hello"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_too_short(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_too_short(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_parse_error(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_parse_error(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1 'unterminated"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_complex_command(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_complex_command(mock_bash):
     cmd = '/bin/bash /tmp/cron-wrapper.sh job-1 python3 script.py --arg "value with spaces"'
     res = mod.command_without_wrapper(cmd)
 
     assert res == "python3 script.py --arg value with spaces"
 
 
-def test_command_without_wrapper_passthrough(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_passthrough(mock_bash):
     cmd = "python3 script.py --arg s"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_missing_command(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_missing_command(mock_bash):
     cmd = "/bin/bash /tmp/cron-wrapper.sh job-1"
     res = mod.command_without_wrapper(cmd)
 
     assert res == cmd
 
 
-def test_command_without_wrapper_extra_spaces(mocker: MockerFixture):
-    mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
+def test_command_without_wrapper_extra_spaces(mock_bash):
     cmd = "  /bin/bash   /tmp/cron-wrapper.sh   job-1   echo   hello  "
     res = mod.command_without_wrapper(cmd)
 

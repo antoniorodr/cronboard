@@ -4,10 +4,34 @@ import paramiko
 from pathlib import Path
 import shlex
 import shutil
+from typing import Optional
 
 WRAPPER_SOURCE = Path(__file__).parent.parent.parent / "logging" / "cron-wrapper.sh"
 WRAPPER_DIST_DIR = ".cronboard"
 WRAPPER_DIST = f"{WRAPPER_DIST_DIR}/cron-wrapper.sh"
+
+def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
+    try:
+        _, stdout, stderr = ssh.exec_command("echo $HOME")
+        home = stdout.read().decode().strip()
+        err = stderr.read().decode().strip()
+
+        if err:
+            print(f"Error: Failed to get HOME: {err}")
+            return None
+
+        if not home:
+            print("Error: HOME directory is empty")
+            return None
+
+        return home
+
+    except paramiko.SSHException as e:
+        print(f"Error: {e}")
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def is_wrapper_installed_local() -> bool:
     target_file = Path.home() / WRAPPER_DIST
@@ -20,16 +44,23 @@ def is_wrapper_installed_local() -> bool:
 
 
 def is_wrapper_installed_remote(ssh: paramiko.SSHClient) -> bool:
-    stdin, stdout, stderr = ssh.exec_command("echo $HOME")
-    home = stdout.read().decode().strip()
+    home = get_remote_home(ssh)
+    if not home:
+        return False
 
     remote_file = f"{home}/{WRAPPER_DIST}"
 
-    stdin, stdout, stderr = ssh.exec_command(
+    _, stdout, stderr = ssh.exec_command(
         f"test -f {remote_file} && test -x {remote_file} && echo OK || echo MISSING"
     )
 
     result = stdout.read().decode().strip()
+    err = stderr.read().decode().strip()
+
+    if err:
+        print(f"Error: {err}")
+        return False
+
     return result == "OK"
 
 def is_wrapper_installed(ssh: paramiko.SSHClient | None = None) -> bool:
@@ -56,8 +87,9 @@ def install_wrapper_local():
 
 
 def install_wrapper_remote(ssh: paramiko.SSHClient):
-    stdin, stdout, stderr = ssh.exec_command("echo $HOME")
-    home = stdout.read().decode().strip()
+    home = get_remote_home(ssh)
+    if not home:
+        return None
 
     remote_dir = f"{home}/{WRAPPER_DIST_DIR}"
     remote_file = f"{home}/{WRAPPER_DIST}"
@@ -71,6 +103,9 @@ def install_wrapper_remote(ssh: paramiko.SSHClient):
         ssh.exec_command(f"mkdir -p {remote_dir}")
         sftp.put(str(WRAPPER_SOURCE), remote_file)
         ssh.exec_command(f"chmod +x {remote_file}")
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
     finally:
         sftp.close()
 
@@ -85,6 +120,10 @@ def install_wrapper(ssh: paramiko.SSHClient | None = None):
     
 def wrap_command(command: str, identificator: str, ssh: paramiko.SSHClient | None = None):
     wrapper_path = install_wrapper(ssh)
+    if wrapper_path is None:
+        # If this is None, it means failed to install wrapper in ssh server
+        return command
+
     bash_path = shutil.which("bash") or "/bin/bash"
     try:
         parts = shlex.split(command)
@@ -92,7 +131,7 @@ def wrap_command(command: str, identificator: str, ssh: paramiko.SSHClient | Non
         # If it can't be parsed, just wrap it (safer than guessing)
         parts = []
 
-    # Detect already wrapped command
+    # Confirm if it already wrapped
     if (
         len(parts) >= 3
         and parts[0] == bash_path

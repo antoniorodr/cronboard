@@ -1,8 +1,8 @@
 import paramiko
 import shlex
-import shutil
 from pathlib import Path
 import posixpath
+from cronboard.services.logging.cron_wrapper import get_remote_home
 
 LOG_DIR = ".cronboard/logs"
 
@@ -16,8 +16,9 @@ def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
             for p in log_dir.glob(f"{identificator}_*.log")
         }
     else:
-        stdin, stdout, stderr = ssh.exec_command("echo $HOME")
-        home = stdout.read().decode().strip()
+        home = get_remote_home(ssh)
+        if not home:
+            return {}
         log_dir = posixpath.join(home, LOG_DIR)
 
         cmd = f'ls {log_dir} 2>/dev/null'
