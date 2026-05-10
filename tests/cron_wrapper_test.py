@@ -1,22 +1,25 @@
 import stat
 from pathlib import Path
-import pytest
+
 import paramiko
 from pytest_mock import MockerFixture
+
 import cronboard.services.logging.cron_wrapper as mod
+
+from .conftest import (
+    home_dir_under_tmp,
+    patch_cron_wrapper_path_home,
+    ssh_mock_exec_raises,
+    ssh_mock_exec_return,
+    ssh_mock_home_then_other,
+    ssh_mock_install_remote_put_fail_exec,
+)
+
 
 def test_get_remote_home_success(
     mocker: MockerFixture
 ):
-    ssh_mock = mocker.Mock()
-
-    stdout_mock = mocker.Mock()
-    stdout_mock.read.return_value = b"/home/testuser\n"
-
-    stderr_mock = mocker.Mock()
-    stderr_mock.read.return_value = b""
-
-    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+    ssh_mock = ssh_mock_exec_return(mocker, stdout=b"/home/testuser\n")
 
     result = mod.get_remote_home(ssh_mock)
 
@@ -26,15 +29,11 @@ def test_get_remote_home_success(
 def test_get_remote_home_stderr_error(
     mocker: MockerFixture
 ):
-    ssh_mock = mocker.Mock()
-
-    stdout_mock = mocker.Mock()
-    stdout_mock.read.return_value = b"/home/testuser\n"
-
-    stderr_mock = mocker.Mock()
-    stderr_mock.read.return_value = b"some error"
-
-    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+    ssh_mock = ssh_mock_exec_return(
+        mocker,
+        stdout=b"/home/testuser\n",
+        stderr=b"some error",
+    )
 
     result = mod.get_remote_home(ssh_mock)
 
@@ -43,15 +42,7 @@ def test_get_remote_home_stderr_error(
 def test_get_remote_home_empty_output(
     mocker: MockerFixture
 ):
-    ssh_mock = mocker.Mock()
-
-    stdout_mock = mocker.Mock()
-    stdout_mock.read.return_value = b"\n"
-
-    stderr_mock = mocker.Mock()
-    stderr_mock.read.return_value = b""
-
-    ssh_mock.exec_command.return_value = (None, stdout_mock, stderr_mock)
+    ssh_mock = ssh_mock_exec_return(mocker, stdout=b"\n")
 
     result = mod.get_remote_home(ssh_mock)
 
@@ -60,8 +51,9 @@ def test_get_remote_home_empty_output(
 def test_get_remote_home_ssh_exception(
     mocker: MockerFixture
 ):
-    ssh_mock = mocker.Mock()
-    ssh_mock.exec_command.side_effect = paramiko.SSHException("connection failed")
+    ssh_mock = ssh_mock_exec_raises(
+        mocker, paramiko.SSHException("connection failed")
+    )
 
     result = mod.get_remote_home(ssh_mock)
 
@@ -70,8 +62,7 @@ def test_get_remote_home_ssh_exception(
 def test_get_remote_home_generic_exception(
     mocker: MockerFixture
 ):
-    ssh_mock = mocker.Mock()
-    ssh_mock.exec_command.side_effect = Exception("boom")
+    ssh_mock = ssh_mock_exec_raises(mocker, Exception("boom"))
 
     result = mod.get_remote_home(ssh_mock)
 
@@ -80,10 +71,8 @@ def test_get_remote_home_generic_exception(
 def test_is_wrapper_installed_local_true(
     mocker: MockerFixture, tmp_path
 ):
-    home = tmp_path / "home"
-    home.mkdir(parents=True)
-
-    mocker.patch("cronboard.services.logging.cron_wrapper.Path.home", return_value=home)
+    home = home_dir_under_tmp(tmp_path)
+    patch_cron_wrapper_path_home(mocker, home)
 
     wrapper_source = tmp_path / "cron-wrapper.sh"
     wrapper_source.write_text("#!/bin/sh\necho test")
@@ -98,8 +87,8 @@ def test_is_wrapper_installed_local_true(
 def test_is_wrapper_installed_local_false(
     mocker: MockerFixture, tmp_path
 ):
-    home = tmp_path / "home"
-    mocker.patch.object(mod.Path, "home", return_value=home)
+    home = home_dir_under_tmp(tmp_path, mkdir=False)
+    patch_cron_wrapper_path_home(mocker, home)
 
     assert mod.is_wrapper_installed_local() is False
 
@@ -107,21 +96,11 @@ def test_is_wrapper_installed_local_false(
 def test_is_wrapper_installed_remote_true(
     mocker: MockerFixture
 ):
-    ssh = mocker.Mock()
-
-    def exec_command(cmd):
-        mock_stdout = mocker.Mock()
-        mock_stderr = mocker.Mock()
-        mock_stderr.read.return_value = b""  # no error
-
-        if cmd == "echo $HOME":
-            mock_stdout.read.return_value = b"/home/user\n"
-        else:
-            mock_stdout.read.return_value = b"OK\n"
-
-        return (None, mock_stdout, mock_stderr)
-
-    ssh.exec_command.side_effect = exec_command
+    ssh = ssh_mock_home_then_other(
+        mocker,
+        home_stdout=b"/home/user\n",
+        other_stdout=b"OK\n",
+    )
 
     assert mod.is_wrapper_installed_remote(ssh) is True
 
@@ -148,10 +127,8 @@ def test_is_wrapper_installed_remote_false(
 def test_install_wrapper_local_creates_dir_and_copies_and_sets_executable(
     mocker: MockerFixture, tmp_path
 ):
-    home = tmp_path / "home"
-    home.mkdir(parents=True)
-
-    mocker.patch.object(mod.Path, "home", return_value=home)
+    home = home_dir_under_tmp(tmp_path)
+    patch_cron_wrapper_path_home(mocker, home)
 
     wrapper_source = tmp_path / "cron-wrapper.sh"
     wrapper_source.write_bytes(b"#!/bin/sh\necho hello\n")
@@ -174,15 +151,12 @@ def test_install_wrapper_local_creates_dir_and_copies_and_sets_executable(
 def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_path(
     mocker: MockerFixture
 ):
-    ssh = mocker.Mock(spec=["exec_command", "open_sftp"])
-
-    stdout = mocker.Mock()
-    stdout.read.return_value = b"/remote/home/user\n"
-
-    stderr = mocker.Mock()
-    stderr.read.return_value = b""  # no error
-
-    ssh.exec_command.return_value = (mocker.Mock(), stdout, stderr)
+    ssh = ssh_mock_exec_return(
+        mocker,
+        stdout=b"/remote/home/user\n",
+        stdin=mocker.Mock(),
+        spec=["exec_command", "open_sftp"],
+    )
 
     sftp = mocker.Mock()
     ssh.open_sftp.return_value = sftp
@@ -213,25 +187,7 @@ def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_pa
 def test_install_wrapper_remote_closes_sftp_even_if_put_raises(
     mocker: MockerFixture
 ):
-    ssh = mocker.Mock()
-
-    def exec_command(cmd):
-        stdout = mocker.Mock()
-        stderr = mocker.Mock()
-        stderr.read.return_value = b""
-
-        if cmd == "echo $HOME":
-            stdout.read.return_value = b"/remote/home/user\n"
-
-        elif "test -f" in cmd:
-            stdout.read.return_value = b"MISSING\n"
-
-        else:
-            stdout.read.return_value = b""
-
-        return (None, stdout, stderr)
-
-    ssh.exec_command.side_effect = exec_command
+    ssh = ssh_mock_install_remote_put_fail_exec(mocker)
 
     sftp = mocker.Mock()
     sftp.put.side_effect = RuntimeError("upload failed")
@@ -260,14 +216,6 @@ def test_install_wrapper_calls_remote_when_ssh_provided(
     res = mod.install_wrapper(ssh=ssh)
     assert res == "/remote/path"
     mock_remote.assert_called_once_with(ssh)
-
-@pytest.fixture
-def mock_bash(mocker):
-    return mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
-
-@pytest.fixture
-def mock_wrapper_installed(mocker):
-    return mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
 
 def test_wrap_command_basic(mock_bash, mock_wrapper_installed):
     res = mod.wrap_command("echo hello", "job-1")

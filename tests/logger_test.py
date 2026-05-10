@@ -5,6 +5,8 @@ from pytest_mock import MockerFixture
 
 from cronboard.services.logging.logger import get_log_files, read_log_file
 
+from .conftest import ssh_mock_exec_return, ssh_mock_exec_sequence
+
 _LOGGER = "cronboard.services.logging.logger"
 _FAKE_HOME = Path("/fake/home")
 
@@ -21,26 +23,6 @@ def _patch_local_log_discovery(
         mocker.patch.object(Path, "glob", return_value=glob_paths)
 
 
-def _ssh_mock_home_then_ls(
-    mocker: MockerFixture,
-    *,
-    home_read: bytes,
-    ls_read: bytes,
-):
-    ssh = mocker.Mock()
-    stdout_home = mocker.Mock()
-    stdout_home.read.return_value = home_read
-    stdout_ls = mocker.Mock()
-    stdout_ls.read.return_value = ls_read
-    stderr = mocker.Mock()
-    stderr.read.return_value = b""
-    ssh.exec_command.side_effect = [
-        (None, stdout_home, stderr),
-        (None, stdout_ls, stderr),
-    ]
-    return ssh
-
-
 def _patch_logger_path_and_instance(
     mocker: MockerFixture,
     *,
@@ -50,21 +32,6 @@ def _patch_logger_path_and_instance(
     fake_path = mocker.Mock()
     fake_path.exists.return_value = exists
     mock_cls.return_value = fake_path
-
-
-def _ssh_mock_single_exec(
-    mocker: MockerFixture,
-    *,
-    stdout_read: bytes,
-    stderr_read: bytes,
-):
-    ssh = mocker.Mock()
-    stdout = mocker.Mock()
-    stdout.read.return_value = stdout_read
-    stderr = mocker.Mock()
-    stderr.read.return_value = stderr_read
-    ssh.exec_command.return_value = (None, stdout, stderr)
-    return ssh
 
 
 def test_get_log_files_returns_empty_when_dir_missing(mocker: MockerFixture):
@@ -130,10 +97,9 @@ file.txt
     ids=["filtered", "no_match"],
 )
 def test_get_log_files_ssh(mocker: MockerFixture, ls_read: bytes, expected: dict):
-    ssh = _ssh_mock_home_then_ls(
+    ssh = ssh_mock_exec_sequence(
         mocker,
-        home_read=b"/home/test\n",
-        ls_read=ls_read,
+        [(b"/home/test\n", b""), (ls_read, b"")],
     )
 
     assert get_log_files("app1", ssh=ssh) == expected
@@ -183,17 +149,17 @@ def test_read_log_file_ssh(
     remote_path: str,
     expected: list[str],
 ):
-    ssh = _ssh_mock_single_exec(
+    ssh = ssh_mock_exec_return(
         mocker,
-        stdout_read=stdout_read,
-        stderr_read=stderr_read,
+        stdout=stdout_read,
+        stderr=stderr_read,
     )
 
     assert read_log_file(remote_path, ssh=ssh) == expected
 
 
 def test_read_log_file_ssh_empty_stdout_and_stderr(mocker: MockerFixture):
-    ssh = _ssh_mock_single_exec(mocker, stdout_read=b"", stderr_read=b"")
+    ssh = ssh_mock_exec_return(mocker, stdout=b"", stderr=b"")
 
     assert read_log_file("/remote/empty.log", ssh=ssh) == []
 
@@ -201,10 +167,10 @@ def test_read_log_file_ssh_empty_stdout_and_stderr(mocker: MockerFixture):
 def test_read_log_file_ssh_returns_empty_when_stderr_has_noise(
     mocker: MockerFixture,
 ):
-    ssh = _ssh_mock_single_exec(
+    ssh = ssh_mock_exec_return(
         mocker,
-        stdout_read=b"line\n",
-        stderr_read=b"warning: cat wrote to stderr\n",
+        stdout=b"line\n",
+        stderr=b"warning: cat wrote to stderr\n",
     )
 
     assert read_log_file("/remote/log.log", ssh=ssh) == []
