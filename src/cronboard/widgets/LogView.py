@@ -145,14 +145,10 @@ class LogViewModal(ModalScreen[bool]):
         self.identificator = identificator
         self.ssh_client = ssh_client
     def compose(self) -> ComposeResult:
-        dialog = Grid(
+        yield Grid(
             LogView(identificator=self.identificator, ssh_client=self.ssh_client),
             id="dialog",
         )
-
-        dialog.styles.width = "90%"
-        dialog.styles.height = "85%"
-        yield dialog
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         self.app.enable_tab()

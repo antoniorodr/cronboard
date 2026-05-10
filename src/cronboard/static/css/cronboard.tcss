@@ -130,6 +130,13 @@ CronTabs {
     border: thick $primary;
 }
 
+LogViewModal #dialog {
+    width: 96%;
+    height: 94%;
+    max-width: 100%;
+    min-height: 28;
+}
+
 #content {
     align: center middle;
     width: 100%;
