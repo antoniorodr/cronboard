@@ -288,6 +288,12 @@ class CronTable(DataTable):
 
         job_to_toggle = self.find_if_cronjob_exists(identificator, cmd)
 
+        if job_to_toggle is None:
+            job_to_toggle = self.find_if_cronjob_exists(identificator, wrap_command(cmd, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+
+        if job_to_toggle is None:
+            job_to_toggle = self.find_if_cronjob_exists(identificator, command_without_wrapper(cmd))
+
         if job_to_toggle:
             job_to_toggle.enable(
                 False
