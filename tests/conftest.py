@@ -1,13 +1,14 @@
-import pytest
-from pytest_mock import MockerFixture
-import pytest_asyncio
-from cronboard.app import CronBoard
-from cronboard_widgets.CronCreator import CronCreator
-from cronboard_widgets.CronCreator import CronAutoComplete
-from types import SimpleNamespace
-from cronboard_widgets.CronSSHModal import CronSSHModal
 from collections.abc import AsyncIterator
+from types import SimpleNamespace
+
+import pytest
+import pytest_asyncio
+from pytest_mock import MockerFixture
 from textual.pilot import Pilot
+
+from cronboard.app import CronBoard
+from cronboard_widgets.CronCreator import CronAutoComplete, CronCreator
+from cronboard_widgets.CronSSHModal import CronSSHModal
 
 
 @pytest.fixture

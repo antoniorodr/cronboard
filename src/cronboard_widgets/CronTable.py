@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from crontab import CronTab
-from textual.widgets import DataTable
+from rich.text import Text
 from textual.binding import Binding
 from textual.coordinate import Coordinate
-from datetime import datetime
-from rich.text import Text
+from textual.widgets import DataTable
+
 from cronboard_widgets.CronInputSearch import CronInputSearch
 
 

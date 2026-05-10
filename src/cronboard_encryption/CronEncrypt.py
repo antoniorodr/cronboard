@@ -1,5 +1,6 @@
-from cryptography.fernet import Fernet
 import os
+
+from cryptography.fernet import Fernet
 
 CONFIG_DIR = os.path.expanduser("~/.config/cronboard")
 KEY_FILE = os.path.join(CONFIG_DIR, "secret.key")
