@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-LOG_DIR="${CRONBOARD_LOG_DIR:-$HOME/.cronboard/logs}"
+LOG_DIR="${CRONBOARD_LOG_DIR:-$HOME/.config/cronboard/logs}"
 mkdir -p "$LOG_DIR"
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")

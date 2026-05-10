@@ -7,7 +7,7 @@ import shutil
 from typing import Optional
 
 WRAPPER_SOURCE = Path(__file__).parent.parent.parent / "logging" / "cron-wrapper.sh"
-WRAPPER_DIST_DIR = ".cronboard"
+WRAPPER_DIST_DIR = ".config/cronboard"
 WRAPPER_DIST = f"{WRAPPER_DIST_DIR}/cron-wrapper.sh"
 
 def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:

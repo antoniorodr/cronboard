@@ -161,14 +161,14 @@ def test_install_wrapper_local_creates_dir_and_copies_and_sets_executable(
     out_path_str = mod.install_wrapper_local()
     out_path = Path(out_path_str)
 
-    assert out_path == home / ".cronboard" / "cron-wrapper.sh"
+    assert out_path == home / ".config/cronboard" / "cron-wrapper.sh"
     assert out_path.exists()
     assert out_path.read_bytes() == wrapper_source.read_bytes()
 
     mode = out_path.stat().st_mode
     assert mode & stat.S_IEXEC
 
-    assert out_path.parent.name == ".cronboard"
+    assert out_path.parent.name == "cronboard"
 
 
 def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_path(
@@ -192,7 +192,7 @@ def test_install_wrapper_remote_executes_expected_commands_and_returns_remote_pa
 
     remote_path = mod.install_wrapper_remote(ssh)
 
-    expected_remote_dir = "/remote/home/user/.cronboard"
+    expected_remote_dir = "/remote/home/user/.config/cronboard"
     expected_remote_file = f"{expected_remote_dir}/cron-wrapper.sh"
 
     assert remote_path == expected_remote_file

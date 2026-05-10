@@ -70,12 +70,12 @@ def _ssh_mock_single_exec(
 def test_get_log_files_returns_empty_when_dir_missing(mocker: MockerFixture):
     _patch_local_log_discovery(mocker, dir_exists=False)
 
-    assert get_log_files("app1", ssh=None) == []
+    assert get_log_files("app1", ssh=None) == {}
 
 
 def test_get_log_files_returns_dict(mocker: MockerFixture):
-    fake_file1 = _FAKE_HOME / ".cronboard/logs/app1_log1.log"
-    fake_file2 = _FAKE_HOME / ".cronboard/logs/app1_log2.log"
+    fake_file1 = _FAKE_HOME / ".config/cronboard/logs/app1_log1.log"
+    fake_file2 = _FAKE_HOME / ".config/cronboard/logs/app1_log2.log"
 
     _patch_local_log_discovery(
         mocker,
@@ -116,8 +116,8 @@ app2_c.log
 random.txt
 """,
             {
-                "app1_a": "/home/test/.cronboard/logs/app1_a.log",
-                "app1_b": "/home/test/.cronboard/logs/app1_b.log",
+                "app1_a": "/home/test/.config/cronboard/logs/app1_a.log",
+                "app1_b": "/home/test/.config/cronboard/logs/app1_b.log",
             },
         ),
         (

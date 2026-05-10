@@ -4,13 +4,13 @@ from pathlib import Path
 import posixpath
 from cronboard.services.logging.cron_wrapper import get_remote_home
 
-LOG_DIR = ".cronboard/logs"
+LOG_DIR = ".config/cronboard/logs"
 
 def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
     if ssh is None:
         log_dir = Path.home() / LOG_DIR
         if not log_dir.exists():
-            return []
+            return {}
         return {
             p.stem: str(p)
             for p in log_dir.glob(f"{identificator}_*.log")
