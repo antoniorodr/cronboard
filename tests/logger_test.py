@@ -142,7 +142,7 @@ def test_get_log_files_ssh(mocker: MockerFixture, ls_read: bytes, expected: dict
 def test_read_log_file_returns_no_logs_when_missing(mocker: MockerFixture):
     _patch_logger_path_and_instance(mocker, exists=False)
 
-    assert read_log_file("/fake/path.log", ssh=None) == ["No logs found"]
+    assert read_log_file("/fake/path.log", ssh=None) == []
 
 
 def test_read_log_file_returns_lines(mocker: MockerFixture):
@@ -171,7 +171,7 @@ def test_read_log_file_returns_lines(mocker: MockerFixture):
             b"",
             b"some error",
             "/remote/missing.log",
-            ["No logs found"],
+            [],
         ),
     ],
     ids=["success", "missing"],
@@ -198,7 +198,7 @@ def test_read_log_file_ssh_empty_stdout_and_stderr(mocker: MockerFixture):
     assert read_log_file("/remote/empty.log", ssh=ssh) == []
 
 
-def test_read_log_file_ssh_returns_stdout_when_stderr_has_noise(
+def test_read_log_file_ssh_returns_empty_when_stderr_has_noise(
     mocker: MockerFixture,
 ):
     ssh = _ssh_mock_single_exec(
@@ -207,4 +207,4 @@ def test_read_log_file_ssh_returns_stdout_when_stderr_has_noise(
         stderr_read=b"warning: cat wrote to stderr\n",
     )
 
-    assert read_log_file("/remote/log.log", ssh=ssh) == ["line\n"]
+    assert read_log_file("/remote/log.log", ssh=ssh) == []

@@ -22,8 +22,13 @@ def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
         log_dir = posixpath.join(home, LOG_DIR)
 
         cmd = f'ls {log_dir} 2>/dev/null'
-        stdin, stdout, stderr = ssh.exec_command(cmd)
+        _, stdout, stderr = ssh.exec_command(cmd)
         files = stdout.read().decode().splitlines()
+        errors = stderr.read().decode().strip()
+
+        if errors:
+            print(f"Error: {errors}")
+            return {}
 
         result = {}
         for file in files:
@@ -39,17 +44,19 @@ def read_log_file(log_path: str, ssh: paramiko.SSHClient | None = None):
     if ssh is None:
         log_file = Path(log_path)
         if not log_file.exists():
-            return ["No logs found"]
+            return []
         with open(log_file, "r") as f:
             return f.readlines()
     else:
         safe_path = shlex.quote(log_path)
 
-        stdin, stdout, stderr = ssh.exec_command(f"test -f {safe_path} && cat {safe_path}")
+        _, stdout, stderr = ssh.exec_command(f"test -f {safe_path} && cat {safe_path}")
         output = stdout.read().decode()
         error = stderr.read().decode()
 
-        if not output and error:
-            return ["No logs found"]
+        if not output or error:
+            if error:
+                print(f"Error: {error}")
+            return []
 
         return output.splitlines(keepends=True)

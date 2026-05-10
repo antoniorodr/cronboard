@@ -92,8 +92,10 @@ class LogView(Widget):
     @on(LogList.LogSelected)
     def show_log(self, event: LogList.LogSelected):
         self.log_output.clear()
-
-        for line in read_log_file(event.log_path, self.ssh_client):
+        lines = read_log_file(event.log_path, self.ssh_client)
+        if len(lines) == 0:
+            self.log_output.write_line("No logs found")
+        for line in lines:
             self.log_output.write_line(line)
 
 
