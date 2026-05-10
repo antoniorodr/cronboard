@@ -1,17 +1,19 @@
 import tomllib
-from importlib.metadata import version, PackageNotFoundError
-from crontab import CronTab
-import tomlkit
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+
+import tomlkit
+from crontab import CronTab
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Footer, Label, Tabs, Tab
-from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
-from cronboard_widgets.CronTabs import CronTabs
+from textual.widgets import Footer, Label, Tab, Tabs
+
 from cronboard_widgets.CronCreator import CronCreator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronServers import CronServers
+from cronboard_widgets.CronTable import CronTable
+from cronboard_widgets.CronTabs import CronTabs
 
 
 class CronBoard(App):

@@ -1,9 +1,12 @@
 from types import SimpleNamespace
+
 import pytest
 from pytest_mock import MockerFixture
-from .conftest import create_event, create_content, make_query_one
-from cronboard_widgets.CronSSHModal import CronSSHModal
 from textual.containers import Grid
+
+from cronboard_widgets.CronSSHModal import CronSSHModal
+
+from .conftest import create_content, create_event, make_query_one
 
 
 def test_parse_host_info_defaults_port():

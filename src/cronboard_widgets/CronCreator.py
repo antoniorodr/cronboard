@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
-from textual.app import ComposeResult
+
+from cron_descriptor import ExpressionDescriptor, Options
 from crontab import CronTab
-from textual.widgets import Button, Label, Input
+from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
+from textual.widgets import Button, Input, Label
 from textual_autocomplete import (
     DropdownItem,
     PathAutoComplete,
@@ -14,8 +16,6 @@ from textual_autocomplete import (
 from textual_autocomplete._path_autocomplete import (
     PathDropdownItem,
 )
-from cron_descriptor import Options, ExpressionDescriptor
-
 
 CRON_ALIASES = {
     "@reboot": None,

@@ -1,17 +1,19 @@
+import tomllib
+from pathlib import Path
+
+import paramiko
+import tomlkit
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Grid
+from textual.binding import Binding
+from textual.containers import Grid, Horizontal
 from textual.widget import Widget
 from textual.widgets import Label, Tree
-from cronboard_widgets.CronTree import CronTree
-from textual.binding import Binding
+
+from cronboard_encryption.CronEncrypt import decrypt_password, encrypt_password
+from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronSSHModal import CronSSHModal
 from cronboard_widgets.CronTable import CronTable
-from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-import paramiko
-from pathlib import Path
-import tomllib
-import tomlkit
-from cronboard_encryption.CronEncrypt import decrypt_password, encrypt_password
+from cronboard_widgets.CronTree import CronTree
 
 
 class CronServers(Widget):
@@ -83,7 +85,8 @@ class CronServers(Widget):
             if self.current_ssh_client:
                 try:
                     self.current_ssh_client.close()
-                except:
+                except Exception as e:
+                    print(f"Error: {e}")
                     pass
 
             self.current_ssh_client = ssh_client
@@ -147,7 +150,8 @@ class CronServers(Widget):
         if self.current_ssh_client:
             try:
                 self.current_ssh_client.close()
-            except:
+            except Exception as e:
+                print(f"Error: {e}")
                 pass
             self.current_ssh_client = None
 
