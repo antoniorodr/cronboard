@@ -1,3 +1,5 @@
+import base64
+import shlex
 import stat
 from pathlib import Path
 
@@ -220,7 +222,9 @@ def test_install_wrapper_calls_remote_when_ssh_provided(
 def test_wrap_command_basic(mock_bash, mock_wrapper_installed):
     res = mod.wrap_command("echo hello", "job-1")
 
-    assert res == "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
+    assert res == (
+        "/bin/bash /tmp/cron-wrapper.sh job-1 cronboard1:ZWNobyBoZWxsbw=="
+    )
 
 
 def test_wrap_command_fallback_bash(mocker: MockerFixture):
@@ -229,7 +233,9 @@ def test_wrap_command_fallback_bash(mocker: MockerFixture):
 
     res = mod.wrap_command("echo hello", "job-1")
 
-    assert res == "/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
+    assert res == (
+        "/bin/bash /tmp/cron-wrapper.sh job-1 cronboard1:ZWNobyBoZWxsbw=="
+    )
 
 
 def test_wrap_command_with_already_wrapped_command(mock_bash, mock_wrapper_installed):
@@ -242,7 +248,9 @@ def test_wrap_command_with_already_wrapped_command(mock_bash, mock_wrapper_insta
 def test_wrap_command_includes_identificator(mock_bash, mock_wrapper_installed):
     res = mod.wrap_command("echo hello", "job-42")
 
-    assert res == "/bin/bash /tmp/cron-wrapper.sh job-42 echo hello"
+    assert res == (
+        "/bin/bash /tmp/cron-wrapper.sh job-42 cronboard1:ZWNobyBoZWxsbw=="
+    )
 
 
 def test_has_wrapper_valid(mock_bash):
@@ -305,10 +313,29 @@ def test_command_without_wrapper_parse_error(mock_bash):
 
 
 def test_command_without_wrapper_complex_command(mock_bash):
-    cmd = '/bin/bash /tmp/cron-wrapper.sh job-1 python3 script.py --arg "value with spaces"'
+    inner = 'python3 script.py --arg "value with spaces"'
+    blob = mod.COMMAND_PAYLOAD_PREFIX + base64.b64encode(inner.encode()).decode(
+        "ascii"
+    )
+    cmd = f"/bin/bash /tmp/cron-wrapper.sh job-1 {shlex.quote(blob)}"
     res = mod.command_without_wrapper(cmd)
 
-    assert res == "python3 script.py --arg value with spaces"
+    assert res == inner
+
+
+def test_wrap_command_preserves_shell_metacharacters(mock_bash, mock_wrapper_installed):
+    inner = "echo 'a' && echo \"b\" | wc -l"
+    wrapped = mod.wrap_command(inner, "job-x")
+    assert mod.command_without_wrapper(wrapped) == inner
+
+
+def test_has_wrapper_new_payload_format(mock_bash):
+    inner = "echo hello"
+    blob = mod.COMMAND_PAYLOAD_PREFIX + base64.b64encode(inner.encode()).decode(
+        "ascii"
+    )
+    cmd = f"/bin/bash /tmp/cron-wrapper.sh job-1 {shlex.quote(blob)}"
+    assert mod.has_wrapper(cmd) is True
 
 
 def test_command_without_wrapper_passthrough(mock_bash):
@@ -326,7 +353,7 @@ def test_command_without_wrapper_missing_command(mock_bash):
 
 
 def test_command_without_wrapper_extra_spaces(mock_bash):
-    cmd = "  /bin/bash   /tmp/cron-wrapper.sh   job-1   echo   hello  "
+    cmd = "  /bin/bash   /tmp/cron-wrapper.sh   job-1   cronboard1:ZWNobyBoZWxsbw==  "
     res = mod.command_without_wrapper(cmd)
 
     assert res == "echo hello"
