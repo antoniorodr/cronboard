@@ -16,6 +16,7 @@ from textual_autocomplete._path_autocomplete import (
 )
 from cron_descriptor import Options, ExpressionDescriptor
 from cronboard.services.logging.cron_wrapper import has_wrapper, wrap_command, command_without_wrapper
+from cronboard_widgets.VimKeysRadioSet import VimKeysRadioSet
 
 CRON_ALIASES = {
     "@reboot": None,
@@ -258,7 +259,7 @@ class CronCreator(ModalScreen[bool]):
                     id="identificator",
                 )
                 yield Label("Tick if you want to enable logging", classes="form-label mt-2 pt-2")
-                yield RadioSet(
+                yield VimKeysRadioSet(
                     RadioButton("Enable logging", id="enable", value=self.log_enabled),
                     RadioButton("Disable logging", id="disable", value=not self.log_enabled),
                 )
