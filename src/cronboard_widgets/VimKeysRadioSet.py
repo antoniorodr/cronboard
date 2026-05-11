@@ -24,5 +24,11 @@ class VimKeysRadioSet(RadioSet):
         if self._selected is None:
             return
         button = self._nodes[self._selected]
-        if isinstance(button, RadioButton) and not button.value:
+        if not isinstance(button, RadioButton):
+            return
+        if self._pressed_button is None and any(
+            b.value for b in self.query(RadioButton)
+        ):
+            return
+        if not button.value:
             button.value = True
