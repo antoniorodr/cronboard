@@ -3,7 +3,7 @@ from importlib.metadata import version, PackageNotFoundError
 from crontab import CronTab
 import tomlkit
 from pathlib import Path
-from textual import events
+from textual import events, on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import (
@@ -25,6 +25,8 @@ from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
 from cronboard_widgets.CronCreator import CronCreator
+from cronboard.messages import CronJobDeleted
+from cronboard.services.logging.logger import delete_logs_for_identificator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronServers import CronServers
 
@@ -59,6 +61,10 @@ class CronBoard(App):
         yield self.tabs
         self.content_container = Container(id="tab-content")
         yield self.content_container
+
+    @on(CronJobDeleted)
+    def _on_cron_job_deleted(self, event: CronJobDeleted) -> None:
+        delete_logs_for_identificator(event.identificator, event.ssh_client)
 
     def on_mount(self) -> None:
         config = self.load_config()

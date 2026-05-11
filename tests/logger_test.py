@@ -3,7 +3,11 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from cronboard.services.logging.logger import get_log_files, read_log_file
+from cronboard.services.logging.logger import (
+    delete_logs_for_identificator,
+    get_log_files,
+    read_log_file,
+)
 
 from .conftest import ssh_mock_exec_return, ssh_mock_exec_sequence
 
@@ -174,3 +178,52 @@ def test_read_log_file_ssh_returns_empty_when_stderr_has_noise(
     )
 
     assert read_log_file("/remote/log.log", ssh=ssh) == []
+
+
+def test_delete_logs_for_identificator_local_removes_matching_files(
+    mocker: MockerFixture, tmp_path: Path
+):
+    mocker.patch(f"{_LOGGER}.Path.home", return_value=tmp_path)
+    log_dir = tmp_path / ".config/cronboard/logs"
+    log_dir.mkdir(parents=True)
+    keep = log_dir / "other_job_a.log"
+    remove1 = log_dir / "job1_a.log"
+    remove2 = log_dir / "job1_b.log"
+    for p in (keep, remove1, remove2):
+        p.write_text("x", encoding="utf-8")
+
+    delete_logs_for_identificator("job1", ssh=None)
+
+    assert not remove1.exists()
+    assert not remove2.exists()
+    assert keep.exists()
+
+
+def test_delete_logs_for_identificator_local_noop_when_no_files(
+    mocker: MockerFixture, tmp_path: Path
+):
+    mocker.patch(f"{_LOGGER}.Path.home", return_value=tmp_path)
+    (tmp_path / ".config/cronboard/logs").mkdir(parents=True)
+
+    delete_logs_for_identificator("missing", ssh=None)
+
+
+def test_delete_logs_for_identificator_remote_runs_rm(
+    mocker: MockerFixture,
+):
+    ssh = ssh_mock_exec_sequence(
+        mocker,
+        [
+            (b"/home/test\n", b""),
+            (b"app1_a.log\napp1_b.log\n", b""),
+            (b"", b""),
+        ],
+    )
+
+    delete_logs_for_identificator("app1", ssh=ssh)
+
+    assert ssh.exec_command.call_count == 3
+    rm_cmd = ssh.exec_command.call_args_list[2][0][0]
+    assert rm_cmd.startswith("rm -f -- ")
+    assert "/home/test/.config/cronboard/logs/app1_a.log" in rm_cmd
+    assert "/home/test/.config/cronboard/logs/app1_b.log" in rm_cmd

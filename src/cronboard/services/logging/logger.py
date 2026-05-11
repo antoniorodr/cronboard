@@ -60,3 +60,18 @@ def read_log_file(log_path: str, ssh: paramiko.SSHClient | None = None):
             return []
 
         return output.splitlines(keepends=True)
+
+
+def delete_logs_for_identificator(
+    identificator: str, ssh: paramiko.SSHClient | None = None
+) -> None:
+    """Remove all log files for ``identificator`` (same selection as :func:`get_log_files`)."""
+    paths = list(get_log_files(identificator, ssh).values())
+    if not paths:
+        return
+    if ssh is None:
+        for path_str in paths:
+            Path(path_str).unlink(missing_ok=True)
+    else:
+        quoted = " ".join(shlex.quote(p) for p in paths)
+        ssh.exec_command(f"rm -f -- {quoted}")
