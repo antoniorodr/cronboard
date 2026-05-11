@@ -177,6 +177,8 @@ class VirtualLogFileList(ScrollView, can_focus=True):
         width = self.size.width
         rich_style = self.rich_style
         if not self._keys:
+            if row != 0:
+                return Strip.blank(width, rich_style)
             text = Text("No logs found", no_wrap=True)
             text.stylize(rich_style)
             return Strip(text.render(self.app.console), cell_len("No logs found"))
