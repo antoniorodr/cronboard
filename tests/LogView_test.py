@@ -2,8 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 from textual.app import App, ComposeResult
 
-from cronboard.widgets.LogView import LogView
-from textual.widgets import ListView, Log
+from cronboard.widgets.LogView import LogView, VirtualLogFileList, VirtualLogLines
 
 
 _LOG_VIEW = "cronboard.widgets.LogView"
@@ -66,13 +65,53 @@ async def test_highlight_then_j_loads_second_log(
 ):
     async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
         await pilot.pause()
-        pilot.app.query_one(ListView).focus()
+        pilot.app.query_one(VirtualLogFileList).focus()
         await pilot.pause()
 
         paths = [c.args[0] for c in read_log_mock.call_args_list]
         assert "/logs/a.log" in paths
 
         await pilot.press("j")
+        await pilot.pause(0.25)
+
+        assert read_log_mock.call_args_list[-1].args[0] == "/logs/b.log"
+
+
+@pytest.mark.asyncio
+async def test_rapid_cursor_keys_debounce_log_reads(
+    mocker: MockerFixture,
+    read_log_mock,
+):
+    mocker.patch(
+        f"{_LOG_VIEW}.get_log_files",
+        return_value={f"log{i}": f"/logs/{i}.log" for i in range(5)},
+    )
+    async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        pilot.app.query_one(VirtualLogFileList).focus()
+        await pilot.pause(0.25)
+        read_log_mock.reset_mock()
+        for _ in range(3):
+            await pilot.press("j")
+        await pilot.pause(0.25)
+        assert read_log_mock.call_count == 1
+        assert read_log_mock.call_args_list[0].args[0] == "/logs/3.log"
+
+
+@pytest.mark.asyncio
+async def test_click_second_row_loads_second_log(
+    log_paths_two,
+    read_log_mock,
+):
+    async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        fl = pilot.app.query_one(VirtualLogFileList)
+        fl.focus()
+        await pilot.pause()
+
+        assert read_log_mock.call_args_list[-1].args[0] == "/logs/a.log"
+
+        await pilot.click(fl, offset=(0, 1))
         await pilot.pause()
 
         assert read_log_mock.call_args_list[-1].args[0] == "/logs/b.log"
@@ -85,15 +124,15 @@ async def test_k_after_j_loads_first_log_again(
 ):
     async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
         await pilot.pause()
-        pilot.app.query_one(ListView).focus()
+        pilot.app.query_one(VirtualLogFileList).focus()
         await pilot.pause()
 
         await pilot.press("j")
-        await pilot.pause()
+        await pilot.pause(0.25)
         assert read_log_mock.call_args_list[-1].args[0] == "/logs/b.log"
 
         await pilot.press("k")
-        await pilot.pause()
+        await pilot.pause(0.25)
         assert read_log_mock.call_args_list[-1].args[0] == "/logs/a.log"
 
 
@@ -103,17 +142,17 @@ async def test_l_focuses_log_j_scrolls_down(
     log_paths_two,
     read_log_mock,
 ):
-    scroll_mock = mocker.patch.object(Log, "action_scroll_down")
+    scroll_mock = mocker.patch.object(VirtualLogLines, "action_scroll_down")
 
     async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
         await pilot.pause()
-        pilot.app.query_one(ListView).focus()
+        pilot.app.query_one(VirtualLogFileList).focus()
         await pilot.pause()
 
         await pilot.press("l")
         await pilot.pause()
 
-        assert pilot.app.focused is pilot.app.query_one(Log)
+        assert pilot.app.focused is pilot.app.query_one(VirtualLogLines)
 
         await pilot.press("j")
         await pilot.pause()
@@ -128,14 +167,14 @@ async def test_h_focuses_list_from_log_pane(
 ):
     async with LogViewHarnessApp().run_test(size=(100, 40)) as pilot:
         await pilot.pause()
-        pilot.app.query_one(ListView).focus()
+        pilot.app.query_one(VirtualLogFileList).focus()
         await pilot.pause()
 
         await pilot.press("l")
         await pilot.pause()
-        assert pilot.app.focused is pilot.app.query_one(Log)
+        assert pilot.app.focused is pilot.app.query_one(VirtualLogLines)
 
         await pilot.press("h")
         await pilot.pause()
 
-        assert pilot.app.focused is pilot.app.query_one(ListView)
+        assert pilot.app.focused is pilot.app.query_one(VirtualLogFileList)
