@@ -106,10 +106,12 @@ CronTabs {
 #error {
     color: $error;
     padding-top: 1;
+    min-height: 2;
 }
 
 #label_desc {
-    margin-top: 1;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .success {
@@ -141,7 +143,7 @@ LogViewModal #dialog {
     align: center middle;
     width: 100%;
     height: auto;
-    padding: 2;
+    padding: 1 2;
 }
 
 #content Label {
@@ -166,7 +168,7 @@ LogViewModal #dialog {
 #label_special {
     color: $secondary;
     text-style: bold;
-    margin-top: 1;
+    margin-top: 0;
     margin-bottom: 0;
 }
 
