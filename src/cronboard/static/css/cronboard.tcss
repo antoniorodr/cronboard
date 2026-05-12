@@ -108,11 +108,6 @@ CronTabs {
     padding-top: 1;
 }
 
-/* Empty error slot must not reserve a row; typing clears errors and would otherwise jump layout. */
-CronCreator #error {
-    display: none;
-}
-
 #label_desc {
     margin-top: 1;
 }

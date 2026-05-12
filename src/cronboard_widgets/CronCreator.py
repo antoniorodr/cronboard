@@ -205,6 +205,7 @@ class CronAutoComplete(PathAutoComplete):
 
 class CronCreator(ModalScreen[bool]):
     BINDINGS = [Binding(key="escape", action="close_modal", description="Close")]
+    _ERROR_VISIBLE_CLASS = "error-showing"
 
     def __init__(
         self,
@@ -276,16 +277,16 @@ class CronCreator(ModalScreen[bool]):
     def _show_error(self, message: str):
         error_label = self.query_one("#error")
         error_label.update(message)
-        error_label.display = True
+        error_label.add_class(self._ERROR_VISIBLE_CLASS)
 
     def _clear_error(self):
         error_label = self.query_one("#error")
         error_label.update("")
-        error_label.display = False
+        error_label.remove_class(self._ERROR_VISIBLE_CLASS)
 
     def _has_error(self):
         error_label = self.query_one("#error")
-        return bool(error_label.display)
+        return error_label.has_class(self._ERROR_VISIBLE_CLASS)
 
     def on_input_changed(self, event: Input.Changed) -> None:
         self._clear_error()
