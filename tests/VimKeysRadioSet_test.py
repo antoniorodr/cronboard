@@ -46,7 +46,8 @@ async def test_cron_creator_edit_modal_logging_disabled_radio_default():
     async with T().run_test() as pilot:
         await pilot.pause()
         radio = pilot.app.query_one(VimKeysRadioSet)
-        enable, disable = list(radio.query(RadioButton))
+        enable = radio.query_one("#enable", RadioButton)
+        disable = radio.query_one("#disable", RadioButton)
         assert enable.value is False and disable.value is True
         assert radio.pressed_button is disable
 
