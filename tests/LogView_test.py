@@ -9,8 +9,10 @@ _LOG_VIEW = "cronboard.widgets.LogView"
 
 
 class LogViewHarnessApp(App):
-    def disable_tab(self) -> None:
-        pass
+    tab_disabled = False
+
+    def toggle_tab_enablement(self) -> None:
+        self.tab_disabled = not self.tab_disabled
 
     def compose(self) -> ComposeResult:
         yield LogView(identificator="test-job")

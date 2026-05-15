@@ -350,7 +350,7 @@ class LogView(Widget):
         self.log_list.styles.width = "30%"
 
     def on_mount(self) -> None:
-        self.app.disable_tab()
+        self.app.toggle_tab_enablement() # Disable tab switching using the `Tab` key
         self.log_output.set_placeholder("Please select a log from the list on the left.")
 
     def on_key(self, event: events.Key) -> None:
@@ -384,5 +384,5 @@ class LogViewModal(ModalScreen[bool]):
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        self.app.enable_tab()
+        self.app.toggle_tab_enablement() # Enable tab switching using the `Tab` key
         self.dismiss(True)

@@ -113,11 +113,8 @@ class CronBoard(App):
             self.local_table.display = False
             self.servers.display = True
 
-    def disable_tab(self):
-        self.tab_disabled = True
-
-    def enable_tab(self):
-        self.tab_disabled = False
+    def toggle_tab_enablement(self):
+        self.tab_disabled = not self.tab_disabled
 
     def on_key(self, event: events.Key) -> None:
         if event.key != "tab":
