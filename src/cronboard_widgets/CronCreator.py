@@ -327,7 +327,6 @@ class CronCreator(ModalScreen[bool]):
         expression = expression_input.value
         command = command_input.value
         identificator = identificator_input.value
-        content = self.query_one("#content", Vertical)
 
         if not identificator:
             self._show_error("ID cannot be empty.")
