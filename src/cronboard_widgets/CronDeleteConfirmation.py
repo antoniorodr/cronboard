@@ -90,11 +90,11 @@ class CronDeleteConfirmation(ModalScreen[bool]):
 
     def write_remote_crontab(self):
         """Writes the current SSH cron table back to the remote server."""
-        if not (self.remote and self.ssh_client and self.cron):
+        if not (self.remote and self.ssh_client):
             return False
 
         try:
-            new_crontab_content = self.cron.render()
+            new_crontab_content = self.cron.render() or ""
 
             crontab_cmd = (
                 f"crontab -u {self.crontab_user} -"
