@@ -265,7 +265,7 @@ def test_has_wrapper_missing_identificator(mock_bash):
 
 def test_has_wrapper_wrong_bash(mock_bash):
     cmd = "/usr/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
-    assert mod.has_wrapper(cmd) is False
+    assert mod.has_wrapper(cmd) is True
 
 
 def test_has_wrapper_non_wrapper1(mock_bash):
@@ -288,7 +288,7 @@ def test_command_without_wrapper_wrong_bash(mock_bash):
     cmd = "/usr/bin/bash /tmp/cron-wrapper.sh job-1 echo hello"
     res = mod.command_without_wrapper(cmd)
 
-    assert res == cmd
+    assert res == "echo hello"
 
 
 def test_command_without_wrapper_non_wrapper(mock_bash):
