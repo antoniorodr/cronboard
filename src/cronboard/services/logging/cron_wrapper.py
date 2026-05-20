@@ -19,6 +19,18 @@ WRAPPER_SOURCE = Path(__file__).parent.parent.parent / "logging" / "cron-wrapper
 WRAPPER_DIST_DIR = ".config/cronboard"
 WRAPPER_DIST = f"{WRAPPER_DIST_DIR}/cron-wrapper.sh"
 
+
+def get_remote_bash_path(ssh: paramiko.SSHClient) -> str:
+    try:
+        _, stdout, _ = ssh.exec_command("command -v bash")
+        result = stdout.read().decode().strip()
+        if result:
+            return result
+    except Exception:
+        pass
+    return "/bin/bash"
+
+
 def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
     try:
         _, stdout, stderr = ssh.exec_command("echo $HOME")
@@ -41,6 +53,7 @@ def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
     except Exception as e:
         print(f"Error: {e}")
         return None
+
 
 def is_wrapper_installed_local() -> bool:
     target_file = Path.home() / WRAPPER_DIST
@@ -72,11 +85,13 @@ def is_wrapper_installed_remote(ssh: paramiko.SSHClient) -> bool:
 
     return result == "OK"
 
+
 def is_wrapper_installed(ssh: paramiko.SSHClient | None = None) -> bool:
     if ssh is None:
         return is_wrapper_installed_local()
     else:
         return is_wrapper_installed_remote(ssh)
+
 
 def install_wrapper_local():
     target_dir = Path.home() / WRAPPER_DIST_DIR
@@ -137,13 +152,18 @@ def _decode_wrapped_command_payload(token: str) -> str | None:
         return None
 
 
-def wrap_command(command: str, identificator: str, ssh: paramiko.SSHClient | None = None):
+def wrap_command(
+    command: str, identificator: str, ssh: paramiko.SSHClient | None = None
+):
     wrapper_path = install_wrapper(ssh)
     if wrapper_path is None:
         # If this is None, it means failed to install wrapper in ssh server
         return command
 
-    bash_path = shutil.which("bash") or "/bin/bash"
+    if ssh is not None:
+        bash_path = get_remote_bash_path(ssh)
+    else:
+        bash_path = shutil.which("bash") or "/bin/bash"
     try:
         parts = shlex.split(command)
     except ValueError:
@@ -163,9 +183,8 @@ def wrap_command(command: str, identificator: str, ssh: paramiko.SSHClient | Non
         f"{shlex.quote(identificator)} {shlex.quote(payload)}"
     )
 
-def has_wrapper(command: str) -> bool:
-    bash_path = shutil.which("bash") or "/bin/bash"
 
+def has_wrapper(command: str) -> bool:
     try:
         parts = shlex.split(command)
     except ValueError:
@@ -174,19 +193,17 @@ def has_wrapper(command: str) -> bool:
     if len(parts) < 4:
         return False
 
-    if parts[0] != bash_path:
+    if not parts[0].endswith("/bash"):
         return False
 
     wrapper_path = parts[1]
 
     return (
-        wrapper_path.endswith("cron-wrapper.sh")
-        and bool(parts[2])  # identificator
+        wrapper_path.endswith("cron-wrapper.sh") and bool(parts[2])  # identificator
     )
 
-def command_without_wrapper(command: str):
-    bash_path = shutil.which("bash") or "/bin/bash"
 
+def command_without_wrapper(command: str):
     try:
         parts = shlex.split(command)
     except ValueError:
@@ -195,7 +212,7 @@ def command_without_wrapper(command: str):
     if len(parts) < 4:
         return command
 
-    if parts[0] != bash_path:
+    if not parts[0].endswith("/bash"):
         return command
 
     wrapper_path = parts[1]
