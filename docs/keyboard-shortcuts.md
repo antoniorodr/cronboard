@@ -9,7 +9,7 @@ Cronboard is fully keyboard-driven. Below is a complete reference of all availab
 | Key | Action |
 |---|---|
 | `q` / `Ctrl+Q` | Quit Cronboard |
-| `Tab` | Switch focus to the next panel |
+| `Tab` | Switch focus to the next tab |
 
 ---
 
@@ -54,6 +54,7 @@ Cronboard is fully keyboard-driven. Below is a complete reference of all availab
 | `d` | Disconnect from the current server |
 | `D` | Delete the selected server |
 | `j` / `k` | Navigate the server tree |
+| `J` | Jump to the crontab of the selected server |
 
 ---
 
