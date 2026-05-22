@@ -33,6 +33,8 @@ Cronboard is fully keyboard-driven. Below is a complete reference of all availab
 | `D` | Delete the selected cron job |
 | `p` | Pause / resume the selected cron job |
 | `r` | Refresh the cron job list |
+| `L` | View the execution logs of the selected cron job |
+
 
 ### Search
 
