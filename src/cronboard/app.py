@@ -24,17 +24,27 @@ from textual.widgets import (
 from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
-from cronboard_widgets.CronCreator import CronCreator
+from cronboard.screens.CronCreator import CronCreator
 from cronboard.messages import CronJobDeleted
 from cronboard.services.logging.logger import delete_logs_for_identificator
-from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
-from cronboard_widgets.CronServers import CronServers
+from cronboard.screens.CronDeleteConfirmation import CronDeleteConfirmation
+from cronboard.screens.CronServers import CronServers
 
 
 def is_form_element(element):
     return isinstance(
         element,
-        (Input, Checkbox, Button, MaskedInput, RadioButton, RadioSet, Select, Switch, TextArea),
+        (
+            Input,
+            Checkbox,
+            Button,
+            MaskedInput,
+            RadioButton,
+            RadioSet,
+            Select,
+            Switch,
+            TextArea,
+        ),
     )
 
 
