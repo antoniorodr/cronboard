@@ -27,7 +27,7 @@ def app(mocker: MockerFixture):
 
     fake_cron = mocker.MagicMock()
     fake_cron.__iter__ = mocker.MagicMock(side_effect=lambda: iter([fake_job]))
-    mocker.patch("cronboard_widgets.CronTable.CronTab", return_value=fake_cron)
+    mocker.patch("cronboard.widgets.CronTable.CronTab", return_value=fake_cron)
     mocker.patch(
         "cronboard.screens.CronDeleteConfirmation.CronTab", return_value=fake_cron
     )

@@ -21,9 +21,9 @@ from textual.widgets import (
     Switch,
     TextArea,
 )
-from cronboard_widgets.CronTable import CronTable
+from cronboard.widgets.CronTable import CronTable
 from textual.containers import Container
-from cronboard_widgets.CronTabs import CronTabs
+from cronboard.widgets.CronTabs import CronTabs
 from cronboard.screens.CronCreator import CronCreator
 from cronboard.messages import CronJobDeleted
 from cronboard.services.logging.logger import delete_logs_for_identificator

@@ -2,10 +2,10 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Grid
 from textual.widget import Widget
 from textual.widgets import Label, Tree
-from cronboard_widgets.CronTree import CronTree
+from cronboard.widgets.CronTree import CronTree
 from textual.binding import Binding
 from cronboard.screens.CronSSHModal import CronSSHModal
-from cronboard_widgets.CronTable import CronTable
+from cronboard.widgets.CronTable import CronTable
 from cronboard.screens.CronDeleteConfirmation import CronDeleteConfirmation
 import paramiko
 from pathlib import Path
