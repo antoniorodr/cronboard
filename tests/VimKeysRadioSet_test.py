@@ -5,7 +5,7 @@ from textual.widgets import RadioButton
 
 from cronboard.app import CronBoard
 from cronboard_widgets.VimKeysRadioSet import VimKeysRadioSet
-from cronboard_widgets.CronCreator import CronCreator
+from cronboard.screens.CronCreator import CronCreator
 
 
 class _RadioDemoApp(App[None]):

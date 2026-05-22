@@ -1,9 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
 from .conftest import make_creator
-from cronboard_widgets.CronCreator import CronCreator
+from cronboard.screens.CronCreator import CronCreator
 from cronboard.app import CronBoard
-from cronboard_widgets.CronCreator import CronAutoComplete
+from cronboard.screens.CronCreator import CronAutoComplete
 
 
 @pytest.mark.asyncio

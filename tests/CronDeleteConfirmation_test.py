@@ -1,6 +1,6 @@
 import pytest
 from cronboard.messages import CronJobDeleted
-from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
+from cronboard.screens.CronDeleteConfirmation import CronDeleteConfirmation
 from .conftest import create_event, create_job_and_cron, make_remote_command
 from cronboard.app import CronBoard
 from pytest_mock import MockerFixture

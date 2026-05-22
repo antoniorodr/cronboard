@@ -4,10 +4,10 @@ import pytest
 from pytest_mock import MockerFixture
 import pytest_asyncio
 from cronboard.app import CronBoard
-from cronboard_widgets.CronCreator import CronCreator
-from cronboard_widgets.CronCreator import CronAutoComplete
+from cronboard.screens.CronCreator import CronCreator
+from cronboard.screens.CronCreator import CronAutoComplete
 from types import SimpleNamespace
-from cronboard_widgets.CronSSHModal import CronSSHModal
+from cronboard.screens.CronSSHModal import CronSSHModal
 from collections.abc import AsyncIterator
 from textual.pilot import Pilot
 from cronboard.services.logging import cron_wrapper as mod
@@ -29,7 +29,7 @@ def app(mocker: MockerFixture):
     fake_cron.__iter__ = mocker.MagicMock(side_effect=lambda: iter([fake_job]))
     mocker.patch("cronboard_widgets.CronTable.CronTab", return_value=fake_cron)
     mocker.patch(
-        "cronboard_widgets.CronDeleteConfirmation.CronTab", return_value=fake_cron
+        "cronboard.screens.CronDeleteConfirmation.CronTab", return_value=fake_cron
     )
     yield CronBoard()
 
