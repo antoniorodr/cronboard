@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from crontab import CronTab
 from textual.binding import Binding
 
-from cronboard.messages import CronJobDeleted
+from cronboard.services.Messages import CronJobDeleted
 from textual.widgets import Button, Label
 from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen

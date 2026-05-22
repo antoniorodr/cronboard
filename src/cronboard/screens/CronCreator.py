@@ -15,8 +15,12 @@ from textual_autocomplete._path_autocomplete import (
     PathDropdownItem,
 )
 from cron_descriptor import Options, ExpressionDescriptor
-from cronboard.services.logging.cron_wrapper import has_wrapper, wrap_command, command_without_wrapper
-from cronboard_widgets.VimKeysRadioSet import VimKeysRadioSet
+from cronboard.services.logging.cron_wrapper import (
+    has_wrapper,
+    wrap_command,
+    command_without_wrapper,
+)
+from cronboard.widgets.VimKeysRadioSet import VimKeysRadioSet
 
 CRON_ALIASES = {
     "@reboot": None,
@@ -236,7 +240,8 @@ class CronCreator(ModalScreen[bool]):
                 yield Label("- = range of values", id="label_dash")
                 yield Label("/ = step values", id="label_slash")
                 yield Label(
-                    "Enter a valid cron expression (remember whitespaces):", classes="form-label"
+                    "Enter a valid cron expression (remember whitespaces):",
+                    classes="form-label",
                 )
                 yield Label("Minute - Hour - Day - Month - Weekday", id="label2")
                 yield Input(
@@ -247,22 +252,30 @@ class CronCreator(ModalScreen[bool]):
                 yield Label("", id="label_desc")
                 yield Label("Enter the command to execute:", classes="form-label mt-2")
                 command_input = Input(
-                    value="" if self.command is None else command_without_wrapper(self.command),
+                    value=""
+                    if self.command is None
+                    else command_without_wrapper(self.command),
                     placeholder="e.g., python3 /usr/bin/python</path/to/script.py>",
                     id="command",
                 )
                 yield command_input
                 yield CronAutoComplete(target=command_input)
-                yield Label("Enter an ID for the cron job", classes="form-label mt-2 pt-2")
+                yield Label(
+                    "Enter an ID for the cron job", classes="form-label mt-2 pt-2"
+                )
                 yield Input(
                     value="" if self.identificator is None else self.identificator,
                     placeholder="e.g., backup-job-1",
                     id="identificator",
                 )
-                yield Label("Tick if you want to enable logging", classes="form-label mt-2 pt-2")
+                yield Label(
+                    "Tick if you want to enable logging", classes="form-label mt-2 pt-2"
+                )
                 yield VimKeysRadioSet(
                     RadioButton("Enable logging", id="enable", value=self.log_enabled),
-                    RadioButton("Disable logging", id="disable", value=not self.log_enabled),
+                    RadioButton(
+                        "Disable logging", id="disable", value=not self.log_enabled
+                    ),
                 )
                 yield Horizontal(
                     Button("Save", variant="primary", id="save"),
@@ -337,12 +350,24 @@ class CronCreator(ModalScreen[bool]):
             return
 
         try:
-
-            job = self.find_if_cronjob_exists(identificator, command_without_wrapper(command))
+            job = self.find_if_cronjob_exists(
+                identificator, command_without_wrapper(command)
+            )
             if not job:
-                job = self.find_if_cronjob_exists(identificator, wrap_command(command, identificator, self.ssh_client if self.remote and self.ssh_client else None))
+                job = self.find_if_cronjob_exists(
+                    identificator,
+                    wrap_command(
+                        command,
+                        identificator,
+                        self.ssh_client if self.remote and self.ssh_client else None,
+                    ),
+                )
             if self.log_enabled:
-                command = wrap_command(command, identificator, self.ssh_client if self.remote and self.ssh_client else None)
+                command = wrap_command(
+                    command,
+                    identificator,
+                    self.ssh_client if self.remote and self.ssh_client else None,
+                )
             if job:
                 job.set_command(command)
                 job.setall(expression)

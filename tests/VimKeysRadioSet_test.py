@@ -4,7 +4,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import RadioButton
 
 from cronboard.app import CronBoard
-from cronboard_widgets.VimKeysRadioSet import VimKeysRadioSet
+from cronboard.widgets.VimKeysRadioSet import VimKeysRadioSet
 from cronboard.screens.CronCreator import CronCreator
 
 

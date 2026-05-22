@@ -1,10 +1,11 @@
 import pytest
 from cronboard.app import CronBoard
-from cronboard.messages import CronJobDeleted
+from cronboard.services.Messages import CronJobDeleted
 from pytest_mock import MockerFixture
 from textual.widgets import Tree
 
 _APP = "cronboard.app"
+
 
 @pytest.mark.asyncio
 async def test_change_tab(app: CronBoard):
@@ -19,6 +20,7 @@ async def test_change_tab(app: CronBoard):
 
         server_tree = app.servers.query_one("#servers-tree", Tree)
         assert server_tree.has_focus
+
 
 @pytest.mark.asyncio
 async def test_refresh_data(app: CronBoard):

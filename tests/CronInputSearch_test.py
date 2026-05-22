@@ -1,5 +1,5 @@
 import pytest
-from cronboard_widgets.CronInputSearch import CronInputSearch
+from cronboard.screens.CronInputSearch import CronInputSearch
 from textual.pilot import Pilot
 
 
