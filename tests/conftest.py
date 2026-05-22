@@ -10,6 +10,7 @@ from types import SimpleNamespace
 from cronboard_widgets.CronSSHModal import CronSSHModal
 from collections.abc import AsyncIterator
 from textual.pilot import Pilot
+from cronboard.services.logging import cron_wrapper as mod
 
 
 @pytest.fixture
@@ -126,9 +127,7 @@ def ssh_mock_exec_sequence(
     ssh = mocker.Mock()
     tuples = []
     for stdout_b, stderr_b in responses:
-        out_m, err_m = mock_ssh_exec_streams(
-            mocker, stdout=stdout_b, stderr=stderr_b
-        )
+        out_m, err_m = mock_ssh_exec_streams(mocker, stdout=stdout_b, stderr=stderr_b)
         tuples.append((None, out_m, err_m))
     ssh.exec_command.side_effect = tuples
     return ssh
@@ -192,20 +191,19 @@ def home_dir_under_tmp(tmp_path: Path, *, mkdir: bool = True) -> Path:
 
 
 def patch_cron_wrapper_path_home(mocker: MockerFixture, home: Path) -> None:
-    from cronboard.services.logging import cron_wrapper as cw
 
-    mocker.patch.object(cw.Path, "home", return_value=home)
+    mocker.patch.object(mod.Path, "home", return_value=home)
 
 
 @pytest.fixture
 def mock_bash(mocker: MockerFixture):
-    from cronboard.services.logging import cron_wrapper as mod
 
     return mocker.patch.object(mod.shutil, "which", return_value="/bin/bash")
 
 
 @pytest.fixture
 def mock_wrapper_installed(mocker: MockerFixture):
-    from cronboard.services.logging import cron_wrapper as mod
 
-    return mocker.patch.object(mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh")
+    return mocker.patch.object(
+        mod, "install_wrapper", return_value="/tmp/cron-wrapper.sh"
+    )
