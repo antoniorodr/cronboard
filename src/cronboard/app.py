@@ -25,7 +25,7 @@ from cronboard.widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard.widgets.CronTabs import CronTabs
 from cronboard.screens.CronCreator import CronCreator
-from cronboard.services.Messages import CronJobDeleted
+from cronboard.services.messages import CronJobDeleted
 from cronboard.services.logging.logger import delete_logs_for_identificator
 from cronboard.screens.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard.screens.CronServers import CronServers

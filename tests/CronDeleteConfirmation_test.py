@@ -1,5 +1,5 @@
 import pytest
-from cronboard.services.Messages import CronJobDeleted
+from cronboard.services.messages import CronJobDeleted
 from cronboard.screens.CronDeleteConfirmation import CronDeleteConfirmation
 from .conftest import create_event, create_job_and_cron, make_remote_command
 from cronboard.app import CronBoard
