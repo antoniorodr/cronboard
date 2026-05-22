@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 22.05.2026
+
+### Added
+- Add __init__.py files to new folders
+
+### Changed
+- Merge branch 'release/v0.6.0'
+- Update imports after moving files
+- Update cov pyproject
+- Move file to new location for better structure
+- Update imports after moving files
+- Move files to new location for better structure
+- Update imports after moving files
+- Move files to new location for better structure
+- Update imports after moving files
+- Update imports after the file move
+- Move CronEncrypt to cronboard/services/encryption
+- Merge branch 'feat/cronjob-logging' into release/v0.6.0
+- Change formatting
+- Update gitignore
+- Toggle tab enablement
+- Change visibility of the error message in cron creator form
+- Change initial visibility of the error message in cron creator form
+- Improve radioset of croncreator with jk
+- Improve log view's performance
+- Fix feedbacks - change log viewer modal size
+- Fix feedbacks - add hjkl into log viewer
+- Fix feedbacks - pause functionality in cron table
+- Fix feedbacks - improve tests with helpers
+- Fix feedbacks - change config folder
+- Fix feedbacks
+- Update cron-wrapper
+- Update cron-wrapper.sh to improve logs
+- Add cron log functionality into servers section
+- Add tests for logger service
+- Add log viewer for local
+- Add logging functionality on local
+- Merge branch 'fix/disconnect' into release/v0.6.0
+- Bump version to 0.6.0
+- Change code styling for better readability
+- Merge branch 'feat/list-not-intuitive' into release/v0.6.0
+- Make list behavior more intuitive
+- Merge branch 'fix(cronjob)/duplicatedId-in-cronjob-dialog' into release/v0.6.0
+- Update changelog by @antoniorodr
+
+### Fixed
+- Fix bash_path bug on macOS
+- Update test assert
+- Fix deleting cronjob in Servers tab
+- Clear code
+- RadioButton's default value
+- Fix visual bug on CronCreator
+- Fix logview - no logs found
+- Fix cron wrapper to enable special letters like quote in command
+- Fix VimKeysRadioSet default value
+- Resolve feedbacks
+- Fix a bug when disconnecting if no conextion exist
+- Handle duplicated id error in cron creator
+
+### Removed
+- Delete repeated imports
+- Delete logs when deleting cron job
+- Delete unnecessary code
+
 ## [0.5.4] - 30.04.2026
 
 ### Fixed
@@ -323,6 +387,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[0.6.0]: https://github.com/antoniorodr/cronboard/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/antoniorodr/cronboard/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/antoniorodr/cronboard/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/antoniorodr/cronboard/compare/v0.5.1...v0.5.2
