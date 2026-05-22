@@ -11,7 +11,7 @@ import paramiko
 from pathlib import Path
 import tomllib
 import tomlkit
-from cronboard_encryption.CronEncrypt import decrypt_password, encrypt_password
+from cronboard.services.encryption.CronEncrypt import decrypt_password, encrypt_password
 
 
 class CronServers(Widget):
