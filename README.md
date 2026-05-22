@@ -30,6 +30,7 @@ Full documentation is available at [antoniorodr.github.io/cronboard](https://ant
 - Connect to servers over SSH with either a password or SSH keys
 - Manage cron jobs for another user when you have the required `sudo` permissions
 - Search for cron jobs using case-insensitive keywords
+- View the logs of cron jobs to detect potential issues when running
 
 ## 🛠️ Technologies
 
