@@ -3,7 +3,7 @@ from importlib.metadata import version, PackageNotFoundError
 from crontab import CronTab
 import tomlkit
 from pathlib import Path
-from textual import events
+from textual import events, on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import (
@@ -16,6 +16,7 @@ from textual.widgets import (
     Checkbox,
     MaskedInput,
     RadioButton,
+    RadioSet,
     Select,
     Switch,
     TextArea,
@@ -24,6 +25,8 @@ from cronboard_widgets.CronTable import CronTable
 from textual.containers import Container
 from cronboard_widgets.CronTabs import CronTabs
 from cronboard_widgets.CronCreator import CronCreator
+from cronboard.messages import CronJobDeleted
+from cronboard.services.logging.logger import delete_logs_for_identificator
 from cronboard_widgets.CronDeleteConfirmation import CronDeleteConfirmation
 from cronboard_widgets.CronServers import CronServers
 
@@ -31,7 +34,7 @@ from cronboard_widgets.CronServers import CronServers
 def is_form_element(element):
     return isinstance(
         element,
-        (Input, Checkbox, Button, MaskedInput, RadioButton, Select, Switch, TextArea),
+        (Input, Checkbox, Button, MaskedInput, RadioButton, RadioSet, Select, Switch, TextArea),
     )
 
 
@@ -59,6 +62,10 @@ class CronBoard(App):
         self.content_container = Container(id="tab-content")
         yield self.content_container
 
+    @on(CronJobDeleted)
+    def _on_cron_job_deleted(self, event: CronJobDeleted) -> None:
+        delete_logs_for_identificator(event.identificator, event.ssh_client)
+
     def on_mount(self) -> None:
         config = self.load_config()
         saved_theme = config.get("theme", "catppuccin-mocha")
@@ -68,6 +75,7 @@ class CronBoard(App):
         self.content_container.mount(self.local_table)
         self.local_table.display = True
         self.set_focus(self.local_table)
+        self.tab_disabled = False
 
     def load_config(self):
         if self.config_path.exists():
@@ -105,8 +113,15 @@ class CronBoard(App):
             self.local_table.display = False
             self.servers.display = True
 
+    def toggle_tab_enablement(self):
+        self.tab_disabled = not self.tab_disabled
+
     def on_key(self, event: events.Key) -> None:
         if event.key != "tab":
+            return
+
+        if self.tab_disabled:
+            event.prevent_default()
             return
 
         if is_form_element(self.focused):
