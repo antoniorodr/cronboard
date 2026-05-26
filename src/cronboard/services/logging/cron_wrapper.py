@@ -3,21 +3,18 @@ import binascii
 import os
 import stat
 import paramiko
-from pathlib import Path
 import shlex
 import shutil
 from typing import Optional
+from cronboard.config import WRAPPER_SOURCE, CONFIG_DIR, CONFIG_REL_PATH, WRAPPER_DIST
 
 """
 Prefix for base64-encoded user command in wrapped crontab lines (avoids shell
 metacharacters and nested-quote breakage). Legacy wrapped lines without this
 prefix still run via the wrapper's multi-argument branch.
 """
-COMMAND_PAYLOAD_PREFIX = "cronboard1:"
 
-WRAPPER_SOURCE = Path(__file__).parent.parent.parent / "logging" / "cron-wrapper.sh"
-WRAPPER_DIST_DIR = ".config/cronboard"
-WRAPPER_DIST = f"{WRAPPER_DIST_DIR}/cron-wrapper.sh"
+COMMAND_PAYLOAD_PREFIX = "cronboard1:"
 
 
 def get_remote_bash_path(ssh: paramiko.SSHClient) -> str:
@@ -33,7 +30,7 @@ def get_remote_bash_path(ssh: paramiko.SSHClient) -> str:
 
 def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
     try:
-        _, stdout, stderr = ssh.exec_command("echo $HOME")
+        _, stdout, stderr = ssh.exec_command("echo ~")
         home = stdout.read().decode().strip()
         err = stderr.read().decode().strip()
 
@@ -56,7 +53,7 @@ def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
 
 
 def is_wrapper_installed_local() -> bool:
-    target_file = Path.home() / WRAPPER_DIST
+    target_file = CONFIG_DIR / WRAPPER_DIST
 
     return (
         target_file.exists()
@@ -70,7 +67,7 @@ def is_wrapper_installed_remote(ssh: paramiko.SSHClient) -> bool:
     if not home:
         return False
 
-    remote_file = f"{home}/{WRAPPER_DIST}"
+    remote_file = f"{home}/{CONFIG_REL_PATH}/{WRAPPER_DIST}"
 
     _, stdout, stderr = ssh.exec_command(
         f"test -f {remote_file} && test -x {remote_file} && echo OK || echo MISSING"
@@ -94,8 +91,8 @@ def is_wrapper_installed(ssh: paramiko.SSHClient | None = None) -> bool:
 
 
 def install_wrapper_local():
-    target_dir = Path.home() / WRAPPER_DIST_DIR
-    target_file = Path.home() / WRAPPER_DIST
+    target_dir = CONFIG_DIR
+    target_file = CONFIG_DIR / WRAPPER_DIST
 
     target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -109,11 +106,9 @@ def install_wrapper_local():
 
 def install_wrapper_remote(ssh: paramiko.SSHClient):
     home = get_remote_home(ssh)
-    if not home:
-        return None
 
-    remote_dir = f"{home}/{WRAPPER_DIST_DIR}"
-    remote_file = f"{home}/{WRAPPER_DIST}"
+    remote_dir = f"{home}/{CONFIG_REL_PATH}"
+    remote_file = f"{remote_dir}/{WRAPPER_DIST}"
 
     sftp = ssh.open_sftp()
 

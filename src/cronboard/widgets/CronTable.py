@@ -114,9 +114,6 @@ class CronTable(DataTable):
                 )
                 last_dt = schedule.get_prev().strftime("%d.%m.%Y at %H:%M")
 
-                if active_status == "Inactive":
-                    next_dt = "Stopped"
-
             except ValueError as e:
                 next_dt = f"ERR: {e}"
                 last_dt = f"ERR: {e}"
