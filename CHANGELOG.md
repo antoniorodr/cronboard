@@ -5,69 +5,98 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 26.05.2026
+
+### Changed
+- Merge branch 'release/v0.6.1' by @antoniorodr
+- Update `README.md` by @antoniorodr
+- Move css to `cronboard.tcss` by @antoniorodr
+- Create wrapper and log constants by @antoniorodr
+- Move path constants to `config.py` by @antoniorodr
+- Update contants path by @antoniorodr
+- Move `LOG_DIR` constant to config.py by @antoniorodr
+- Update version by @antoniorodr
+- Create config.py to store path variables by @antoniorodr
+- Move path attributes to config file as constant by @antoniorodr
+- Update readme by @antoniorodr
+- Update keybinds by @antoniorodr
+
+### Fixed
+- Update test to use the new `config.py` file constants
+- Fix logs path by @antoniorodr
+
+### Removed
+- Delete unreachable code by @antoniorodr
+
 ## [0.6.0] - 22.05.2026
 
 ### Added
-- Add __init__.py files to new folders
+- Add __init__.py files to new folders by @antoniorodr
 
 ### Changed
-- Merge branch 'release/v0.6.0'
-- Update imports after moving files
-- Update cov pyproject
-- Move file to new location for better structure
-- Update imports after moving files
-- Move files to new location for better structure
-- Update imports after moving files
-- Move files to new location for better structure
-- Update imports after moving files
-- Update imports after the file move
-- Move CronEncrypt to cronboard/services/encryption
-- Merge branch 'feat/cronjob-logging' into release/v0.6.0
-- Change formatting
-- Update gitignore
-- Toggle tab enablement
-- Change visibility of the error message in cron creator form
-- Change initial visibility of the error message in cron creator form
-- Improve radioset of croncreator with jk
-- Improve log view's performance
-- Fix feedbacks - change log viewer modal size
-- Fix feedbacks - add hjkl into log viewer
-- Fix feedbacks - pause functionality in cron table
-- Fix feedbacks - improve tests with helpers
-- Fix feedbacks - change config folder
-- Fix feedbacks
-- Update cron-wrapper
-- Update cron-wrapper.sh to improve logs
-- Add cron log functionality into servers section
-- Add tests for logger service
-- Add log viewer for local
-- Add logging functionality on local
-- Merge branch 'fix/disconnect' into release/v0.6.0
-- Bump version to 0.6.0
-- Change code styling for better readability
-- Merge branch 'feat/list-not-intuitive' into release/v0.6.0
-- Make list behavior more intuitive
-- Merge branch 'fix(cronjob)/duplicatedId-in-cronjob-dialog' into release/v0.6.0
+- Update keyboard shortcuts for the documentation by @antoniorodr
+- Update changelog by @antoniorodr
+- Merge branch 'release/v0.6.0' by @antoniorodr
+- Update imports after moving files by @antoniorodr
+- Update cov pyproject by @antoniorodr
+- Move file to new location for better structure by @antoniorodr
+- Update imports after moving files by @antoniorodr
+- Move files to new location for better structure by @antoniorodr
+- Update imports after moving files by @antoniorodr
+- Move files to new location for better structure by @antoniorodr
+- Update imports after moving files by @antoniorodr
+- Update imports after the file move by @antoniorodr
+- Move CronEncrypt to cronboard/services/encryption by @antoniorodr
+- Merge branch 'feat/cronjob-logging' into release/v0.6.0 by @antoniorodr
+- Change formatting by @antoniorodr
+- Update gitignore by @antoniorodr
+- Toggle tab enablement by @bcExpt1123
+- Change visibility of the error message in cron creator form by @bcExpt1123
+- Change initial visibility of the error message in cron creator form by @bcExpt1123
+- Improve radioset of croncreator with jk by @bcExpt1123
+- Improve log view's performance by @bcExpt1123
+- Fix feedbacks - change log viewer modal size by @bcExpt1123
+- Fix feedbacks - add hjkl into log viewer by @bcExpt1123
+- Fix feedbacks - pause functionality in cron table by @bcExpt1123
+- Fix feedbacks - improve tests with helpers by @bcExpt1123
+- Fix feedbacks - change config folder by @bcExpt1123
+- Fix feedbacks by @bcExpt1123
+- Update cron-wrapper by @bcExpt1123
+- Update cron-wrapper.sh to improve logs by @bcExpt1123
+- Add cron log functionality into servers section by @bcExpt1123
+- Add tests for logger service by @bcExpt1123
+- Add log viewer for local by @bcExpt1123
+- Add logging functionality on local by @bcExpt1123
+- Merge branch 'fix/disconnect' into release/v0.6.0 by @antoniorodr
+- Bump version to 0.6.0 by @antoniorodr
+- Change code styling for better readability by @antoniorodr
+- Merge branch 'feat/list-not-intuitive' into release/v0.6.0 by @antoniorodr in [#49](https://github.com/antoniorodr/cronboard/pull/49)
+- Make list behavior more intuitive by @bcExpt1123
+- Merge branch 'fix(cronjob)/duplicatedId-in-cronjob-dialog' into release/v0.6.0 by @antoniorodr in [#48](https://github.com/antoniorodr/cronboard/pull/48)
 - Update changelog by @antoniorodr
 
 ### Fixed
-- Fix bash_path bug on macOS
-- Update test assert
-- Fix deleting cronjob in Servers tab
-- Clear code
-- RadioButton's default value
-- Fix visual bug on CronCreator
-- Fix logview - no logs found
-- Fix cron wrapper to enable special letters like quote in command
-- Fix VimKeysRadioSet default value
-- Resolve feedbacks
-- Fix a bug when disconnecting if no conextion exist
-- Handle duplicated id error in cron creator
+- Fix import which was making tests fail by @antoniorodr
+- Fix bash_path bug on macOS by @antoniorodr in [#50](https://github.com/antoniorodr/cronboard/pull/50)
+- Update test assert by @antoniorodr
+- Fix deleting cronjob in Servers tab by @bcExpt1123
+- Clear code by @bcExpt1123
+- RadioButton's default value by @bcExpt1123
+- Fix visual bug on CronCreator by @antoniorodr
+- Fix logview - no logs found by @bcExpt1123
+- Fix cron wrapper to enable special letters like quote in command by @bcExpt1123
+- Fix VimKeysRadioSet default value by @bcExpt1123
+- Resolve feedbacks by @bcExpt1123
+- Fix a bug when disconnecting if no conextion exist by @antoniorodr
+- Handle duplicated id error in cron creator by @bcExpt1123
 
 ### Removed
-- Delete repeated imports
-- Delete logs when deleting cron job
-- Delete unnecessary code
+- Delete repeated imports by @antoniorodr
+- Delete logs when deleting cron job by @bcExpt1123
+- Delete unnecessary code by @bcExpt1123
+
+### New Contributors
+* @bcExpt1123 made their first contribution
 
 ## [0.5.4] - 30.04.2026
 
@@ -83,14 +112,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update release and tests workflows by @antoniorodr
 
 ### Fixed
-- Notify once when disconnecting server by @volcano303
+- Notify once when disconnecting server by @DragunovX16
 
 ### Removed
 - Delete project explanation file by @antoniorodr
-- Remove unreachable line by @volcano303
+- Remove unreachable line by @DragunovX16
 
 ### New Contributors
-* @volcano303 made their first contribution
+* @DragunovX16 made their first contribution
 
 ## [0.5.2] - 19.04.2026
 
@@ -387,6 +416,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[0.6.1]: https://github.com/antoniorodr/cronboard/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/antoniorodr/cronboard/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/antoniorodr/cronboard/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/antoniorodr/cronboard/compare/v0.5.2...v0.5.3
