@@ -190,9 +190,10 @@ def home_dir_under_tmp(tmp_path: Path, *, mkdir: bool = True) -> Path:
     return home
 
 
-def patch_cron_wrapper_path_home(mocker: MockerFixture, home: Path) -> None:
-
-    mocker.patch.object(mod.Path, "home", return_value=home)
+def patch_config_dir(mocker: MockerFixture, home: Path) -> None:
+    config_dir = home / ".config/cronboard"
+    config_dir.mkdir(parents=True)
+    mocker.patch.object(mod, "CONFIG_DIR", config_dir)
 
 
 @pytest.fixture

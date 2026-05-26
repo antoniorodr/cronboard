@@ -21,10 +21,10 @@ def _patch_local_log_discovery(
     dir_exists: bool,
     glob_paths: list[Path] | None = None,
 ) -> None:
-    mocker.patch(f"{_LOGGER}.Path.home", return_value=_FAKE_HOME)
-    mocker.patch.object(Path, "exists", return_value=dir_exists)
-    if glob_paths is not None:
-        mocker.patch.object(Path, "glob", return_value=glob_paths)
+    mock_log_dir = mocker.Mock()
+    mock_log_dir.exists.return_value = dir_exists
+    mock_log_dir.glob.return_value = glob_paths or []
+    mocker.patch(f"{_LOGGER}.LOG_DIR", mock_log_dir)
 
 
 def _patch_logger_path_and_instance(
@@ -183,9 +183,9 @@ def test_read_log_file_ssh_returns_empty_when_stderr_has_noise(
 def test_delete_logs_for_identificator_local_removes_matching_files(
     mocker: MockerFixture, tmp_path: Path
 ):
-    mocker.patch(f"{_LOGGER}.Path.home", return_value=tmp_path)
     log_dir = tmp_path / ".config/cronboard/logs"
     log_dir.mkdir(parents=True)
+    mocker.patch(f"{_LOGGER}.LOG_DIR", log_dir)
     keep = log_dir / "other_job_a.log"
     remove1 = log_dir / "job1_a.log"
     remove2 = log_dir / "job1_b.log"
@@ -202,7 +202,7 @@ def test_delete_logs_for_identificator_local_removes_matching_files(
 def test_delete_logs_for_identificator_local_noop_when_no_files(
     mocker: MockerFixture, tmp_path: Path
 ):
-    mocker.patch(f"{_LOGGER}.Path.home", return_value=tmp_path)
+    mocker.patch(f"{_LOGGER}.LOG_DIR", tmp_path / ",config/cronboard/logs")
     (tmp_path / ".config/cronboard/logs").mkdir(parents=True)
 
     delete_logs_for_identificator("missing", ssh=None)
