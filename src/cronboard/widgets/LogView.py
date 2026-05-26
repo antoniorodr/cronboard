@@ -37,18 +37,6 @@ class VirtualLogFileList(ScrollView, can_focus=True):
 
     ALLOW_MAXIMIZE = True
 
-    DEFAULT_CSS = """
-    VirtualLogFileList {
-        background: $surface;
-        color: $text;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        &:focus {
-            background-tint: $foreground 5%;
-        }
-    }
-    """
-
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("enter", "select_cursor", "Select", show=False),
         Binding("up", "cursor_up", "Cursor up", show=False, priority=True),
@@ -197,18 +185,6 @@ class VirtualLogFileList(ScrollView, can_focus=True):
 class VirtualLogLines(ScrollView, can_focus=True):
     """Log file body: all lines kept in memory; scrollbar reflects full height; only visible rows render."""
 
-    DEFAULT_CSS = """
-    VirtualLogLines {
-        background: $surface;
-        color: $text;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        &:focus {
-            background-tint: $foreground 5%;
-        }
-    }
-    """
-
     def __init__(
         self,
         *,
@@ -297,7 +273,9 @@ class LogView(Widget):
     def __init__(self, identificator: str, ssh_client=None) -> None:
         super().__init__()
         self.ssh_client = ssh_client
-        self.log_list = LogList(identificator=identificator, id="log-list", ssh_client=ssh_client)
+        self.log_list = LogList(
+            identificator=identificator, id="log-list", ssh_client=ssh_client
+        )
         self.log_output = VirtualLogLines(classes="focusable")
 
     def _file_list(self) -> VirtualLogFileList:
@@ -350,8 +328,10 @@ class LogView(Widget):
         self.log_list.styles.width = "30%"
 
     def on_mount(self) -> None:
-        self.app.toggle_tab_enablement() # Disable tab switching using the `Tab` key
-        self.log_output.set_placeholder("Please select a log from the list on the left.")
+        self.app.toggle_tab_enablement()  # Disable tab switching using the `Tab` key
+        self.log_output.set_placeholder(
+            "Please select a log from the list on the left."
+        )
 
     def on_key(self, event: events.Key) -> None:
         if event.key == "tab":
@@ -384,5 +364,5 @@ class LogViewModal(ModalScreen[bool]):
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        self.app.toggle_tab_enablement() # Enable tab switching using the `Tab` key
+        self.app.toggle_tab_enablement()  # Enable tab switching using the `Tab` key
         self.dismiss(True)
