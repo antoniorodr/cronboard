@@ -48,3 +48,6 @@ jobs:
           artifacts: dist/*
           artifactErrorsFailBuild: true
           makeLatest: true
+  update-flake-lock:
+    needs: release
+    uses: ./.github/workflows/update-flake-lock.yml
