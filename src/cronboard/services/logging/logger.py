@@ -3,25 +3,22 @@ import shlex
 from pathlib import Path
 import posixpath
 from cronboard.services.logging.cron_wrapper import get_remote_home
+from cronboard.config import LOG_DIR
 
-LOG_DIR = ".config/cronboard/logs"
 
 def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
     if ssh is None:
         log_dir = Path.home() / LOG_DIR
         if not log_dir.exists():
             return {}
-        return {
-            p.stem: str(p)
-            for p in log_dir.glob(f"{identificator}_*.log")
-        }
+        return {p.stem: str(p) for p in log_dir.glob(f"{identificator}_*.log")}
     else:
         home = get_remote_home(ssh)
         if not home:
             return {}
         log_dir = posixpath.join(home, LOG_DIR)
 
-        cmd = f'ls {log_dir} 2>/dev/null'
+        cmd = f"ls {log_dir} 2>/dev/null"
         _, stdout, stderr = ssh.exec_command(cmd)
         files = stdout.read().decode().splitlines()
         errors = stderr.read().decode().strip()
