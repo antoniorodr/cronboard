@@ -62,7 +62,12 @@ class CronBoard(App):
     def compose(self) -> ComposeResult:
         version = self.get_version()
         self.config_path = Path.home() / ".config/cronboard/config.toml"
-        yield Label(f"CronBoard v{version}", id="title")
+        yield Label(
+            f"""▄▖      ▄        ▌
+▌ ▛▘▛▌▛▌▙▘▛▌▀▌▛▘▛▌
+▙▖▌ ▙▌▌▌▙▘▙▌█▌▌ ▙▌ v{version}""",
+            id="title",
+        )
         yield Footer()
         self.tabs = CronTabs(
             Tab("Local", id="local"),
