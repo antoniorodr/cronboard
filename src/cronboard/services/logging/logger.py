@@ -11,7 +11,12 @@ def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
         log_dir = LOG_DIR
         if not log_dir.exists():
             return {}
-        return {p.stem: str(p) for p in log_dir.glob(f"{identificator}_*.log")}
+        return {
+            p.stem: str(p)
+            for p in sorted(
+                log_dir.glob(f"{identificator}_*.log"), key=lambda p: p.stem
+            )
+        }
     else:
         home = get_remote_home(ssh)
         if not home:
@@ -28,7 +33,7 @@ def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None):
             return {}
 
         result = {}
-        for file in files:
+        for file in sorted(files):
             if file.startswith(f"{identificator}_") and file.endswith(".log"):
                 stem = file[:-4]  # remove ".log"
                 full_path = posixpath.join(log_dir, file)
