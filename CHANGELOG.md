@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 27.05.2026
+
+### Changed
+- Create ascii title
+- Update version
+- Merge branch 'feat/log-crono-order' into release/v0.6.2
+- Order logs chronologically
+- Update update flake workflow
+- Update release workflow
+- Update `CHANGELOG.md` by @antoniorodr
+
 ## [0.6.1] - 26.05.2026
 
 ### Changed
@@ -22,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update keybinds by @antoniorodr
 
 ### Fixed
-- Update test to use the new `config.py` file constants
+- Update test to use the new `config.py` file constants by @antoniorodr
 - Fix logs path by @antoniorodr
 
 ### Removed
@@ -416,6 +427,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[0.6.2]: https://github.com/antoniorodr/cronboard/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/antoniorodr/cronboard/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/antoniorodr/cronboard/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/antoniorodr/cronboard/compare/v0.5.3...v0.5.4
