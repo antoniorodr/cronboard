@@ -51,3 +51,5 @@ jobs:
   update-flake-lock:
     needs: release
     uses: ./.github/workflows/update-flake-lock.yml
+    permissions:
+      contents: write
