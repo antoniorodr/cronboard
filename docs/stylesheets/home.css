@@ -174,8 +174,11 @@
   color: var(--cb-mauve);
   font-family: 'miniwi', monospace;
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1;
   letter-spacing: 0;
+  font-size: 1.6rem;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .term-dim {

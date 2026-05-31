@@ -140,16 +140,17 @@
   color: var(--md-primary-fg-color);
 }
 
-/* ASCII logo in header */
+/* Logo in header */
 .md-logo__ascii {
   margin: 0;
   padding: 0;
   font-family: 'miniwi', monospace;
-  font-size: 0.55rem;
-  line-height: 1.1;
+  font-size: 1.4rem;
+  line-height: 1;
   color: var(--md-primary-fg-color);
-  white-space: pre;
-  letter-spacing: 0;
+  display: inline-block;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .md-header__button.md-logo {
