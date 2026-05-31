@@ -1,6 +1,17 @@
 /* ============================================================================
-   Catppuccin Latte (light mode)
-   ============================================================================ */
+    Miniwi Font (8x4 bitmap font for ASCII art logo)
+    ============================================================================ */
+@font-face {
+  font-family: 'miniwi';
+  src: url('../fonts/miniwi.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================================
+    Catppuccin Latte (light mode)
+    ============================================================================ */
 [data-md-color-scheme=default] {
   --md-hue: 220;
   --md-default-fg-color: #4c4f69;
@@ -133,11 +144,12 @@
 .md-logo__ascii {
   margin: 0;
   padding: 0;
+  font-family: 'miniwi', monospace;
   font-size: 0.55rem;
   line-height: 1.1;
   color: var(--md-primary-fg-color);
-  font-weight: 600;
   white-space: pre;
+  letter-spacing: 0;
 }
 
 .md-header__button.md-logo {

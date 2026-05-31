@@ -172,8 +172,10 @@
 
 .term-art {
   color: var(--cb-mauve);
-  font-weight: 600;
+  font-family: 'miniwi', monospace;
+  font-weight: 400;
   line-height: 1.1;
+  letter-spacing: 0;
 }
 
 .term-dim {
