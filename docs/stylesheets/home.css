@@ -512,7 +512,7 @@ body:has(.cronboard-home) .md-content__inner {
   left: 50%;
   transform: translateX(-50%) translateY(1rem);
   background: var(--cb-mauve);
-  color: #1e1e2e;
+  color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 0.35rem;
   font-size: 0.8rem;
@@ -522,6 +522,10 @@ body:has(.cronboard-home) .md-content__inner {
   opacity: 0;
   transition: opacity 0.2s, transform 0.2s;
   z-index: 1000;
+}
+
+[data-md-color-scheme=slate] .copy-toast {
+  color: #1e1e2e;
 }
 
 .copy-toast.show {
