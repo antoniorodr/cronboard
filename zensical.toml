@@ -80,7 +80,7 @@ extra_javascript = ["javascripts/docs-link.js", "javascripts/install-tabs.js"]
 # Section for configuring theme options
 # ----------------------------------------------------------------------------
 [project.theme]
-logo = "logo.png"
+# logo = "logo.png"
 
 # change this to "classic" to use the traditional Material for MkDocs look.
 #variant = "classic"
