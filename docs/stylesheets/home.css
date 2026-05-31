@@ -505,6 +505,30 @@ body:has(.cronboard-home) .md-content__inner {
   color: var(--cb-green);
 }
 
+/* Copy toast */
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(1rem);
+  background: var(--cb-mauve);
+  color: #1e1e2e;
+  padding: 0.5rem 1rem;
+  border-radius: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 1000;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .install-panel .comment {
   color: var(--cb-text-muted);
 }
