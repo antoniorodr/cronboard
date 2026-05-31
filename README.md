@@ -11,7 +11,7 @@
 
 Cronboard is a terminal application for managing and scheduling cron jobs on local and remote servers. You can add, edit, pause, resume, search, and delete jobs from a Textual-based interface.
 
-Full documentation is available at [antoniorodr.github.io/cronboard](https://antoniorodr.github.io/cronboard).
+Full documentation is available at [cronboard.dev](https://cronboard.dev).
 
 ## 🎬 Demo
 
