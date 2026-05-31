@@ -3,21 +3,38 @@
    ============================================================================ */
 
 /* --- Hide sidebar, tabs, footer nav, and header title on home --- */
-body:has(.cronboard-home) .md-sidebar--primary,
-body:has(.cronboard-home) .md-sidebar--secondary,
-body:has(.cronboard-home) .md-tabs,
-body:has(.cronboard-home) .md-footer__inner,
-body:has(.cronboard-home) .md-header__title {
-  display: none !important;
+/* Desktop only: hide sidebar on home page */
+@media (min-width: 76.25em) {
+  body:has(.cronboard-home) .md-sidebar--primary,
+  body:has(.cronboard-home) .md-sidebar--secondary,
+  body:has(.cronboard-home) .md-tabs,
+  body:has(.cronboard-home) .md-footer__inner,
+  body:has(.cronboard-home) .md-header__title {
+    display: none !important;
+  }
 }
 
-body:has(.cronboard-home) .md-content {
-  max-width: 100%;
+/* Mobile: keep sidebar visible for hamburger menu, but hide secondary sidebar and tabs */
+@media (max-width: 76.235em) {
+  body:has(.cronboard-home) .md-sidebar--secondary,
+  body:has(.cronboard-home) .md-tabs,
+  body:has(.cronboard-home) .md-footer__inner,
+  body:has(.cronboard-home) .md-header__title {
+    display: none !important;
+  }
 }
 
-body:has(.cronboard-home) .md-content__inner {
-  padding: 0;
-  margin: 0;
+@media (min-width: 76.25em) {
+  body:has(.cronboard-home) .md-content {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 76.25em) {
+  body:has(.cronboard-home) .md-content__inner {
+    padding: 0;
+    margin: 0;
+  }
 }
 
 /* ============================================================================
