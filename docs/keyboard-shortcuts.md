@@ -1,4 +1,4 @@
-# Keyboard Shortcuts
+# Keyboard Keybinds
 
 Cronboard is fully keyboard-driven. Below is a complete reference of all available key bindings.
 
