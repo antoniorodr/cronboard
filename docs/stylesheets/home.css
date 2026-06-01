@@ -435,8 +435,7 @@
 }
 
 .install-panel:not(.active) {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
 }
 
 .install-panel.active {
@@ -747,7 +746,8 @@ a.btn-primary:focus {
   }
 
   .term-body {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
+    min-width: 0;
   }
 
   .community-actions {
@@ -763,5 +763,41 @@ a.btn-primary:focus {
     white-space: nowrap;
     padding: 0.4rem 0.65rem;
     font-size: 0.7rem;
+  }
+
+  .install-panel {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .install-terminal {
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .install-panels {
+    min-width: 0;
+  }
+
+  .install-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .term-line,
+  .term-cmd-text {
+    white-space: normal !important;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
+  .term-cmd {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .term-copy {
+    opacity: 1;
+    margin-left: 0;
+    margin-top: 0.25rem;
   }
 }
