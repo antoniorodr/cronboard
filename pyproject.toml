@@ -30,9 +30,14 @@ Issues = "https://github.com/antoniorodr/cronboard/issues"
 [project.scripts]
 cronboard = "cronboard.app:main"
 
-[tool.pytest.ini_options]
+[tool.pytest]
 pythonpath = [".", "src"]
-addopts = "--cov=cronboard --cov-report=term-missing --cov-report=lcov:coverage.lcov"
+addopts = [
+  "--cov=cronboard",
+  "--cov-report=term-missing",
+  "--cov-report=lcov:coverage.lcov",
+]
+asyncio_mode = "auto"
 
 
 [dependency-groups]
