@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "cronboard"
@@ -30,9 +30,6 @@ Issues = "https://github.com/antoniorodr/cronboard/issues"
 [project.scripts]
 cronboard = "cronboard.app:main"
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
 addopts = "--cov=cronboard --cov-report=term-missing --cov-report=lcov:coverage.lcov"
@@ -48,6 +45,3 @@ dev = [
   "zensical>=0.0.33",
   "debugpy>=1.8.21",
 ]
-
-[tool.setuptools.package-data]
-"cronboard" = ["static/css/*.tcss", "logging/*.sh"]
