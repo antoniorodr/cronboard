@@ -98,7 +98,7 @@ class CronTable(DataTable):
         else:
             self.ssh_cron = None
 
-        self.load_crontabs()
+        CronJobServices.load_crontabs(self)
 
     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         """Checks if an action may run.
@@ -200,21 +200,6 @@ class CronTable(DataTable):
                 )
             )
 
-    def load_crontabs(self) -> None:
-        """Loads the crontabs."""
-
-        self.clear()
-        self._rows_data: list = []
-        self._search_matches: list = []
-        self._search_index = -1
-        self._search_query = ""
-
-        if self.remote and self.ssh_client:
-            self.parse_cron(self.ssh_cron)
-
-        else:
-            self.parse_cron(self.cron)
-
     def action_create_cronjob_keybind(self) -> None:
         """Handles create cronjob action by calling the main app's method."""
 
@@ -293,7 +278,7 @@ class CronTable(DataTable):
             self.ssh_cron = CronTab(tab=self.crontab_content)
         else:
             self.cron = CronTab(user=True)
-        self.load_crontabs()
+        CronJobServices.load_crontabs(self)
         self.refresh_bindings()
 
     def action_cron_search(self) -> None:
@@ -406,57 +391,17 @@ class CronTable(DataTable):
         identificator: str = row[0]
         cmd: str = row[2]
 
-        cron_to_use: CronTab | None = (
-            self.ssh_cron if (self.remote and self.ssh_client) else self.cron
-        )
-
-        job_to_toggle = CronJobServices.find_if_cronjob_exists(
+        CronJobServices.pause_cronjob(
             self.ssh_cron,
             self.remote,
             self.ssh_client,
             self.cron,
             self.server_name,
+            self.crontab_user,
             identificator,
             cmd,
+            self,
         )
-
-        if job_to_toggle is None:
-            job_to_toggle = CronJobServices.find_if_cronjob_exists(
-                self.ssh_cron,
-                self.remote,
-                None,
-                self.cron,
-                self.server_name,
-                identificator,
-                wrap_command(
-                    cmd,
-                    identificator,
-                    self.ssh_client if self.remote and self.ssh_client else None,
-                    self.server_name,
-                ),
-            )
-
-        if job_to_toggle is None:
-            job_to_toggle = CronJobServices.find_if_cronjob_exists(
-                self.ssh_cron,
-                self.remote,
-                None,
-                self.cron,
-                self.server_name,
-                identificator,
-                command_without_wrapper(cmd),
-            )
-
-        if job_to_toggle:
-            job_to_toggle.enable(
-                False
-            ) if job_to_toggle.is_enabled() else job_to_toggle.enable(True)
-
-            if self.remote and self.ssh_client:
-                self.write_remote_crontab()
-            else:
-                cron_to_use.write()
-            self.load_crontabs()
 
     def action_edit_cronjob(self) -> None:
         """Edits the selected cronjob."""
@@ -526,46 +471,6 @@ class CronTable(DataTable):
 
         if self.remote and self.ssh_client:
             self.app.action_disconnect_ssh()
-
-    def write_remote_crontab(self):
-        """Writes the current SSH cron table back to the remote server.
-
-        Returns:
-            True if success. Else False.
-        """
-
-        if not (self.remote and self.ssh_client and self.ssh_cron):
-            return False
-
-        try:
-            new_crontab_content: CronSSHModal = self.ssh_cron.render()
-
-            crontab_cmd: str = (
-                f"crontab -u {self.crontab_user} -"
-                if self.crontab_user
-                else "crontab -"
-            )
-            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
-            stdin.write(new_crontab_content)
-            stdin.channel.shutdown_write()
-
-            exit_status: str = stdin.channel.recv_exit_status()
-            errors: str = stderr.read().decode().strip()
-
-            if errors:
-                print(f"❌ Failed to write remote crontab: {errors}")
-                return False
-
-            if exit_status != 0:
-                print(f"❌ Command failed with exit status: {exit_status}")
-                return False
-
-            print("✅ Remote crontab updated successfully")
-            return True
-
-        except Exception as e:
-            print(f"❌ Error writing remote crontab: {e}")
-            return False
 
     def action_view_logs(self) -> None:
         """Views the logs for the selected cronjob."""
