@@ -16,6 +16,7 @@ from cronboard.services.cron_logging.cron_wrapper import (
     has_wrapper,
     wrap_command,
 )
+from cronboard.services.cronjob_services import CronJobServices
 from cronboard.widgets.cron_log_view import LogViewModal
 
 
@@ -409,10 +410,23 @@ class CronTable(DataTable):
             self.ssh_cron if (self.remote and self.ssh_client) else self.cron
         )
 
-        job_to_toggle = self.find_if_cronjob_exists(identificator, cmd)
+        job_to_toggle = CronJobServices.find_if_cronjob_exists(
+            self.ssh_cron,
+            self.remote,
+            self.ssh_client,
+            self.cron,
+            self.server_name,
+            identificator,
+            cmd,
+        )
 
         if job_to_toggle is None:
-            job_to_toggle = self.find_if_cronjob_exists(
+            job_to_toggle = CronJobServices.find_if_cronjob_exists(
+                self.ssh_cron,
+                self.remote,
+                None,
+                self.cron,
+                self.server_name,
                 identificator,
                 wrap_command(
                     cmd,
@@ -423,8 +437,14 @@ class CronTable(DataTable):
             )
 
         if job_to_toggle is None:
-            job_to_toggle = self.find_if_cronjob_exists(
-                identificator, command_without_wrapper(cmd)
+            job_to_toggle = CronJobServices.find_if_cronjob_exists(
+                self.ssh_cron,
+                self.remote,
+                None,
+                self.cron,
+                self.server_name,
+                identificator,
+                command_without_wrapper(cmd),
             )
 
         if job_to_toggle:
@@ -446,7 +466,12 @@ class CronTable(DataTable):
         expr = row[1]
         cmd = row[2]
 
-        job_to_edit = self.find_if_cronjob_exists(
+        job_to_edit = CronJobServices.find_if_cronjob_exists(
+            self.ssh_cron,
+            self.remote,
+            self.ssh_client,
+            self.cron,
+            self.server_name,
             identificator,
             wrap_command(
                 cmd,
@@ -464,7 +489,15 @@ class CronTable(DataTable):
             return
 
         if not job_to_edit:
-            job_to_edit = self.find_if_cronjob_exists(identificator, cmd)
+            job_to_edit = CronJobServices.find_if_cronjob_exists(
+                self.ssh_cron,
+                self.remote,
+                None,
+                self.cron,
+                self.server_name,
+                identificator,
+                cmd,
+            )
         if job_to_edit:
             self.action_edit_cronjob_keybind(identificator, expr, job_to_edit.command)
 
@@ -475,41 +508,18 @@ class CronTable(DataTable):
         identificator = row[0]
         cmd = row[2]
 
-        job_to_delete = self.find_if_cronjob_exists(identificator, cmd)
+        job_to_delete = CronJobServices.find_if_cronjob_exists(
+            self.ssh_cron,
+            self.remote,
+            None,
+            self.cron,
+            self.server_name,
+            identificator,
+            cmd,
+        )
 
         if job_to_delete:
             self.action_delete_cronjob_keybind(job_to_delete)
-
-    def find_if_cronjob_exists(self, identificator: str, cmd: str):
-        """Finds the CronJob in the local or remote CronTab.
-
-        Args:
-            identificator: The identificator of the cronjob.
-            cmd: The command to execute.
-
-        Returns:
-            The CronJob if found, else None.
-        """
-
-        cron_to_use: CronTab | None = (
-            self.ssh_cron if (self.remote and self.ssh_client) else self.cron
-        )
-
-        cmd_variants: set = {
-            cmd,
-            wrap_command(
-                cmd,
-                identificator,
-                self.ssh_client if self.remote and self.ssh_client else None,
-                self.server_name,
-            ),
-            command_without_wrapper(cmd),
-        }
-
-        for job in cron_to_use:
-            if job.comment == identificator and job.command in cmd_variants:
-                return job
-        return None
 
     def action_disconnect_ssh(self) -> None:
         """Disconnects the SSH connection and returns to the local crontab."""
@@ -592,7 +602,7 @@ class CronTable(DataTable):
 
     def _read_job_setting(
         self, identificator: str, key: str, fallback: bool | None
-    ) -> bool:
+    ) -> bool | None:
         """Reads the job setting from the notifications file."""
 
         try:
