@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from cronboard.widgets.cron_table import CronTable
 
 from crontab import CronTab
+from paramiko.client import SSHClient
 
 from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.cron_logging.cron_wrapper import (
@@ -16,20 +17,33 @@ from cronboard.services.cron_logging.cron_wrapper import (
 
 
 class CronJobServices:
+    """Services for CronJob related operations."""
+
     @staticmethod
     def find_if_cronjob_exists(
-        ssh_cron, remote, ssh_client, cron, server_name, identificator: str, cmd: str
-    ):
+        ssh_cron: CronTab | None,
+        remote: bool,
+        ssh_client: SSHClient | None,
+        cron: CronTab,
+        server_name: str,
+        identificator: str,
+        cmd: str,
+    ) -> CronTab | None:
         """Finds the CronJob in the local or remote CronTab.
 
         Args:
-            identificator: The identificator of the cronjob.
-            cmd: The command to execute.
+            ssh_cron: CronTab instance for the remote CronTab.
+            remote: Whether the user is on the remote CronTab.
+            ssh_client: SSH client.
+            cron: CronTab instance for the local CronTab.
+            server_name: Server name if remote.
+            identificator: Identificator of the cronjob.
+            cmd:  Command to execute for the cronjob.
 
         Returns:
-            The CronJob if found, else None.
-        """
+            CronJob if found, else None.
 
+        """
         cron_to_use: CronTab | None = ssh_cron if (remote and ssh_client) else cron
 
         cmd_variants: set = {
@@ -49,7 +63,7 @@ class CronJobServices:
         return None
 
     @staticmethod
-    def write_remote_crontab(remote, ssh_client, ssh_cron, crontab_user):
+    def write_remote_crontab(remote, ssh_client, ssh_cron, crontab_user) -> bool:
         """Writes the current SSH cron table back to the remote server.
 
         Returns:
@@ -103,7 +117,7 @@ class CronJobServices:
 
         cron_to_use: CronTab | None = ssh_cron if (remote and ssh_client) else cron
 
-        job_to_toggle = CronJobServices.find_if_cronjob_exists(
+        job_to_toggle: CronTab | None = CronJobServices.find_if_cronjob_exists(
             ssh_cron,
             remote,
             ssh_client,
@@ -112,33 +126,6 @@ class CronJobServices:
             identificator,
             cmd,
         )
-
-        if job_to_toggle is None:
-            job_to_toggle = CronJobServices.find_if_cronjob_exists(
-                ssh_cron,
-                remote,
-                None,
-                cron,
-                server_name,
-                identificator,
-                wrap_command(
-                    cmd,
-                    identificator,
-                    ssh_client if remote and ssh_client else None,
-                    server_name,
-                ),
-            )
-
-        if job_to_toggle is None:
-            job_to_toggle = CronJobServices.find_if_cronjob_exists(
-                ssh_cron,
-                remote,
-                None,
-                cron,
-                server_name,
-                identificator,
-                command_without_wrapper(cmd),
-            )
 
         if job_to_toggle:
             job_to_toggle.enable(
@@ -155,8 +142,11 @@ class CronJobServices:
 
     @staticmethod
     def load_crontabs(crontable: "CronTable") -> None:
-        """Loads the crontabs."""
+        """Loads the crontabs.
 
+        Args:
+            crontable: The CronTable instance to populate.
+        """
         crontable.clear()
         crontable._rows_data: list = []
         crontable._search_matches: list = []
@@ -175,6 +165,7 @@ class CronJobServices:
 
         Args:
             cron: The CronTab instance to parse.
+            crontable: The CronTable instance to populate.
         """
 
         for job in cron:
