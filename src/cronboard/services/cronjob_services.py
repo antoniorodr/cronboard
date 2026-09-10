@@ -112,9 +112,20 @@ class CronJobServices:
         identificator: str,
         cmd: str,
         crontable,
-    ):
-        """Pauses the selected cronjob."""
+    ) -> None:
+        """Pauses the selected cronjob.
 
+        Args:
+            ssh_cron: CronTab instance for the remote CronTab.
+            remote: Whether the user is on the remote CronTab.
+            ssh_client: SSH client.
+            cron: CronTab instance for the local CronTab.
+            server_name: Server name if remote.
+            crontab_user: CronTab user for the remote CronTab.
+            identificator: Identificator of the cronjob.
+            cmd:  Command to execute for the cronjob.
+            crontable: The CronTable instance to populate.
+        """
         cron_to_use: CronTab | None = ssh_cron if (remote and ssh_client) else cron
 
         job_to_toggle: CronTab | None = CronJobServices.find_if_cronjob_exists(
