@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import tomlkit
 from crontab import CronTab
 from paramiko.client import SSHClient
@@ -10,9 +8,7 @@ from textual.widgets import DataTable
 
 from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_input_search import CronInputSearch
-from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.cron_logging.cron_wrapper import (
-    command_without_wrapper,
     has_wrapper,
     wrap_command,
 )
@@ -139,66 +135,6 @@ class CronTable(DataTable):
         is_empty: bool = self.row_count == 0
         if event.key == "space":
             self.notify(f"empty: {is_empty}")
-
-    def parse_cron(self, cron) -> None:
-        """Parses the crontab and populates the table.
-
-        Args:
-            cron: The CronTab instance to parse.
-        """
-
-        for job in cron:
-            expr: str = job.slices.render()
-            cmd: str = command_without_wrapper(job.command)
-            log_enabled: bool | None = self.has_log_enabled(job.comment, job.command)
-            notifications_enabled: bool | None = self.has_notifications_enabled(
-                job.comment
-            )
-            identificator: str = job.comment if job.comment else "No ID"
-            try:
-                active_status: str = "Active" if job.is_enabled() else "Paused"
-                schedule = job.schedule(date_from=datetime.now())
-                next_dt = (
-                    schedule.get_next().strftime("%d.%m.%Y at %H:%M")
-                    if active_status == "Active"
-                    else "Paused"
-                )
-                last_dt = schedule.get_prev().strftime("%d.%m.%Y at %H:%M")
-
-            except ValueError as e:
-                next_dt = f"ERR: {e}"
-                last_dt = f"ERR: {e}"
-                active_status = "Inactive"
-
-            if active_status == "Active":
-                status_text = Text(active_status, style="#B8E7B8")
-            elif active_status == "Paused":
-                status_text = Text(active_status, style="#FF6F61")
-            else:
-                status_text = Text(active_status, style="#F6BF00")
-
-            self.add_row(
-                identificator,
-                expr,
-                cmd,
-                str(log_enabled),
-                str(notifications_enabled),
-                str(last_dt),
-                str(next_dt),
-                status_text,
-            )
-            self._rows_data.append(
-                (
-                    identificator,
-                    expr,
-                    cmd,
-                    str(log_enabled),
-                    str(notifications_enabled),
-                    str(last_dt),
-                    str(next_dt),
-                    status_text,
-                )
-            )
 
     def action_create_cronjob_keybind(self) -> None:
         """Handles create cronjob action by calling the main app's method."""

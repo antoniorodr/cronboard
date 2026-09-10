@@ -1,4 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
+
+from rich.text import Text
 
 if TYPE_CHECKING:
     from cronboard.widgets.cron_table import CronTable
@@ -161,7 +164,70 @@ class CronJobServices:
         crontable._search_query = ""
 
         if crontable.remote and crontable.ssh_client:
-            crontable.parse_cron(crontable.ssh_cron)
+            CronJobServices.parse_cron(crontable, crontable.ssh_cron)
 
         else:
-            crontable.parse_cron(crontable.cron)
+            CronJobServices.parse_cron(crontable, crontable.cron)
+
+    @staticmethod
+    def parse_cron(crontable: "CronTable", cron) -> None:
+        """Parses the crontab and populates the table.
+
+        Args:
+            cron: The CronTab instance to parse.
+        """
+
+        for job in cron:
+            expr: str = job.slices.render()
+            cmd: str = command_without_wrapper(job.command)
+            log_enabled: bool | None = crontable.has_log_enabled(
+                job.comment, job.command
+            )
+            notifications_enabled: bool | None = crontable.has_notifications_enabled(
+                job.comment
+            )
+            identificator: str = job.comment if job.comment else "No ID"
+            try:
+                active_status: str = "Active" if job.is_enabled() else "Paused"
+                schedule = job.schedule(date_from=datetime.now())
+                next_dt = (
+                    schedule.get_next().strftime("%d.%m.%Y at %H:%M")
+                    if active_status == "Active"
+                    else "Paused"
+                )
+                last_dt = schedule.get_prev().strftime("%d.%m.%Y at %H:%M")
+
+            except ValueError as e:
+                next_dt = f"ERR: {e}"
+                last_dt = f"ERR: {e}"
+                active_status = "Inactive"
+
+            if active_status == "Active":
+                status_text = Text(active_status, style="#B8E7B8")
+            elif active_status == "Paused":
+                status_text = Text(active_status, style="#FF6F61")
+            else:
+                status_text = Text(active_status, style="#F6BF00")
+
+            crontable.add_row(
+                identificator,
+                expr,
+                cmd,
+                str(log_enabled),
+                str(notifications_enabled),
+                str(last_dt),
+                str(next_dt),
+                status_text,
+            )
+            crontable._rows_data.append(
+                (
+                    identificator,
+                    expr,
+                    cmd,
+                    str(log_enabled),
+                    str(notifications_enabled),
+                    str(last_dt),
+                    str(next_dt),
+                    status_text,
+                )
+            )
