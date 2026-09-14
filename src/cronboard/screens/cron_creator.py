@@ -16,8 +16,8 @@ from cronboard.services.cron_logging.cron_wrapper import (
     _generate_notifications_config_for_server,
     command_without_wrapper,
     get_remote_home,
-    wrap_command,
 )
+from cronboard.services.cronjob_services import CronJobServices
 from cronboard.widgets.cron_vim_keys_radio_set import VimKeysRadioSet
 
 CRON_ALIASES: dict[str, None | str] = {
@@ -218,6 +218,8 @@ class CronCreator(ModalScreen[bool]):
         elif event.pressed.id == "disable-notifications":
             self.notifications_enabled = False
 
+    # TODO: Should be moved to a service class (the logic, not the function itself)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Determines the action on button pressed. It saves the cronjob on save. Shows
         errors if any.
@@ -233,61 +235,9 @@ class CronCreator(ModalScreen[bool]):
         if self._has_error():
             return
 
-        identificator_input: Input = self.query_one("#identificator", Input)
-        expression_input: Input = self.query_one("#expression", Input)
-        command_input: Input = self.query_one("#command", Input)
-        expression: str = expression_input.value
-        command: str = command_input.value
-        identificator: str = identificator_input.value
+        CronJobServices.save_cronjob(self)
 
-        if not identificator:
-            self._show_error("ID cannot be empty.")
-            return
-
-        if " " in identificator:
-            self._show_error("ID cannot contain spaces. e.g., backup_job_1")
-            return
-
-        self.save_job_settings(
-            identificator, self.notifications_enabled, self.log_enabled
-        )
-        if self.remote and self.ssh_client:
-            self.push_notifications_to_remote()
-
-        try:
-            job = self.find_if_cronjob_exists(
-                identificator, command_without_wrapper(command)
-            )
-            if not job:
-                job = self.find_if_cronjob_exists(
-                    identificator,
-                    wrap_command(
-                        command,
-                        identificator,
-                        self.ssh_client if self.remote and self.ssh_client else None,
-                        self.server_name,
-                    ),
-                )
-            if self.log_enabled or self.notifications_enabled:
-                command = wrap_command(
-                    command,
-                    identificator,
-                    self.ssh_client if self.remote and self.ssh_client else None,
-                    self.server_name,
-                )
-            if job:
-                job.set_command(command)
-                job.setall(expression)
-                self.write_cron_changes()
-            else:
-                cron_job = self.cron.new(command=command, comment=identificator)
-                cron_job.setall(expression)
-                self.write_cron_changes()
-
-            self.dismiss(True)
-
-        except (ValueError, KeyError):
-            self._show_error("Invalid cron expression. Please try again.")
+    # TODO: Should be moved to a service class
 
     def expression_description(self, expr: str, label_desc: Label) -> None:
         """Parses the cron expression to natural language, updating the label for the
@@ -333,6 +283,8 @@ class CronCreator(ModalScreen[bool]):
             label_desc.remove_class("success")
             label_desc.add_class("error")
 
+    # TODO: Should be moved to a service class
+
     def write_cron_changes(self) -> None:
         """Write cron changes to appropriate destination (local or remote)"""
 
@@ -360,7 +312,7 @@ class CronCreator(ModalScreen[bool]):
         else:
             self.cron.write()
 
-    def find_if_cronjob_exists(self, identificator: str, cmd: str):
+    def find_cronjob_in_cron_list(self, identificator: str, cmd: str):
         """Search for a cronjob in the list.
 
         Args:
@@ -375,6 +327,8 @@ class CronCreator(ModalScreen[bool]):
             if job.comment == identificator and job.command == cmd:
                 return job
         return None
+
+    # TODO: Should be moved to a service class
 
     def save_job_settings(
         self, cron_name: str, notifications: bool, logging: bool
@@ -400,6 +354,8 @@ class CronCreator(ModalScreen[bool]):
         with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
             f.write(tomlkit.dumps(config))
 
+    # TODO: Should be moved to a service class
+
     def _migrate_old_format(self, config) -> None:
         """Migrate old flat format (key = true) to new per-server format."""
 
@@ -414,6 +370,8 @@ class CronCreator(ModalScreen[bool]):
             config["local"][key] = tomlkit.table()
             config["local"][key]["notifications"] = value
             config["local"][key]["logging"] = False
+
+    # TODO: Should be moved to a service class
 
     def push_notifications_to_remote(self) -> None:
         """Pushes the flattened notifications.toml to the remote server."""

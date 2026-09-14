@@ -2,8 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from rich.text import Text
+from textual.widgets import Input
 
 if TYPE_CHECKING:
+    from cronboard.screens.cron_creator import CronCreator
     from cronboard.widgets.cron_table import CronTable
 
 from crontab import CronTab
@@ -233,3 +235,72 @@ class CronJobServices:
                     status_text,
                 )
             )
+
+    @staticmethod
+    def save_cronjob(cron_creator: "CronCreator") -> None:
+        """Saves the cronjob on save. Shows errors if any.
+
+        If the cronjob exists, it updates it. Else, it creates a new one.
+
+        Args:
+            cron_creator: The CronCreator instance.
+        """
+        identificator_input: Input = cron_creator.query_one("#identificator", Input)
+        expression_input: Input = cron_creator.query_one("#expression", Input)
+        command_input: Input = cron_creator.query_one("#command", Input)
+        expression: str = expression_input.value
+        command: str = command_input.value
+        identificator: str = identificator_input.value
+
+        if not identificator:
+            cron_creator._show_error("ID cannot be empty.")
+            return
+
+        if " " in identificator:
+            cron_creator._show_error("ID cannot contain spaces. e.g., backup_job_1")
+            return
+
+        cron_creator.save_job_settings(
+            identificator, cron_creator.notifications_enabled, cron_creator.log_enabled
+        )
+        if cron_creator.remote and cron_creator.ssh_client:
+            cron_creator.push_notifications_to_remote()
+
+        try:
+            job = cron_creator.find_cronjob_in_cron_list(
+                identificator, command_without_wrapper(command)
+            )
+            if not job:
+                job = cron_creator.find_cronjob_in_cron_list(
+                    identificator,
+                    wrap_command(
+                        command,
+                        identificator,
+                        cron_creator.ssh_client
+                        if cron_creator.remote and cron_creator.ssh_client
+                        else None,
+                        cron_creator.server_name,
+                    ),
+                )
+            if cron_creator.log_enabled or cron_creator.notifications_enabled:
+                command = wrap_command(
+                    command,
+                    identificator,
+                    cron_creator.ssh_client
+                    if cron_creator.remote and cron_creator.ssh_client
+                    else None,
+                    cron_creator.server_name,
+                )
+            if job:
+                job.set_command(command)
+                job.setall(expression)
+                cron_creator.write_cron_changes()
+            else:
+                cron_job = cron_creator.cron.new(command=command, comment=identificator)
+                cron_job.setall(expression)
+                cron_creator.write_cron_changes()
+
+            cron_creator.dismiss(True)
+
+        except (ValueError, KeyError):
+            cron_creator._show_error("Invalid cron expression. Please try again.")
