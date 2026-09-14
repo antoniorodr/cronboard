@@ -7,12 +7,9 @@ from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label
 
-from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
-from cronboard.services.cron_logging.cron_wrapper import (
-    CONFIG_REL_PATH,
-    _generate_notifications_config_for_server,
-    get_remote_home,
-)
+from cronboard.config import CONFIG_REL_PATH, CRONBOARD_NOTIFICATIONS_FILE
+from cronboard.services.config_service import ConfigService
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cron_messages import CronJobDeleted
 
 
@@ -147,16 +144,21 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
                 f.write(tomlkit.dumps(config))
 
+    # TODO: Should be moved to a service class
+
     def push_notifications_to_remote(self) -> None:
         """Pushes the flattened notifications.toml to the remote server."""
 
         try:
-            content = _generate_notifications_config_for_server(self.server_name)
+            content = ConfigService._generate_notifications_config_for_server(
+                self.server_name
+            )
+
             if content is None:
                 return
 
             if self.ssh_client:
-                home = get_remote_home(self.ssh_client)
+                home = CronWrapperService.get_remote_home(self.ssh_client)
 
             if not home:
                 return
@@ -168,6 +170,8 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             sftp.close()
         except Exception as e:
             print(f"Warning: Failed to sync notifications.toml to remote: {e}  ")
+
+    # TODO: Should be moved to a service class
 
     def write_remote_crontab(self) -> bool:
         """Writes the current SSH cron table back to the remote server.

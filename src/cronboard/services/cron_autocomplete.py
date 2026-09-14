@@ -16,7 +16,7 @@ from textual_autocomplete._path_autocomplete import (
 )
 
 from cronboard.services.cron_dir_entry import CronDirEntry
-from cronboard.services.cron_logging.cron_wrapper import get_files, get_remote_home
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 
 
 class CronAutoComplete(PathAutoComplete):
@@ -50,7 +50,9 @@ class CronAutoComplete(PathAutoComplete):
 
         if self.ssh_client:
             if not self._remote_home:
-                self._remote_home: str | None = get_remote_home(self.ssh_client)
+                self._remote_home: str | None = CronWrapperService.get_remote_home(
+                    self.ssh_client
+                )
             if self._remote_home:
                 home_path = Path(self._remote_home)
         else:

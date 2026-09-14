@@ -6,7 +6,9 @@ from pathlib import Path
 import paramiko
 
 from cronboard.config import LOG_DIR, LOG_REL_PATH
-from cronboard.services.cron_logging.cron_wrapper import get_remote_home
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+
+# TODO: Create a CronLogger class
 
 
 def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None) -> dict:
@@ -32,7 +34,7 @@ def get_log_files(identificator: str, ssh: paramiko.SSHClient | None = None) -> 
             )
         }
     else:
-        home: str | None = get_remote_home(ssh)
+        home: str | None = CronWrapperService.get_remote_home(ssh)
         if not home:
             return {}
         log_dir: str = posixpath.join(home, LOG_REL_PATH, identificator)
@@ -104,7 +106,7 @@ def delete_logs_for_identificator(
         path: Path = LOG_DIR / identificator
         shutil.rmtree(path, ignore_errors=True)
     else:
-        home: str | None = get_remote_home(ssh)
+        home: str | None = CronWrapperService.get_remote_home(ssh)
 
         if not home:
             return

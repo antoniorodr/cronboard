@@ -82,6 +82,8 @@ class CronServers(Widget):
             if server_info:
                 self.connect_to_server(server_info)
 
+    # TODO: Should be moved to a service class
+
     def connect_to_server(self, server_info: dict) -> None:
         """Tries to connect to the chosen server, using `ssh key` if available, or
         `password` if not. If the user is connected to another server, it will then
@@ -187,6 +189,8 @@ class CronServers(Widget):
         horizontal.mount(disconnected_label)
         self.content_area = disconnected_label
 
+    # TODO: Should be moved to a service class
+
     def action_disconnect_server(self) -> None:
         """Disconnect from the server under the cursor, shows a notification and updates
         the server information."""
@@ -211,6 +215,8 @@ class CronServers(Widget):
             self.notify("You are not connected to any server")
 
         self.save_servers()
+
+    # TODO: Should be moved to a service class
 
     def load_servers(self) -> dict:
         """Loads the server information from the config file.
@@ -251,6 +257,8 @@ class CronServers(Widget):
         else:
             print("📝 No servers file found, starting with empty list")
         return {}
+
+    # TODO: Should be moved to a service class
 
     def save_servers(self) -> None:
         """Saves the server information to the config file."""

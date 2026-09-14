@@ -1,4 +1,3 @@
-import tomlkit
 from cron_descriptor import ExpressionDescriptor, Options
 from crontab import CronTab
 from paramiko.client import SSHClient
@@ -9,14 +8,10 @@ from textual.screen import ModalScreen
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label, RadioButton, RadioSet
 
-from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
+from cronboard.config import CONFIG_REL_PATH
+from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_autocomplete import CronAutoComplete
-from cronboard.services.cron_logging.cron_wrapper import (
-    CONFIG_REL_PATH,
-    _generate_notifications_config_for_server,
-    command_without_wrapper,
-    get_remote_home,
-)
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_vim_keys_radio_set import VimKeysRadioSet
 
@@ -107,7 +102,7 @@ class CronCreator(ModalScreen[bool]):
                 command_input = Input(
                     value=""
                     if self.command is None
-                    else command_without_wrapper(self.command),
+                    else CronWrapperService.command_without_wrapper(self.command),
                     placeholder="e.g., python3 /usr/bin/python</path/to/script.py>",
                     id="command",
                 )
@@ -301,58 +296,18 @@ class CronCreator(ModalScreen[bool]):
 
     # TODO: Should be moved to a service class (ConfigService)
 
-    def save_job_settings(
-        self, cron_name: str, notifications: bool, logging: bool
-    ) -> None:
-        """Saves the notification settings to the notifications file."""
-
-        try:
-            with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
-                config = tomlkit.loads(f.read())
-        except FileNotFoundError:
-            config = tomlkit.document()
-
-        self._migrate_old_format(config)
-
-        if self.server_name not in config or not isinstance(
-            config[self.server_name], dict
-        ):
-            config[self.server_name] = tomlkit.table()
-        config[self.server_name][cron_name] = tomlkit.table()
-        config[self.server_name][cron_name]["notifications"] = notifications
-        config[self.server_name][cron_name]["logging"] = logging
-
-        with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
-            f.write(tomlkit.dumps(config))
-
-    # TODO: Should be moved to a service class (ConfigService)
-
-    def _migrate_old_format(self, config) -> None:
-        """Migrate old flat format (key = true) to new per-server format."""
-
-        to_migrate = []
-        for key, value in config.items():
-            if isinstance(value, bool):
-                to_migrate.append(key)
-        for key in to_migrate:
-            value = config.pop(key)
-            if "local" not in config or not isinstance(config["local"], dict):
-                config["local"] = tomlkit.table()
-            config["local"][key] = tomlkit.table()
-            config["local"][key]["notifications"] = value
-            config["local"][key]["logging"] = False
-
-    # TODO: Should be moved to a service class (ConfigService)
-
-    def push_notifications_to_remote(self) -> None:
+    def push_notifications_file_to_remote(self) -> None:
         """Pushes the flattened notifications.toml to the remote server."""
 
         try:
-            content = _generate_notifications_config_for_server(self.server_name)
+            content = ConfigService._generate_notifications_config_for_server(
+                self.server_name
+            )
+
             if content is None:
                 return
 
-            home = get_remote_home(self.ssh_client)
+            home = CronWrapperService.get_remote_home(self.ssh_client)
             if not home:
                 return
 
