@@ -283,35 +283,6 @@ class CronCreator(ModalScreen[bool]):
             label_desc.remove_class("success")
             label_desc.add_class("error")
 
-    # TODO: Should be moved to a service class
-
-    def write_cron_changes(self) -> None:
-        """Write cron changes to appropriate destination (local or remote)"""
-
-        if self.remote and self.ssh_client:
-            try:
-                new_crontab_content = self.cron.render()
-                crontab_cmd: str = (
-                    f"crontab -u {self.crontab_user} -"
-                    if self.crontab_user
-                    else "crontab -"
-                )
-                stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
-                stdin.write(new_crontab_content)
-                stdin.channel.shutdown_write()
-
-                exit_status: str = stdin.channel.recv_exit_status()
-                errors: str = stderr.read().decode().strip()
-
-                if errors or exit_status != 0:
-                    self.notify(f"Failed to write remote crontab: {errors}")
-
-            except Exception as e:
-                print(f"❌ Error writing remote crontab: {e}")
-                raise
-        else:
-            self.cron.write()
-
     def find_cronjob_in_cron_list(self, identificator: str, cmd: str):
         """Search for a cronjob in the list.
 

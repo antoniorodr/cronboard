@@ -245,6 +245,9 @@ class CronJobServices:
         Args:
             cron_creator: The CronCreator instance.
         """
+
+        # TODO: Move UI queries to CronCreator
+
         identificator_input: Input = cron_creator.query_one("#identificator", Input)
         expression_input: Input = cron_creator.query_one("#expression", Input)
         command_input: Input = cron_creator.query_one("#command", Input)
@@ -294,13 +297,41 @@ class CronJobServices:
             if job:
                 job.set_command(command)
                 job.setall(expression)
-                cron_creator.write_cron_changes()
+                CronJobServices.write_cron_changes(cron_creator)
             else:
                 cron_job = cron_creator.cron.new(command=command, comment=identificator)
                 cron_job.setall(expression)
-                cron_creator.write_cron_changes()
+                CronJobServices.write_cron_changes(cron_creator)
 
             cron_creator.dismiss(True)
 
         except (ValueError, KeyError):
             cron_creator._show_error("Invalid cron expression. Please try again.")
+
+    @staticmethod
+    def write_cron_changes(cron_creator: "CronCreator") -> None:
+        """Write cron changes to appropriate destination (local or remote)"""
+
+        if cron_creator.remote and cron_creator.ssh_client:
+            try:
+                new_crontab_content = cron_creator.cron.render()
+                crontab_cmd: str = (
+                    f"crontab -u {cron_creator.crontab_user} -"
+                    if cron_creator.crontab_user
+                    else "crontab -"
+                )
+                stdin, _, stderr = cron_creator.ssh_client.exec_command(crontab_cmd)
+                stdin.write(new_crontab_content)
+                stdin.channel.shutdown_write()
+
+                exit_status: str = stdin.channel.recv_exit_status()
+                errors: str = stderr.read().decode().strip()
+
+                if errors or exit_status != 0:
+                    cron_creator.notify(f"Failed to write remote crontab: {errors}")
+
+            except Exception as e:
+                print(f"❌ Error writing remote crontab: {e}")
+                raise
+        else:
+            cron_creator.cron.write()
