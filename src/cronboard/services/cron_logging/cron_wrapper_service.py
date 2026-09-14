@@ -22,7 +22,7 @@ from cronboard.services.cron_dir_entry import CronDirEntry
 
 
 class CronWrapperService:
-    """Services for CronWrapper related operations."""
+    """Service for CronWrapper related operations."""
 
     """
     Prefix for base64-encoded user command in wrapped crontab lines (avoids shell
@@ -53,7 +53,7 @@ class CronWrapperService:
         return "/bin/bash"
 
     @staticmethod
-    def get_remote_home(ssh: paramiko.SSHClient) -> Optional[str]:
+    def get_remote_home(ssh: paramiko.SSHClient | None) -> Optional[str]:
         """Gets the home directory on the remote server.
 
         Args:
