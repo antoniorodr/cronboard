@@ -12,10 +12,8 @@ from crontab import CronTab
 from paramiko.client import SSHClient
 
 from cronboard.screens.cron_ssh_modal import CronSSHModal
-from cronboard.services.cron_logging.cron_wrapper import (
-    command_without_wrapper,
-    wrap_command,
-)
+from cronboard.services.config_service import ConfigService
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 
 
 class CronJobService:
@@ -50,13 +48,13 @@ class CronJobService:
 
         cmd_variants: set = {
             cmd,
-            wrap_command(
+            CronWrapperService.wrap_command(
                 cmd,
                 identificator,
                 ssh_client if remote and ssh_client else None,
                 server_name,
             ),
-            command_without_wrapper(cmd),
+            CronWrapperService.command_without_wrapper(cmd),
         }
 
         for job in cron_to_use:
@@ -183,7 +181,7 @@ class CronJobService:
 
         for job in cron:
             expr: str = job.slices.render()
-            cmd: str = command_without_wrapper(job.command)
+            cmd: str = CronWrapperService.command_without_wrapper(job.command)
             log_enabled: bool | None = crontable.has_log_enabled(
                 job.comment, job.command
             )
@@ -263,20 +261,24 @@ class CronJobService:
             cron_creator._show_error("ID cannot contain spaces. e.g., backup_job_1")
             return
 
-        cron_creator.save_job_settings(
-            identificator, cron_creator.notifications_enabled, cron_creator.log_enabled
+        ConfigService.save_job_settings(
+            cron_creator,
+            identificator,
+            cron_creator.notifications_enabled,
+            cron_creator.log_enabled,
         )
+
         if cron_creator.remote and cron_creator.ssh_client:
-            cron_creator.push_notifications_to_remote()
+            cron_creator.push_notifications_file_to_remote()
 
         try:
             job = cron_creator.find_cronjob_in_cron_list(
-                identificator, command_without_wrapper(command)
+                identificator, CronWrapperService.command_without_wrapper(command)
             )
             if not job:
                 job = cron_creator.find_cronjob_in_cron_list(
                     identificator,
-                    wrap_command(
+                    CronWrapperService.wrap_command(
                         command,
                         identificator,
                         cron_creator.ssh_client
@@ -286,7 +288,7 @@ class CronJobService:
                     ),
                 )
             if cron_creator.log_enabled or cron_creator.notifications_enabled:
-                command = wrap_command(
+                command = CronWrapperService.wrap_command(
                     command,
                     identificator,
                     cron_creator.ssh_client
