@@ -17,7 +17,7 @@ from cronboard.services.cron_logging.cron_wrapper import (
     command_without_wrapper,
     get_remote_home,
 )
-from cronboard.services.cronjob_services import CronJobServices
+from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_vim_keys_radio_set import VimKeysRadioSet
 
 CRON_ALIASES: dict[str, None | str] = {
@@ -235,7 +235,7 @@ class CronCreator(ModalScreen[bool]):
         if self._has_error():
             return
 
-        CronJobServices.save_cronjob(self)
+        CronJobService.save_cronjob(self)
 
     # TODO: Should be moved to a service class
 
@@ -299,7 +299,7 @@ class CronCreator(ModalScreen[bool]):
                 return job
         return None
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (ConfigService)
 
     def save_job_settings(
         self, cron_name: str, notifications: bool, logging: bool
@@ -325,7 +325,7 @@ class CronCreator(ModalScreen[bool]):
         with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
             f.write(tomlkit.dumps(config))
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (ConfigService)
 
     def _migrate_old_format(self, config) -> None:
         """Migrate old flat format (key = true) to new per-server format."""
@@ -342,7 +342,7 @@ class CronCreator(ModalScreen[bool]):
             config["local"][key]["notifications"] = value
             config["local"][key]["logging"] = False
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (ConfigService)
 
     def push_notifications_to_remote(self) -> None:
         """Pushes the flattened notifications.toml to the remote server."""
