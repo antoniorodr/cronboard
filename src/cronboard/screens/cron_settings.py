@@ -5,10 +5,7 @@ from textual.widget import Widget
 from textual.widgets import Button, Input, Label
 
 from cronboard.config import CRONBOARD_CONFIG_FILE
-from cronboard.services.encryption.cron_encrypt import (
-    decrypt_telegram_token,
-    encrypt_telegram_token,
-)
+from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
 
 
 class CronSettings(Widget):
@@ -62,7 +59,9 @@ class CronSettings(Widget):
         if event.button.id == "save":
             try:
                 config = tomlkit.loads(CRONBOARD_CONFIG_FILE.read_text())
-                config["telegram_token"] = encrypt_telegram_token(telegram_token)
+                config["telegram_token"] = CronEncryptService.encrypt_telegram_token(
+                    telegram_token
+                )
                 config["telegram_chat_id"] = telegram_chat_id
 
                 CRONBOARD_CONFIG_FILE.write_text(tomlkit.dumps(config))
@@ -79,9 +78,9 @@ class CronSettings(Widget):
                 config: dict = tomlkit.loads(f.read())
                 telegram_token: str = config.get("telegram_token", "")
                 telegram_chat_id: str = config.get("telegram_chat_id", "")
-                self.query_one("#telegram-token", Input).value = decrypt_telegram_token(
-                    telegram_token
-                )
+                self.query_one(
+                    "#telegram-token", Input
+                ).value = CronEncryptService.decrypt_telegram_token(telegram_token)
                 self.query_one("#telegram-chat-id", Input).value = telegram_chat_id
         except Exception as e:
             print(f"Warning: Failed to fetch settings: {e}")

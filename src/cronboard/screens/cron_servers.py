@@ -12,10 +12,7 @@ from textual.widgets import Label, Tree
 from cronboard.config import CONFIG_FILE
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_ssh_modal import CronSSHModal
-from cronboard.services.encryption.cron_encrypt import (
-    decrypt_password,
-    encrypt_password,
-)
+from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
 from cronboard.widgets.cron_table import CronTable
 from cronboard.widgets.cron_tree import CronTree
 
@@ -235,8 +232,10 @@ class CronServers(Widget):
                         encrypted_password = server_info.pop("encrypted_password")
                         if encrypted_password:
                             try:
-                                server_info["password"] = decrypt_password(
-                                    encrypted_password
+                                server_info["password"] = (
+                                    CronEncryptService.decrypt_password(
+                                        encrypted_password
+                                    )
                                 )
                             except Exception as e:
                                 print(
@@ -269,7 +268,9 @@ class CronServers(Widget):
             for server_id, server_info in self.servers.items():
                 encrypted_password = ""
                 if server_info.get("password"):
-                    encrypted_password = encrypt_password(server_info["password"])
+                    encrypted_password = CronEncryptService.encrypt_password(
+                        server_info["password"]
+                    )
 
                 toml_safe_servers[server_id] = {
                     "name": server_info["name"],
