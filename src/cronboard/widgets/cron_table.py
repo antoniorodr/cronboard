@@ -8,10 +8,7 @@ from textual.widgets import DataTable
 
 from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_input_search import CronInputSearch
-from cronboard.services.cron_logging.cron_wrapper import (
-    has_wrapper,
-    wrap_command,
-)
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_log_view import LogViewModal
 
@@ -373,7 +370,7 @@ class CronTable(DataTable):
             self.cron,
             self.server_name,
             identificator,
-            wrap_command(
+            CronWrapperService.wrap_command(
                 cmd,
                 identificator,
                 self.ssh_client if self.remote and self.ssh_client else None,
@@ -398,6 +395,7 @@ class CronTable(DataTable):
                 identificator,
                 cmd,
             )
+
         if job_to_edit:
             self.action_edit_cronjob_keybind(identificator, expr, job_to_edit.command)
 
@@ -464,7 +462,7 @@ class CronTable(DataTable):
         setting = self._read_job_setting(identificator, "logging", None)
         if setting is not None:
             return setting
-        return has_wrapper(command)
+        return CronWrapperService.has_wrapper(command)
 
     def _read_job_setting(
         self, identificator: str, key: str, fallback: bool | None
