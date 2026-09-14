@@ -8,19 +8,19 @@ from pathlib import Path
 from typing import Optional
 
 import paramiko
-import tomlkit
 from paramiko.sftp_client import SFTPClient
 
 from cronboard.config import (
     CONFIG_DIR,
     CONFIG_REL_PATH,
-    CRONBOARD_CONFIG_FILE,
-    CRONBOARD_NOTIFICATIONS_FILE,
     KEY_FILE,
     WRAPPER_DIST,
     WRAPPER_SOURCE,
 )
+from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_dir_entry import CronDirEntry
+
+# TODO: Should be a class here
 
 """
 Prefix for base64-encoded user command in wrapped crontab lines (avoids shell
@@ -231,8 +231,10 @@ def install_wrapper_remote(
         sftp.put(str(KEY_FILE), remote_key)
         ssh.exec_command(f"chmod 600 {remote_key}")
 
-        config_content = _generate_telegram_config()
-        notifications_content = _generate_notifications_config_for_server(server_name)
+        config_content = ConfigService._generate_telegram_config()
+        notifications_content = ConfigService._generate_notifications_config_for_server(
+            server_name
+        )
         with sftp.open(remote_config, "w") as f:
             f.write(config_content)
         with sftp.open(remote_notifications, "w") as f:
@@ -245,43 +247,6 @@ def install_wrapper_remote(
         sftp.close()
 
     return remote_file
-
-
-def _generate_telegram_config() -> str:
-    """Generates a minimal config.toml with only Telegram settings."""
-
-    try:
-        with CRONBOARD_CONFIG_FILE.open("r") as f:
-            config: dict = tomlkit.loads(f.read())
-        minimal: dict = tomlkit.document()
-        minimal["telegram_token"] = config.get("telegram_token", "")
-        minimal["telegram_chat_id"] = config.get("telegram_chat_id", "")
-        return tomlkit.dumps(minimal)
-    except Exception as e:
-        print(f"Error: {e}")
-        return ""
-
-
-def _generate_notifications_config_for_server(server_name: str) -> str:
-    """Generates a flattened notifications.toml for a specific server.
-
-    Extracts only entries for the given server and removes the server
-    prefix.
-    """
-
-    try:
-        with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
-            config = tomlkit.loads(f.read())
-        result = tomlkit.document()
-        server_section = config.get(server_name)
-        if isinstance(server_section, dict):
-            for job_name, value in server_section.items():
-                if isinstance(value, dict):
-                    result[job_name] = value
-        return tomlkit.dumps(result)
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
 
 
 def install_wrapper(
