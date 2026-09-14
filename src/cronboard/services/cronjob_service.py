@@ -310,7 +310,11 @@ class CronJobService:
 
     @staticmethod
     def write_cron_changes(cron_creator: "CronCreator") -> None:
-        """Write cron changes to appropriate destination (local or remote)"""
+        """Write cron changes to appropriate destination (local or remote)
+
+        Args:
+            cron_creator: The CronCreator instance.
+        """
 
         if cron_creator.remote and cron_creator.ssh_client:
             try:
