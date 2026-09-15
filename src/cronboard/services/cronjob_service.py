@@ -269,7 +269,7 @@ class CronJobService:
         )
 
         if cron_creator.remote and cron_creator.ssh_client:
-            cron_creator.push_notifications_file_to_remote()
+            ConfigService.push_notifications_file_to_remote(cron_creator)
 
         try:
             job = cron_creator.find_cronjob_in_cron_list(

@@ -5,11 +5,16 @@ if TYPE_CHECKING:
 
 import tomlkit
 
-from cronboard.config import CRONBOARD_CONFIG_FILE, CRONBOARD_NOTIFICATIONS_FILE
+from cronboard.config import (
+    CONFIG_REL_PATH,
+    CRONBOARD_CONFIG_FILE,
+    CRONBOARD_NOTIFICATIONS_FILE,
+)
+from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 
 
 class ConfigService:
-    """Services for Config related operations."""
+    """Service for Config related operations."""
 
     @staticmethod
     def save_job_settings(
@@ -88,3 +93,27 @@ class ConfigService:
         except Exception as e:
             print(f"Error: {e}")
             return None
+
+    @staticmethod
+    def push_notifications_file_to_remote(croncreator: "CronCreator") -> None:
+        """Pushes the flattened notifications.toml to the remote server."""
+
+        try:
+            content = ConfigService._generate_notifications_config_for_server(
+                croncreator.server_name
+            )
+
+            if content is None:
+                return
+
+            home = CronWrapperService.get_remote_home(croncreator.ssh_client)
+            if not home:
+                return
+
+            remote_path = f"{home}/{CONFIG_REL_PATH}/notifications.toml"
+            sftp = croncreator.ssh_client.open_sftp()
+            with sftp.open(remote_path, "w") as f:
+                f.write(content)
+            sftp.close()
+        except Exception as e:
+            print(f"Warning: Failed to sync notifications.toml to remote: {e}")

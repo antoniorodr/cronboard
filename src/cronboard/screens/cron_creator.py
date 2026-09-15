@@ -293,28 +293,3 @@ class CronCreator(ModalScreen[bool]):
             if job.comment == identificator and job.command == cmd:
                 return job
         return None
-
-    # TODO: Should be moved to a service class (ConfigService)
-
-    def push_notifications_file_to_remote(self) -> None:
-        """Pushes the flattened notifications.toml to the remote server."""
-
-        try:
-            content = ConfigService._generate_notifications_config_for_server(
-                self.server_name
-            )
-
-            if content is None:
-                return
-
-            home = CronWrapperService.get_remote_home(self.ssh_client)
-            if not home:
-                return
-
-            remote_path = f"{home}/{CONFIG_REL_PATH}/notifications.toml"
-            sftp = self.ssh_client.open_sftp()
-            with sftp.open(remote_path, "w") as f:
-                f.write(content)
-            sftp.close()
-        except Exception as e:
-            print(f"Warning: Failed to sync notifications.toml to remote: {e}")
