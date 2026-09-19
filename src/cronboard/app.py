@@ -30,7 +30,7 @@ from cronboard.screens.cron_creator import CronCreator
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_servers import CronServers
 from cronboard.screens.cron_settings import CronSettings
-from cronboard.services.cron_logging.cron_logger import delete_logs_for_identificator
+from cronboard.services.cron_logging.cron_logger_service import CronLogger
 from cronboard.services.cron_messages import CronJobDeleted
 from cronboard.themes.everforest_dark_hard import everforest_dark_hard
 from cronboard.widgets.cron_table import CronTable
@@ -113,7 +113,7 @@ class CronBoard(App):
 
     @on(CronJobDeleted)
     def _on_cron_job_deleted(self, event: CronJobDeleted) -> None:
-        delete_logs_for_identificator(event.identificator, event.ssh_client)
+        CronLogger.delete_logs_for_identificator(event.identificator, event.ssh_client)
 
     def on_mount(self) -> None:
         """Loads the theme and config, and mounts the CronTable widget."""

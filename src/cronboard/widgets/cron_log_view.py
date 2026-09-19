@@ -20,7 +20,7 @@ from textual.timer import Timer
 from textual.widget import Widget
 from textual.widgets import Button
 
-from cronboard.services.cron_logging.cron_logger import get_log_files, read_log_file
+from cronboard.services.cron_logging.cron_logger_service import CronLogger
 
 _sub_escape = re.compile("[\u0000-\u0014]").sub
 
@@ -321,7 +321,7 @@ class LogList(Widget):
     def __init__(self, identificator: str, ssh_client=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.identificator: str = identificator
-        self.log_paths: dict = get_log_files(identificator, ssh_client)
+        self.log_paths: dict = CronLogger.get_log_files(identificator, ssh_client)
         self.logs: list = list(self.log_paths.keys())
 
     def compose(self):
@@ -451,7 +451,7 @@ class LogView(Widget):
             event: LogList.LogSelected object. Identifies the selected log file.
         """
 
-        lines: list[str] = read_log_file(event.log_path, self.ssh_client)
+        lines: list[str] = CronLogger.read_log_file(event.log_path, self.ssh_client)
         if len(lines) == 0:
             self.log_output.set_content(["No logs found"])
         else:
