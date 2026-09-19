@@ -1,4 +1,3 @@
-import tomlkit
 from crontab import CronTab
 from paramiko.client import SSHClient
 from rich.text import Text
@@ -6,7 +5,6 @@ from textual.binding import Binding
 from textual.coordinate import Coordinate
 from textual.widgets import DataTable
 
-from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_input_search import CronInputSearch
 from cronboard.screens.cron_log_view import LogViewModal
 from cronboard.services.cron_logging.cron_logger_service import CronLogger
@@ -417,44 +415,6 @@ class CronTable(DataTable):
 
         if job_to_delete:
             self.action_delete_cronjob_keybind(job_to_delete)
-
-    # TODO: Should be moved to a service class
-
-    def has_notifications_enabled(self, identificator: str) -> bool:
-        """Checks if the notifications are enabled for the selected cronjob."""
-
-        result = self._read_job_setting(identificator, "notifications", False)
-        return result if result is not None else False
-
-    def has_log_enabled(self, identificator: str, command: str) -> bool:
-        """Checks if the log is enabled for the selected cronjob."""
-
-        setting = self._read_job_setting(identificator, "logging", None)
-        if setting is not None:
-            return setting
-        return CronWrapperService.has_wrapper(command)
-
-    def _read_job_setting(
-        self, identificator: str, key: str, fallback: bool | None
-    ) -> bool | None:
-        """Reads the job setting from the notifications file."""
-
-        try:
-            with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
-                config = tomlkit.loads(f.read())
-        except (FileNotFoundError, Exception):
-            return fallback
-
-        server_section = config.get(self.server_name)
-        if isinstance(server_section, dict):
-            section = server_section.get(identificator)
-            if isinstance(section, dict):
-                return section.get(key, fallback)
-
-        bare = config.get(identificator)
-        if isinstance(bare, bool):
-            return bare if key == "notifications" else False
-        return fallback
 
     def action_view_logs(self) -> None:
         """Views the logs for the selected cronjob."""

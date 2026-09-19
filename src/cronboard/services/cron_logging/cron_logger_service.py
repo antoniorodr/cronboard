@@ -12,6 +12,7 @@ import paramiko
 
 from cronboard.config import LOG_DIR, LOG_REL_PATH
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cronjob_service import CronJobService
 
 
 class CronLogger:
@@ -138,7 +139,7 @@ class CronLogger:
         row: list = crontable.get_row_at(crontable.cursor_row)
         identificator = row[0]
         command = row[2]
-        log_enabled = crontable.has_log_enabled(identificator, command)
+        log_enabled = CronJobService.has_log_enabled(crontable, identificator, command)
 
         if not log_enabled:
             crontable.notify("Log is disabled for this job")

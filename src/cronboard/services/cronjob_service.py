@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+import tomlkit
 from rich.text import Text
 from textual.widgets import Input
 
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 from crontab import CronTab
 from paramiko.client import SSHClient
 
+from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
@@ -182,11 +184,11 @@ class CronJobService:
         for job in cron:
             expr: str = job.slices.render()
             cmd: str = CronWrapperService.command_without_wrapper(job.command)
-            log_enabled: bool | None = crontable.has_log_enabled(
-                job.comment, job.command
+            log_enabled: bool | None = CronJobService.has_log_enabled(
+                crontable, job.comment, job.command
             )
-            notifications_enabled: bool | None = crontable.has_notifications_enabled(
-                job.comment
+            notifications_enabled: bool | None = (
+                CronJobService.has_notifications_enabled(crontable, job.comment)
             )
             identificator: str = job.comment if job.comment else "No ID"
             try:
@@ -341,3 +343,48 @@ class CronJobService:
                 raise
         else:
             cron_creator.cron.write()
+
+    @staticmethod
+    def _read_job_setting(
+        crontable: "CronTable", identificator: str, key: str, fallback: bool | None
+    ) -> bool | None:
+        """Reads the job setting from the notifications file."""
+
+        try:
+            with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
+                config = tomlkit.loads(f.read())
+        except (FileNotFoundError, Exception):
+            return fallback
+
+        server_section = config.get(crontable.server_name)
+        if isinstance(server_section, dict):
+            section = server_section.get(identificator)
+            if isinstance(section, dict):
+                return section.get(key, fallback)
+
+        bare = config.get(identificator)
+        if isinstance(bare, bool):
+            return bare if key == "notifications" else False
+        return fallback
+
+    @staticmethod
+    def has_notifications_enabled(crontable: "CronTable", identificator: str) -> bool:
+        """Checks if the notifications are enabled for the selected cronjob."""
+
+        result = CronJobService._read_job_setting(
+            crontable, identificator, "notifications", False
+        )
+        return result if result is not None else False
+
+    @staticmethod
+    def has_log_enabled(
+        crontable: "CronTable", identificator: str, command: str
+    ) -> bool:
+        """Checks if the log is enabled for the selected cronjob."""
+
+        setting = CronJobService._read_job_setting(
+            crontable, identificator, "logging", None
+        )
+        if setting is not None:
+            return setting
+        return CronWrapperService.has_wrapper(command)
