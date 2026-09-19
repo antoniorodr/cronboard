@@ -10,8 +10,8 @@ from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_input_search import CronInputSearch
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
-from cronboard.widgets.cron_log_view import LogViewModal
 from cronboard.services.ssh_service import SSHService
+from cronboard.widgets.cron_log_view import LogViewModal
 
 
 class CronTable(DataTable):
