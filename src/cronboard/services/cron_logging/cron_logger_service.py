@@ -1,3 +1,8 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from cronboard.widgets.cron_table import CronTable
+
 import posixpath
 import shlex
 import shutil
@@ -119,3 +124,24 @@ class CronLogger:
 
             path: str = posixpath.join(home, LOG_REL_PATH, identificator)
             ssh.exec_command(f"rm -rf -- {shlex.quote(path)}")
+
+    @staticmethod
+    def view_logs_of_cronjob(crontable: "CronTable") -> str:
+        """Views the logs for the selected cronjob.
+
+        Args:
+            crontable: The CronTable instance.
+
+        Returns: The identificator of the cronjob.
+
+        """
+        row: list = crontable.get_row_at(crontable.cursor_row)
+        identificator = row[0]
+        command = row[2]
+        log_enabled = crontable.has_log_enabled(identificator, command)
+
+        if not log_enabled:
+            crontable.notify("Log is disabled for this job")
+            return ""
+
+        return identificator

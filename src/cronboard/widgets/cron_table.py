@@ -8,10 +8,11 @@ from textual.widgets import DataTable
 
 from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_input_search import CronInputSearch
+from cronboard.screens.cron_log_view import LogViewModal
+from cronboard.services.cron_logging.cron_logger_service import CronLogger
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.services.ssh_service import SSHService
-from cronboard.widgets.cron_log_view import LogViewModal
 
 
 class CronTable(DataTable):
@@ -192,8 +193,6 @@ class CronTable(DataTable):
             server_name=self.server_name,
         )
 
-    # TODO: Should be moved to a service class
-
     def action_refresh(self) -> None:
         """Refreshes the cronjob list."""
 
@@ -217,8 +216,6 @@ class CronTable(DataTable):
         CronJobService.load_crontabs(self)
         self.refresh_bindings()
 
-    # TODO: Should be moved to a service class
-
     def action_cron_search(self) -> None:
         """Handles cron search action by calling the main app's method."""
 
@@ -234,17 +231,17 @@ class CronTable(DataTable):
 
         self.app.push_screen(CronInputSearch(), check_search)
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def action_clear_search(self) -> None:
-        """Handles clear search action by calling the main app's method."""
+        """Clears the search query."""
 
         self._search_query = ""
         self._search_matches: list = []
         self._search_index = -1
         self._restore_cells()
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def apply_search(self, query: str) -> None:
         """Applies the search query.
@@ -284,7 +281,7 @@ class CronTable(DataTable):
             self._search_index = -1
             self.notify(f"No matches for '{self._search_query}'")
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def _highlight_text(self, text: str, query: str) -> Text:
         result = Text(text)
@@ -295,7 +292,8 @@ class CronTable(DataTable):
             idx: int = text.lower().find(q_lower, idx + 1)
         return result
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
+
     def _highlight_matches(self) -> None:
         self._restore_cells()
         for i in self._search_matches:
@@ -308,14 +306,14 @@ class CronTable(DataTable):
                         self._highlight_text(text, self._search_query),
                     )
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def _restore_cells(self) -> None:
         for i, row_data in enumerate(self._rows_data):
             for col_idx in range(3):
                 self.update_cell_at(Coordinate(i, col_idx), row_data[col_idx])
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def action_search_next(self) -> None:
         """Searches for the next match."""
@@ -325,7 +323,7 @@ class CronTable(DataTable):
         self._search_index: int = (self._search_index + 1) % len(self._search_matches)
         self.move_cursor(row=self._search_matches[self._search_index])
 
-    # TODO: Should be moved to a service class
+    # TODO: Should be moved to a service class (SearchService?)
 
     def action_search_prev(self) -> None:
         """Searches for the previous match."""
@@ -422,33 +420,6 @@ class CronTable(DataTable):
 
     # TODO: Should be moved to a service class
 
-    def action_disconnect_ssh(self) -> None:
-        """Disconnects the SSH connection and returns to the local crontab."""
-
-        if self.remote and self.ssh_client:
-            self.app.action_disconnect_ssh()
-
-    # TODO: Should be moved to a service class
-
-    def action_view_logs(self) -> None:
-        """Views the logs for the selected cronjob."""
-
-        row: list = self.get_row_at(self.cursor_row)
-        identificator = row[0]
-        command = row[2]
-        log_enabled = self.has_log_enabled(identificator, command)
-
-        if not log_enabled:
-            self.notify("Log is disabled for this job")
-            return
-
-        self.app.push_screen(
-            LogViewModal(
-                identificator=identificator,
-                ssh_client=self.ssh_client if self.remote and self.ssh_client else None,
-            ),
-        )
-
     def has_notifications_enabled(self, identificator: str) -> bool:
         """Checks if the notifications are enabled for the selected cronjob."""
 
@@ -484,3 +455,15 @@ class CronTable(DataTable):
         if isinstance(bare, bool):
             return bare if key == "notifications" else False
         return fallback
+
+    def action_view_logs(self) -> None:
+        """Views the logs for the selected cronjob."""
+
+        identificator = CronLogger.view_logs_of_cronjob(self)
+
+        self.app.push_screen(
+            LogViewModal(
+                identificator=identificator,
+                ssh_client=self.ssh_client if self.remote and self.ssh_client else None,
+            ),
+        )
