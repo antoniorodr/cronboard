@@ -11,6 +11,7 @@ from cronboard.screens.cron_input_search import CronInputSearch
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_log_view import LogViewModal
+from cronboard.services.ssh_service import SSHService
 
 
 class CronTable(DataTable):
@@ -147,8 +148,6 @@ class CronTable(DataTable):
             server_name=self.server_name,
         )
 
-    # TODO: Should be moved to a service class not the keybind, but the action)
-
     def action_edit_cronjob_keybind(
         self, identificator: str, expression: str, command: str
     ) -> None:
@@ -204,13 +203,13 @@ class CronTable(DataTable):
                 if self.crontab_user
                 else "crontab -l"
             )
-            _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
-            exit_status: str = stdout.channel.recv_exit_status()
+
+            exit_status, stdout = SSHService.execute_ssh_command(self, crontab_cmd)
 
             if exit_status == 1:
                 self.crontab_content = ""
             else:
-                self.crontab_content: str = stdout.read().decode() if stdout else ""
+                self.crontab_content: str = stdout
 
             self.ssh_cron = CronTab(tab=self.crontab_content)
         else:

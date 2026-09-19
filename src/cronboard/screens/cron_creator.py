@@ -8,8 +8,6 @@ from textual.screen import ModalScreen
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label, RadioButton, RadioSet
 
-from cronboard.config import CONFIG_REL_PATH
-from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_autocomplete import CronAutoComplete
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
@@ -212,8 +210,6 @@ class CronCreator(ModalScreen[bool]):
             self.notifications_enabled = True
         elif event.pressed.id == "disable-notifications":
             self.notifications_enabled = False
-
-    # TODO: Should be moved to a service class (the logic, not the function itself)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Determines the action on button pressed. It saves the cronjob on save. Shows

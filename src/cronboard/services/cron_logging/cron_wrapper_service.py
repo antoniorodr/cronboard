@@ -5,7 +5,7 @@ import shlex
 import shutil
 import stat
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import paramiko
 from paramiko.sftp_client import SFTPClient
@@ -19,6 +19,9 @@ from cronboard.config import (
 )
 from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_dir_entry import CronDirEntry
+
+if TYPE_CHECKING:
+    from cronboard.screens.cron_creator import CronCreator
 
 
 class CronWrapperService:
@@ -392,3 +395,27 @@ class CronWrapperService:
             return decoded
         # Legacy: remainder was split as argv words; best-effort rejoin.
         return " ".join(parts[3:])
+
+    @staticmethod
+    def push_notifications_file_to_remote(croncreator: "CronCreator") -> None:
+        """Pushes the flattened notifications.toml to the remote server."""
+
+        try:
+            content = ConfigService._generate_notifications_config_for_server(
+                croncreator.server_name
+            )
+
+            if content is None:
+                return
+
+            home = CronWrapperService.get_remote_home(croncreator.ssh_client)
+            if not home:
+                return
+
+            remote_path = f"{home}/{CONFIG_REL_PATH}/notifications.toml"
+            sftp = croncreator.ssh_client.open_sftp()
+            with sftp.open(remote_path, "w") as f:
+                f.write(content)
+            sftp.close()
+        except Exception as e:
+            print(f"Warning: Failed to sync notifications.toml to remote: {e}")
