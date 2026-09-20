@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import tomlkit
+from cron_descriptor import ExpressionDescriptor, Options
 from rich.text import Text
 from textual.widgets import Input
 
@@ -388,3 +389,11 @@ class CronJobService:
         if setting is not None:
             return setting
         return CronWrapperService.has_wrapper(command)
+
+    @staticmethod
+    def parse_cron_to_description(expression: str) -> str:
+        options = Options()
+        options.locale_code = "en"
+        options.use_24hour_time_format = True
+        desc: str = ExpressionDescriptor(expression, options).get_description()
+        return desc

@@ -228,8 +228,6 @@ class CronCreator(ModalScreen[bool]):
 
         CronJobService.save_cronjob(self)
 
-    # TODO: Should be moved to a service class
-
     def expression_description(self, expr: str, label_desc: Label) -> None:
         """Parses the cron expression to natural language, updating the label for the
         user.
@@ -261,10 +259,7 @@ class CronCreator(ModalScreen[bool]):
 
             expr: str = CRON_ALIASES.get(expr, expr)
 
-            options = Options()
-            options.locale_code = "en"
-            options.use_24hour_time_format = True
-            desc: str = ExpressionDescriptor(expr, options).get_description()
+            desc = CronJobService.parse_cron_to_description(expr)
 
             label_desc.update(desc)
             label_desc.remove_class("error")
