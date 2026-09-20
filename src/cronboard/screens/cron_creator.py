@@ -1,4 +1,3 @@
-from cron_descriptor import ExpressionDescriptor, Options
 from crontab import CronTab
 from paramiko.client import SSHClient
 from textual.app import ComposeResult

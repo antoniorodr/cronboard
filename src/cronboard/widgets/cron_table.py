@@ -1,6 +1,5 @@
 from crontab import CronTab
 from paramiko.client import SSHClient
-from rich.text import Text
 from textual.binding import Binding
 from textual.coordinate import Coordinate
 from textual.widgets import DataTable
