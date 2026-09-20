@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 import paramiko
 
 if TYPE_CHECKING:
-    from cronboard.widgets.cron_table import CronTable
+    from paramiko.client import SSHClient
 
 
 class SSHService:
     """Service class for SSH operations."""
 
     @staticmethod
-    def execute_ssh_command(crontable: "CronTable", command: str):
+    def execute_ssh_command(ssh_client: "SSHClient", command: str):
         """Executes a command on a remote server.
 
         Args:
@@ -20,8 +20,8 @@ class SSHService:
         Returns: A tuple with the exit status and the output of the command.
 
         """
-        if crontable.ssh_client:
-            _, stdout, _ = crontable.ssh_client.exec_command(command)
+        if ssh_client:
+            _, stdout, _ = ssh_client.exec_command(command)
             exit_status: str = stdout.channel.recv_exit_status()
 
             return exit_status, stdout.read().decode() if stdout else ""
@@ -64,3 +64,15 @@ class SSHService:
             ssh_client: The SSHClient.
         """
         ssh_client.close()
+
+    @staticmethod
+    def ssh_write(stdin, content: str):
+        """Writes content to stdin.
+
+        Args:
+            stdin: The stdin object from SSHClient.
+            content: The content to write.
+        """
+
+        stdin.write(content)
+        stdin.channel.shutdown_write()

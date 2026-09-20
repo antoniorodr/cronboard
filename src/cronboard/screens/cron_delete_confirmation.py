@@ -11,6 +11,7 @@ from cronboard.config import CONFIG_REL_PATH, CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cron_messages import CronJobDeleted
+from cronboard.services.ssh_service import SSHService
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
@@ -165,13 +166,13 @@ class CronDeleteConfirmation(ModalScreen[bool]):
 
             remote_path = f"{home}/{CONFIG_REL_PATH}/notifications.toml"
             sftp = self.ssh_client.open_sftp()
+
             with sftp.open(remote_path, "w") as f:
                 f.write(content)
             sftp.close()
+
         except Exception as e:
             print(f"Warning: Failed to sync notifications.toml to remote: {e}  ")
-
-    # TODO: Should be moved to a service class
 
     def write_remote_crontab(self) -> bool:
         """Writes the current SSH cron table back to the remote server.
@@ -193,9 +194,8 @@ class CronDeleteConfirmation(ModalScreen[bool]):
                 if self.crontab_user
                 else "crontab -"
             )
-            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
-            stdin.write(new_crontab_content)
-            stdin.channel.shutdown_write()
+            stdin, stderr = SSHService.execute_ssh_command(self.ssh_client, crontab_cmd)
+            SSHService.ssh_write(stdin, new_crontab_content)
 
             exit_status: str = stdin.channel.recv_exit_status()
             errors: str = stderr.read().decode().strip()
