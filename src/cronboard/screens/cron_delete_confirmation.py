@@ -145,8 +145,6 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
                 f.write(tomlkit.dumps(config))
 
-    # TODO: Should be moved to a service class
-
     def push_notifications_to_remote(self) -> None:
         """Pushes the flattened notifications.toml to the remote server."""
 
