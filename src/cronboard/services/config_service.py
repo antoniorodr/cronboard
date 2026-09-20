@@ -1,3 +1,5 @@
+from cronboard.screens.cron_servers import CronServers
+import tomllib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -6,9 +8,11 @@ if TYPE_CHECKING:
 import tomlkit
 
 from cronboard.config import (
+    CONFIG_FILE,
     CRONBOARD_CONFIG_FILE,
     CRONBOARD_NOTIFICATIONS_FILE,
 )
+from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
 
 
 class ConfigService:
@@ -91,3 +95,82 @@ class ConfigService:
         except Exception as e:
             print(f"Error: {e}")
             return None
+
+    @staticmethod
+    def load_servers_config() -> dict:
+        """Loads the servers config from the config file.
+        Returns:
+            A dictionary with the servers config.
+        """
+
+        if CONFIG_FILE.exists():
+            try:
+                with CONFIG_FILE.open("rb") as f:
+                    loaded_servers = tomllib.load(f)
+
+                for server_id, server_info in loaded_servers.items():
+                    if "encrypted_password" in server_info:
+                        encrypted_password = server_info.pop("encrypted_password")
+                        if encrypted_password:
+                            try:
+                                server_info["password"] = (
+                                    CronEncryptService.decrypt_password(
+                                        encrypted_password
+                                    )
+                                )
+                            except Exception as e:
+                                print(
+                                    f"❌ Failed to decrypt password for {server_id}: {e}"
+                                )
+                                server_info["password"] = None
+                        else:
+                            server_info["password"] = None
+                    elif "password" not in server_info:
+                        server_info["password"] = None
+
+                    if "crontab_user" not in server_info:
+                        server_info["crontab_user"] = None
+
+                return loaded_servers
+            except Exception as e:
+                print(f"❌ Warning: Failed to load servers: {e}")
+        else:
+            print("📝 No servers file found, starting with empty list")
+        return {}
+
+    @staticmethod
+    def save_servers_config(servers: dict) -> None | Exception:
+        """Saves the servers config to the config file.
+
+        Args:
+            servers: The dictionary with the servers config.
+        """
+
+        try:
+            CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+            toml_safe_servers = {}
+            for server_id, server_info in servers.items():
+                encrypted_password = ""
+                if server_info.get("password"):
+                    encrypted_password = CronEncryptService.encrypt_password(
+                        server_info["password"]
+                    )
+
+                toml_safe_servers[server_id] = {
+                    "name": server_info["name"],
+                    "host": server_info["host"],
+                    "port": server_info["port"],
+                    "username": server_info["username"],
+                    "encrypted_password": encrypted_password,
+                    "ssh_key": server_info["ssh_key"],
+                    "connected": server_info["connected"],
+                    "crontab_user": server_info.get("crontab_user")
+                    if server_info.get("crontab_user")
+                    else server_info["username"],
+                }
+
+            with CONFIG_FILE.open("w", encoding="utf-8") as f:
+                tomlkit.dump(toml_safe_servers, f)
+            return None
+        except Exception as e:
+            return e

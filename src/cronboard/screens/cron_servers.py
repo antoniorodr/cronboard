@@ -12,7 +12,9 @@ from textual.widgets import Label, Tree
 from cronboard.config import CONFIG_FILE
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_ssh_modal import CronSSHModal
+from cronboard.services.config_service import ConfigService
 from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
+from cronboard.services.ssh_service import SSHService
 from cronboard.widgets.cron_table import CronTable
 from cronboard.widgets.cron_tree import CronTree
 
@@ -79,8 +81,6 @@ class CronServers(Widget):
             if server_info:
                 self.connect_to_server(server_info)
 
-    # TODO: Should be moved to a service class
-
     def connect_to_server(self, server_info: dict) -> None:
         """Tries to connect to the chosen server, using `ssh key` if available, or
         `password` if not. If the user is connected to another server, it will then
@@ -93,14 +93,9 @@ class CronServers(Widget):
         """
 
         try:
-            ssh_client = paramiko.SSHClient()
-            ssh_client.load_system_host_keys()
-            ssh_client.set_missing_host_key_policy(paramiko.WarningPolicy)
-
-            host = server_info["host"]
-            port = server_info["port"]
-            username = server_info["username"]
-            password = server_info["password"]
+            ssh_client, host, port, username, password = (
+                SSHService.connect_to_ssh_server(server_info)
+            )
             crontab_user = server_info.get("crontab_user")
 
             if server_info["ssh_key"]:
@@ -112,7 +107,7 @@ class CronServers(Widget):
 
             if self.current_ssh_client:
                 try:
-                    self.current_ssh_client.close()
+                    SSHService.disconnect_from_ssh_server(self.current_ssh_client)
                 except:
                     pass
 
@@ -186,15 +181,13 @@ class CronServers(Widget):
         horizontal.mount(disconnected_label)
         self.content_area = disconnected_label
 
-    # TODO: Should be moved to a service class
-
     def action_disconnect_server(self) -> None:
         """Disconnect from the server under the cursor, shows a notification and updates
         the server information."""
 
         if self.current_ssh_client:
             try:
-                self.current_ssh_client.close()
+                SSHService.disconnect_from_ssh_server(self.current_ssh_client)
                 self.show_disconnected_message()
             except:
                 pass
@@ -213,8 +206,6 @@ class CronServers(Widget):
 
         self.save_servers()
 
-    # TODO: Should be moved to a service class
-
     def load_servers(self) -> dict:
         """Loads the server information from the config file.
 
@@ -222,73 +213,15 @@ class CronServers(Widget):
             The server information as a dictionary, if the config file exists. It not, returns an empty dictionary.
         """
 
-        if CONFIG_FILE.exists():
-            try:
-                with CONFIG_FILE.open("rb") as f:
-                    loaded_servers = tomllib.load(f)
-
-                for server_id, server_info in loaded_servers.items():
-                    if "encrypted_password" in server_info:
-                        encrypted_password = server_info.pop("encrypted_password")
-                        if encrypted_password:
-                            try:
-                                server_info["password"] = (
-                                    CronEncryptService.decrypt_password(
-                                        encrypted_password
-                                    )
-                                )
-                            except Exception as e:
-                                print(
-                                    f"❌ Failed to decrypt password for {server_id}: {e}"
-                                )
-                                server_info["password"] = None
-                        else:
-                            server_info["password"] = None
-                    elif "password" not in server_info:
-                        server_info["password"] = None
-
-                    if "crontab_user" not in server_info:
-                        server_info["crontab_user"] = None
-
-                return loaded_servers
-            except Exception as e:
-                print(f"❌ Warning: Failed to load servers: {e}")
-        else:
-            print("📝 No servers file found, starting with empty list")
-        return {}
-
-    # TODO: Should be moved to a service class
+        return ConfigService.load_servers_config()
 
     def save_servers(self) -> None:
         """Saves the server information to the config file."""
 
-        try:
-            CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
-            toml_safe_servers = {}
-            for server_id, server_info in self.servers.items():
-                encrypted_password = ""
-                if server_info.get("password"):
-                    encrypted_password = CronEncryptService.encrypt_password(
-                        server_info["password"]
-                    )
+        saved: None | Exception = ConfigService.save_servers_config(self.servers)
 
-                toml_safe_servers[server_id] = {
-                    "name": server_info["name"],
-                    "host": server_info["host"],
-                    "port": server_info["port"],
-                    "username": server_info["username"],
-                    "encrypted_password": encrypted_password,
-                    "ssh_key": server_info["ssh_key"],
-                    "connected": server_info["connected"],
-                    "crontab_user": server_info.get("crontab_user")
-                    if server_info.get("crontab_user")
-                    else server_info["username"],
-                }
-
-            with CONFIG_FILE.open("w", encoding="utf-8") as f:
-                tomlkit.dump(toml_safe_servers, f)
-        except Exception as e:
-            self.notify(f"❌ Error: Failed to save servers: {e}")
+        if saved is not None:
+            self.notify(f"❌ Error: Failed to save servers: {saved}")
 
     def action_add_server(self) -> None:
         """Adds a new server to the tree view."""
