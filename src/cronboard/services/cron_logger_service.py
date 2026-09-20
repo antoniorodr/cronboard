@@ -11,7 +11,7 @@ from pathlib import Path
 import paramiko
 
 from cronboard.config import LOG_DIR, LOG_REL_PATH
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 
 
