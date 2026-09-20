@@ -16,7 +16,7 @@ from textual_autocomplete._path_autocomplete import (
 )
 
 from cronboard.services.cron_dir_entry import CronDirEntry
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cron_wrapper_service import CronWrapperService
 
 
 class CronAutoComplete(PathAutoComplete):

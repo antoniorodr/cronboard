@@ -9,8 +9,8 @@ from textual.widgets import Button, Label
 
 from cronboard.config import CONFIG_REL_PATH, CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.services.config_service import ConfigService
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cron_messages import CronJobDeleted
+from cronboard.services.cron_wrapper_service import CronWrapperService
 from cronboard.services.ssh_service import SSHService
 
 

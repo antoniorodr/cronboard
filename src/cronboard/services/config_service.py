@@ -11,7 +11,7 @@ from cronboard.config import (
     CRONBOARD_CONFIG_FILE,
     CRONBOARD_NOTIFICATIONS_FILE,
 )
-from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
+from cronboard.services.cron_encrypt_service import CronEncryptService
 
 
 class ConfigService:

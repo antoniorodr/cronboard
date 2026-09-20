@@ -16,7 +16,7 @@ from paramiko.client import SSHClient
 from cronboard.config import CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.config_service import ConfigService
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cron_wrapper_service import CronWrapperService
 
 # TODO: Check the functions and move UI queries to CronCreator
 

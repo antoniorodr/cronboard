@@ -8,7 +8,7 @@ from textual.widget import Widget
 from textual.widgets import Button, Input, Label, RadioButton, RadioSet
 
 from cronboard.services.cron_autocomplete import CronAutoComplete
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_vim_keys_radio_set import VimKeysRadioSet
 

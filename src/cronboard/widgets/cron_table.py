@@ -6,8 +6,8 @@ from textual.widgets import DataTable
 
 from cronboard.screens.cron_input_search import CronInputSearch
 from cronboard.screens.cron_log_view import LogViewModal
-from cronboard.services.cron_logging.cron_logger_service import CronLogger
-from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
+from cronboard.services.cron_logger_service import CronLogger
+from cronboard.services.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.services.search_service import SearchService
 from cronboard.services.ssh_service import SSHService

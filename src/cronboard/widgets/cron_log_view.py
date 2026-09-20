@@ -19,7 +19,7 @@ from textual.timer import Timer
 from textual.widget import Widget
 from textual.widgets import Button
 
-from cronboard.services.cron_logging.cron_logger_service import CronLogger
+from cronboard.services.cron_logger_service import CronLogger
 
 _sub_escape = re.compile("[\u0000-\u0014]").sub
 

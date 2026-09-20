@@ -5,7 +5,7 @@ from textual.widget import Widget
 from textual.widgets import Button, Input, Label
 
 from cronboard.config import CRONBOARD_CONFIG_FILE
-from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
+from cronboard.services.cron_encrypt_service import CronEncryptService
 
 
 class CronSettings(Widget):

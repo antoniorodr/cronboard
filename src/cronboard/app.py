@@ -30,7 +30,7 @@ from cronboard.screens.cron_creator import CronCreator
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_servers import CronServers
 from cronboard.screens.cron_settings import CronSettings
-from cronboard.services.cron_logging.cron_logger_service import CronLogger
+from cronboard.services.cron_logger_service import CronLogger
 from cronboard.services.cron_messages import CronJobDeleted
 from cronboard.themes.everforest_dark_hard import everforest_dark_hard
 from cronboard.widgets.cron_table import CronTable
