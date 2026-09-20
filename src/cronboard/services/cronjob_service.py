@@ -18,6 +18,8 @@ from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 
+# TODO: Check the functions and move UI queries to CronCreator
+
 
 class CronJobService:
     """Services for CronJob related operations."""
@@ -246,8 +248,6 @@ class CronJobService:
         Args:
             cron_creator: The CronCreator instance.
         """
-
-        # TODO: Move UI queries to CronCreator
 
         identificator_input: Input = cron_creator.query_one("#identificator", Input)
         expression_input: Input = cron_creator.query_one("#expression", Input)

@@ -97,7 +97,7 @@ class CronAutoComplete(PathAutoComplete):
                     if not self._sftp:
                         self._sftp: SFTPClient = self.ssh_client.open_sftp()
 
-                    entries: list[CronDirEntry] = get_files(
+                    entries: list[CronDirEntry] = CronWrapperService.get_files(
                         self.ssh_client, str(directory), sftp=self._sftp
                     )
 

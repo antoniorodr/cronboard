@@ -201,7 +201,9 @@ class CronTable(DataTable):
                 else "crontab -l"
             )
 
-            exit_status, stdout = SSHService.execute_ssh_command(self, crontab_cmd)
+            exit_status, stdout = SSHService.execute_ssh_command(
+                self.ssh_client, crontab_cmd
+            )
 
             if exit_status == 1:
                 self.crontab_content = ""
