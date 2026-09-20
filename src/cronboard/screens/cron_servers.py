@@ -1,7 +1,4 @@
-import tomllib
-
 import paramiko
-import tomlkit
 from paramiko.client import SSHClient
 from textual.app import ComposeResult
 from textual.binding import Binding
@@ -9,11 +6,9 @@ from textual.containers import Grid, Horizontal
 from textual.widget import Widget
 from textual.widgets import Label, Tree
 
-from cronboard.config import CONFIG_FILE
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_ssh_modal import CronSSHModal
 from cronboard.services.config_service import ConfigService
-from cronboard.services.encryption.cron_encrypt_service import CronEncryptService
 from cronboard.services.ssh_service import SSHService
 from cronboard.widgets.cron_table import CronTable
 from cronboard.widgets.cron_tree import CronTree
