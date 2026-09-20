@@ -1,6 +1,7 @@
-from cronboard.screens.cron_servers import CronServers
 import tomllib
 from typing import TYPE_CHECKING
+
+from cronboard.screens.cron_servers import CronServers
 
 if TYPE_CHECKING:
     from cronboard.screens.cron_creator import CronCreator
