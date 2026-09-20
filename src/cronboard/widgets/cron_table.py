@@ -10,6 +10,7 @@ from cronboard.screens.cron_log_view import LogViewModal
 from cronboard.services.cron_logging.cron_logger_service import CronLogger
 from cronboard.services.cron_logging.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
+from cronboard.services.search_service import SearchService
 from cronboard.services.ssh_service import SSHService
 
 
@@ -229,8 +230,6 @@ class CronTable(DataTable):
 
         self.app.push_screen(CronInputSearch(), check_search)
 
-    # TODO: Should be moved to a service class (SearchService?)
-
     def action_clear_search(self) -> None:
         """Clears the search query."""
 
@@ -238,8 +237,6 @@ class CronTable(DataTable):
         self._search_matches: list = []
         self._search_index = -1
         self._restore_cells()
-
-    # TODO: Should be moved to a service class (SearchService?)
 
     def apply_search(self, query: str) -> None:
         """Applies the search query.
@@ -255,18 +252,9 @@ class CronTable(DataTable):
             self._restore_cells()
             return
 
-        for i, row_data in enumerate(self._rows_data):
-            identificator, expr, cmd = (
-                str(row_data[0]),
-                str(row_data[1]),
-                str(row_data[2]),
-            )
-            if (
-                self._search_query in identificator.lower()
-                or self._search_query in expr.lower()
-                or self._search_query in cmd.lower()
-            ):
-                self._search_matches.append(i)
+        self._search_matches = SearchService.find_matches(
+            self._rows_data, self._search_query
+        )
 
         if self._search_matches:
             self._search_index = 0
@@ -279,19 +267,6 @@ class CronTable(DataTable):
             self._search_index = -1
             self.notify(f"No matches for '{self._search_query}'")
 
-    # TODO: Should be moved to a service class (SearchService?)
-
-    def _highlight_text(self, text: str, query: str) -> Text:
-        result = Text(text)
-        q_lower: str = query.lower()
-        idx: int = text.lower().find(q_lower)
-        while idx >= 0:
-            result.stylize("bold yellow", idx, idx + len(query))
-            idx: int = text.lower().find(q_lower, idx + 1)
-        return result
-
-    # TODO: Should be moved to a service class (SearchService?)
-
     def _highlight_matches(self) -> None:
         self._restore_cells()
         for i in self._search_matches:
@@ -301,17 +276,13 @@ class CronTable(DataTable):
                 if self._search_query.lower() in text.lower():
                     self.update_cell_at(
                         Coordinate(i, col_idx),
-                        self._highlight_text(text, self._search_query),
+                        SearchService.highlight_text(text, self._search_query),
                     )
-
-    # TODO: Should be moved to a service class (SearchService?)
 
     def _restore_cells(self) -> None:
         for i, row_data in enumerate(self._rows_data):
             for col_idx in range(3):
                 self.update_cell_at(Coordinate(i, col_idx), row_data[col_idx])
-
-    # TODO: Should be moved to a service class (SearchService?)
 
     def action_search_next(self) -> None:
         """Searches for the next match."""
@@ -320,8 +291,6 @@ class CronTable(DataTable):
             return
         self._search_index: int = (self._search_index + 1) % len(self._search_matches)
         self.move_cursor(row=self._search_matches[self._search_index])
-
-    # TODO: Should be moved to a service class (SearchService?)
 
     def action_search_prev(self) -> None:
         """Searches for the previous match."""
