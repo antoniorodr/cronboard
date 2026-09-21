@@ -265,7 +265,7 @@ class CronJobService:
             return
 
         ConfigService.save_job_settings(
-            cron_creator,
+            cron_creator.server_name,
             identificator,
             cron_creator.notifications_enabled,
             cron_creator.log_enabled,
