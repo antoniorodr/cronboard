@@ -1,8 +1,4 @@
 import tomllib
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from cronboard.screens.cron_creator import CronCreator
 
 import tomlkit
 
@@ -19,28 +15,33 @@ class ConfigService:
 
     @staticmethod
     def save_job_settings(
-        cron_creator: "CronCreator", cron_name: str, notifications: bool, logging: bool
-    ) -> None:
-        """Saves the notification settings to the notifications file."""
+        server_name: str, cron_name: str, notifications: bool, logging: bool
+    ) -> bool:
+        """Saves notification/logging settings for a cron job.
 
+        Returns True on success, False on any failure.
+        """
         try:
-            with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
-                config = tomlkit.loads(f.read())
-        except FileNotFoundError:
-            config = tomlkit.document()
+            try:
+                with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
+                    config = tomlkit.loads(f.read())
+            except FileNotFoundError:
+                config = tomlkit.document()
 
-        ConfigService._migrate_old_format(config)
+            ConfigService._migrate_old_format(config)
 
-        if cron_creator.server_name not in config or not isinstance(
-            config[cron_creator.server_name], dict
-        ):
-            config[cron_creator.server_name] = tomlkit.table()
-        config[cron_creator.server_name][cron_name] = tomlkit.table()
-        config[cron_creator.server_name][cron_name]["notifications"] = notifications
-        config[cron_creator.server_name][cron_name]["logging"] = logging
+            if server_name not in config or not isinstance(config[server_name], dict):
+                config[server_name] = tomlkit.table()
 
-        with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
-            f.write(tomlkit.dumps(config))
+            config[server_name][cron_name] = tomlkit.table()
+            config[server_name][cron_name]["notifications"] = notifications
+            config[server_name][cron_name]["logging"] = logging
+
+            with CRONBOARD_NOTIFICATIONS_FILE.open("w") as f:
+                f.write(tomlkit.dumps(config))
+            return True
+        except Exception:
+            return False
 
     @staticmethod
     def _migrate_old_format(config) -> None:
