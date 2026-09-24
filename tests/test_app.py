@@ -6,7 +6,7 @@ from cronboard.app import CronBoard
 async def test_close(app: CronBoard) -> None:
     async with app.run_test() as pilot:
         await pilot.press("q")
-        assert pilot.app.exit
+    assert pilot.app.return_code == 0
 
 
 async def test_load_config(app: CronBoard) -> None:
