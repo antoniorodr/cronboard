@@ -126,6 +126,8 @@ class CronLogger:
             path: str = posixpath.join(home, LOG_REL_PATH, identificator)
             ssh.exec_command(f"rm -rf -- {shlex.quote(path)}")
 
+    # TODO: CronTable parameter is not necessary. It should't be there. Move the UI related things
+
     @staticmethod
     def view_logs_of_cronjob(crontable: "CronTable") -> str:
         """Views the logs for the selected cronjob.

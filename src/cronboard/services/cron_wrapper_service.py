@@ -275,6 +275,7 @@ class CronWrapperService:
         b64: str = base64.b64encode(command.encode("utf-8")).decode("ascii")
         return f"{CronWrapperService.COMMAND_PAYLOAD_PREFIX}{b64}"
 
+    @staticmethod
     def _decode_wrapped_command_payload(token: str) -> str | None:
         if not token.startswith(CronWrapperService.COMMAND_PAYLOAD_PREFIX):
             return None
