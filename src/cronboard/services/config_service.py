@@ -23,6 +23,7 @@ class ConfigService:
         """
         try:
             try:
+                CRONBOARD_NOTIFICATIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
                 with CRONBOARD_NOTIFICATIONS_FILE.open("r") as f:
                     config = tomlkit.loads(f.read())
             except FileNotFoundError:
