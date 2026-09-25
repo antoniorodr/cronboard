@@ -364,8 +364,6 @@ class CronTable(DataTable):
         if job_to_edit:
             self.action_edit_cronjob_keybind(identificator, expr, job_to_edit.command)
 
-    # BUG: The cronjob is not deleted from the remote server
-
     def action_delete_cronjob(self) -> None:
         """Deletes the selected cronjob."""
 

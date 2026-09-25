@@ -5,69 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 25.09.2026
+
+### Fixed
+- Fix a bug deleting ssh cronjobs
+
 ## [1.2.0] - 24.09.2026
 
 ### Added
-- Add staticmethod decorator
-- Add docstrings to `CronJobServices`
+- Add staticmethod decorator by @antoniorodr
+- Add docstrings to `CronJobServices` by @antoniorodr
 
 ### Changed
-- Change parameters to send server_name
-- Refactor `save_job_settings`
-- Update imports after refactor
-- Move `encryption` and `logging` to `services`
-- Refactor(ssh_write)): move `ssh_write` to `SSHService`
-- Move `highlight_text` and `find_matches` to `SearchService`
-- Move connect/disconnect to server to `SSHService`
-- Reorganize imports
-- Move load/save server to config to `ConfigService`
-- Move description parsing to service
-- Move notifications related methods to CronJobService
-- Move LogViewModal to a new screen file
-- Move the logic to CronLogger
-- Update imports
-- Move `push_notifications_file_to_remote`
-- Update imports
-- Create a `SSHService` class
-- Update references to `CronLogger`
-- Create `CronLogger` class
-- Move `push_notifications_file_to_remote` to ConfigService
-- Update imports for `CronEncryptService`
-- Create `CronEncryptService` class
-- Rename to singular form
-- Rename to `cron_wrapper_service`
-- Create CronWrapperService
-- Create ConfigService
-- Update docstring for write_cron_changes
-- Rename CronJobServices to CronJobService
-- Move write_cron_changes to CronJobServices
-- Move save_cronjob to CronJobServices
-- Move `parse_cron` to `CronJobServices`
-- Move pause and load crontabs to `cronjob_services`
-- Bump to 1.2.0
-- Move `find_if_cronjob_exists`
-- Create `CronJobServices` class
-- Use `main` to launche the app
-- Convert `adapts` to a list
-- Change backend to hatchling
+- Update changelog file by @antoniorodr
+- Change parameters to send server_name by @antoniorodr
+- Refactor `save_job_settings` by @antoniorodr
+- Update imports after refactor by @antoniorodr
+- Move `encryption` and `logging` to `services` by @antoniorodr
+- Refactor(ssh_write)): move `ssh_write` to `SSHService` by @antoniorodr
+- Move `highlight_text` and `find_matches` to `SearchService` by @antoniorodr
+- Move connect/disconnect to server to `SSHService` by @antoniorodr
+- Reorganize imports by @antoniorodr
+- Move load/save server to config to `ConfigService` by @antoniorodr
+- Move description parsing to service by @antoniorodr
+- Move notifications related methods to CronJobService by @antoniorodr
+- Move LogViewModal to a new screen file by @antoniorodr
+- Move the logic to CronLogger by @antoniorodr
+- Update imports by @antoniorodr
+- Move `push_notifications_file_to_remote` by @antoniorodr
+- Update imports by @antoniorodr
+- Create a `SSHService` class by @antoniorodr
+- Update references to `CronLogger` by @antoniorodr
+- Create `CronLogger` class by @antoniorodr
+- Move `push_notifications_file_to_remote` to ConfigService by @antoniorodr
+- Update imports for `CronEncryptService` by @antoniorodr
+- Create `CronEncryptService` class by @antoniorodr
+- Rename to singular form by @antoniorodr
+- Rename to `cron_wrapper_service` by @antoniorodr
+- Create CronWrapperService by @antoniorodr
+- Create ConfigService by @antoniorodr
+- Update docstring for write_cron_changes by @antoniorodr
+- Rename CronJobServices to CronJobService by @antoniorodr
+- Move write_cron_changes to CronJobServices by @antoniorodr
+- Move save_cronjob to CronJobServices by @antoniorodr
+- Move `parse_cron` to `CronJobServices` by @antoniorodr
+- Move pause and load crontabs to `cronjob_services` by @antoniorodr
+- Bump to 1.2.0 by @antoniorodr
+- Move `find_if_cronjob_exists` by @antoniorodr
+- Create `CronJobServices` class by @antoniorodr
+- Use `main` to launche the app by @antoniorodr
+- Convert `adapts` to a list by @antoniorodr
+- Change backend to hatchling by @antoniorodr
 - Organize imports by @antoniorodr
 
 ### Fixed
-- Rewrite tests
-- Update fixtures
-- Function referances
-- Fix imports after refactoring
-- Make fixture for app async
-- Rewrite tests
-- Refactor fixtures
+- Create config folder if not exists by @antoniorodr
+- Rewrite tests by @antoniorodr
+- Update fixtures by @antoniorodr
+- Function referances by @antoniorodr
+- Fix imports after refactoring by @antoniorodr
+- Make fixture for app async by @antoniorodr
+- Rewrite tests by @antoniorodr
+- Refactor fixtures by @antoniorodr
 
 ### Removed
-- Delete tests to write new ones
-- Delete finished todo
-- Delete unused imports
-- Delete unused imports
-- Delete unused imports
-- Remove redundant fallback calls
+- Delete tests to write new ones by @antoniorodr
+- Delete finished todo by @antoniorodr
+- Delete unused imports by @antoniorodr
+- Delete unused imports by @antoniorodr
+- Delete unused imports by @antoniorodr
+- Remove redundant fallback calls by @antoniorodr
 - Delete empty lines and TODOs by @antoniorodr
 
 ## [1.1.1] - 28.07.2026
@@ -752,6 +759,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[1.2.1]: https://github.com/antoniorodr/cronboard/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/antoniorodr/cronboard/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/antoniorodr/cronboard/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/antoniorodr/cronboard/compare/v1.0.0...v1.1.0
