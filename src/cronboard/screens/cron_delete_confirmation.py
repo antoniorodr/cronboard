@@ -192,7 +192,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
                 if self.crontab_user
                 else "crontab -"
             )
-            stdin, stderr = SSHService.execute_ssh_command(self.ssh_client, crontab_cmd)
+            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             SSHService.ssh_write(stdin, new_crontab_content)
 
             exit_status: str = stdin.channel.recv_exit_status()

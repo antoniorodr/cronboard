@@ -376,7 +376,7 @@ class CronTable(DataTable):
         job_to_delete = CronJobService.find_if_cronjob_exists(
             self.ssh_cron,
             self.remote,
-            None,
+            self.ssh_client,
             self.cron,
             self.server_name,
             identificator,
