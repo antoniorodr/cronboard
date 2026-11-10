@@ -1,5 +1,4 @@
 import tomllib
-from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 import tomlkit
@@ -26,6 +25,7 @@ from textual.widgets import (
     TextArea,
 )
 
+from cronboard import __version__
 from cronboard.screens.cron_creator import CronCreator
 from cronboard.screens.cron_delete_confirmation import CronDeleteConfirmation
 from cronboard.screens.cron_servers import CronServers
@@ -402,13 +402,9 @@ class CronBoard(App):
         """Gets the version of the app.
 
         Returns:
-            The version of the app. If not found, returns "Unknown".
+            The version of the app.
         """
-
-        try:
-            return version("cronboard")
-        except PackageNotFoundError:
-            return "Unknown"
+        return __version__
 
 
 def main():
