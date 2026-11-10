@@ -1,4 +1,4 @@
-import re
+import tomllib
 
 from cronboard.app import CronBoard
 
@@ -15,13 +15,7 @@ async def test_load_config(app: CronBoard) -> None:
             assert pilot.app.theme == app.theme
 
 
-async def test_get_version(app: CronBoard) -> None:
-
-    def get_version_from_pyproject():
-        with open("pyproject.toml", "r") as f:
-            content = f.read()
-            return (
-                match := re.search(r"version = \"(.*)\"", content)
-            ) is not None and match.group(1)
-
-    assert app.get_version() == get_version_from_pyproject()
+def test_get_version(app: CronBoard) -> None:
+    with open("pyproject.toml", "rb") as f:
+        version = tomllib.load(f)["project"]["version"]
+    assert app.get_version() == version
