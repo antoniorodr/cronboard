@@ -40,6 +40,9 @@ addopts = [
 asyncio_mode = "auto"
 
 
+[tool.hatch.build.hooks.version]
+path = "src/cronboard/_version.py"
+
 [dependency-groups]
 dev = [
   "pytest-cov>=7.1.0",
