@@ -17,9 +17,13 @@ class SearchService:
         """
 
         matches = []
+        # Lowercase the query here (the haystack is lowercased below) so
+        # matching is case-insensitive no matter which case the caller
+        # passes the query in.
+        query_lower = query.lower()
         for i, row in enumerate(rows_data):
             searchable = " ".join(str(c) for c in row[:3]).lower()
-            if query in searchable:
+            if query_lower in searchable:
                 matches.append(i)
         return matches
 
