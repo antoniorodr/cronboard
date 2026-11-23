@@ -194,6 +194,7 @@ CronCreator #content {
 
 #hostname,
 #username,
+#ssh_key_name,
 #password,
 #telegram-token,
 #telegram-chat-id {

@@ -44,6 +44,10 @@ class CronSSHModal(ModalScreen):
                     placeholder="Username",
                     id="username",
                 ),
+                Input(
+                    placeholder="SSH Key Name (e.g. id_rsa). Default is id_ed25519",
+                    id="ssh_key_name",
+                ),
                 Label(
                     "Use password if you are not using SSH key",
                     id="label_andor",
@@ -97,6 +101,7 @@ class CronSSHModal(ModalScreen):
         if event.button.id == "add":
             host_info: str = self.query_one("#hostname", Input).value.strip()
             username: str = self.query_one("#username", Input).value.strip()
+            ssh_key_name: str = self.query_one("#ssh_key_name", Input).value.strip()
             password: str = self.query_one("#password", Input).value.strip()
             content: Vertical = self.query_one("#content", Vertical)
             crontab_user: str = self.query_one("#crontab_user", Input).value.strip()
@@ -116,6 +121,7 @@ class CronSSHModal(ModalScreen):
                 "username": username,
                 "password": password,
                 "ssh_key": True if not password else False,
+                "ssh_key_name": ssh_key_name,
                 "crontab_user": crontab_user if crontab_user else None,
             }
 
