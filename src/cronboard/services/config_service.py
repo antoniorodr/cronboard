@@ -164,6 +164,7 @@ class ConfigService:
                     "username": server_info["username"],
                     "encrypted_password": encrypted_password,
                     "ssh_key": server_info["ssh_key"],
+                    "ssh_key_name": server_info.get("ssh_key_name"),
                     "connected": server_info["connected"],
                     "crontab_user": server_info.get("crontab_user")
                     if server_info.get("crontab_user")
