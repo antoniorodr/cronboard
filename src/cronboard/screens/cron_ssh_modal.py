@@ -58,7 +58,7 @@ class CronSSHModal(ModalScreen):
                     password=True,
                 ),
                 Label(
-                    "Crontab user (optional, for root/sudo access)",
+                    "Crontab user (optional, for root/sudo access. Needs passwordless sudo)",
                     id="label_crontab_user",
                 ),
                 Input(
