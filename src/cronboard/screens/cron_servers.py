@@ -88,17 +88,8 @@ class CronServers(Widget):
         """
 
         try:
-            ssh_client, host, port, username, password = (
-                SSHService.connect_to_ssh_server(server_info)
-            )
+            ssh_client, _, _, _, _ = SSHService.connect_to_ssh_server(server_info)
             crontab_user = server_info.get("crontab_user")
-
-            if server_info["ssh_key"]:
-                ssh_client.connect(hostname=host, port=port, username=username)
-            else:
-                ssh_client.connect(
-                    hostname=host, port=port, username=username, password=password
-                )
 
             if self.current_ssh_client:
                 try:
@@ -232,10 +223,15 @@ class CronServers(Widget):
                 host = result.get("hostname")
                 port = result.get("port")
                 username = result.get("username")
+                ssh_key_name = (
+                    result.get("ssh_key_name")
+                    if result.get("ssh_key_name")
+                    else "id_ed25519"
+                )
                 password = result.get("password") if result.get("password") else None
                 crontab_user = result.get("crontab_user")
                 self.add_server_to_tree(
-                    name, host, port, username, password, crontab_user
+                    name, host, port, username, password, crontab_user, ssh_key_name
                 )
 
         cron_ssh_modal = CronSSHModal()
@@ -249,6 +245,7 @@ class CronServers(Widget):
         username: str,
         password: str | None,
         crontab_user: str | None = None,
+        ssh_key_name: str | None = None,
     ) -> None:
         """Adds a server to the tree view.
 
@@ -260,6 +257,7 @@ class CronServers(Widget):
             password: The password of the user connecting to the server. Empty is using
             SSH key.
             crontab_user: The CronTab user for the server.
+            ssh_key_name: The name of the SSH key file.
         """
 
         servers_tree = self.query_one("#servers-tree", Tree)
@@ -272,6 +270,7 @@ class CronServers(Widget):
                 "username": username,
                 "password": password,
                 "ssh_key": True if not password else False,
+                "ssh_key_name": ssh_key_name,
                 "connected": False,
                 "crontab_user": crontab_user,
             }
