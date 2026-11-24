@@ -23,7 +23,7 @@ Full documentation is available at [cronboard.dev](https://cronboard.dev).
 - View formatted last and next run times
 - Accept `special expressions` like `@daily`, `@yearly`, and `@monthly`
 - Connect to servers over SSH with either a password or SSH keys
-- Manage cron jobs for another user when you have the required `sudo` permissions
+- Manage cron jobs for another user when you have the required `sudo passwordless` permissions
 - Search for cron jobs using case-insensitive keywords
 - Get notifications via Telegram when a cron job fails
 
