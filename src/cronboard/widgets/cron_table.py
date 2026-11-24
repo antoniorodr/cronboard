@@ -75,11 +75,22 @@ class CronTable(DataTable):
         )
 
         if self.remote and self.ssh_client:
-            crontab_cmd: str = (
-                f"crontab -u {self.crontab_user} -l"
-                if self.crontab_user
-                else "crontab -l"
-            )
+            # NOTE:  For this to work, the sudo should be paswordless, otherwise it will fail.
+            # BUG: When logging with sudo passwordless, the cronjobs for the other user are listed, but the actions are not working.
+            self.is_crontab_user_sudo = SSHService.is_user_sudo(self.ssh_client)
+
+            if self.is_crontab_user_sudo:
+                crontab_cmd: str = (
+                    f"sudo crontab -u {self.crontab_user} -l"
+                    if self.crontab_user
+                    else "sudo crontab -l"
+                )
+            else:
+                crontab_cmd: str = (
+                    f"crontab -u {self.crontab_user} -l"
+                    if self.crontab_user
+                    else "crontab -l"
+                )
             _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status: str = stdout.channel.recv_exit_status()
 
@@ -196,11 +207,18 @@ class CronTable(DataTable):
         """Refreshes the cronjob list."""
 
         if self.remote and self.ssh_client:
-            crontab_cmd: str = (
-                f"crontab -u {self.crontab_user} -l"
-                if self.crontab_user
-                else "crontab -l"
-            )
+            if self.is_crontab_user_sudo:
+                crontab_cmd: str = (
+                    f"sudo crontab -u {self.crontab_user} -l"
+                    if self.crontab_user
+                    else "sudo crontab -l"
+                )
+            else:
+                crontab_cmd: str = (
+                    f"crontab -u {self.crontab_user} -l"
+                    if self.crontab_user
+                    else "crontab -l"
+                )
 
             exit_status, stdout = SSHService.execute_ssh_command(
                 self.ssh_client, crontab_cmd
