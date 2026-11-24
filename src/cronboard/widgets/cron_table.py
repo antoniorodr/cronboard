@@ -76,7 +76,6 @@ class CronTable(DataTable):
 
         if self.remote and self.ssh_client:
             # NOTE:  For this to work, the sudo should be paswordless, otherwise it will fail.
-            # BUG: When logging with sudo passwordless, the cronjobs for the other user are listed, but the actions are not working.
             self.is_crontab_user_sudo = SSHService.is_user_sudo(self.ssh_client)
 
             if self.is_crontab_user_sudo:
@@ -157,6 +156,7 @@ class CronTable(DataTable):
             ssh_client=self.ssh_client,
             crontab_user=self.crontab_user,
             server_name=self.server_name,
+            is_crontab_user_sudo=self.is_crontab_user_sudo,
         )
 
     def action_edit_cronjob_keybind(
@@ -182,6 +182,7 @@ class CronTable(DataTable):
             ssh_client=self.ssh_client,
             crontab_user=self.crontab_user,
             server_name=self.server_name,
+            is_crontab_user_sudo=self.is_crontab_user_sudo,
         )
 
     def action_delete_cronjob_keybind(self, job) -> None:
@@ -201,6 +202,7 @@ class CronTable(DataTable):
             ssh_client=self.ssh_client,
             crontab_user=self.crontab_user,
             server_name=self.server_name,
+            is_crontab_user_sudo=self.is_crontab_user_sudo,
         )
 
     def action_refresh(self) -> None:
@@ -332,7 +334,6 @@ class CronTable(DataTable):
             self.remote,
             self.ssh_client,
             self.cron,
-            self.server_name,
             self.crontab_user,
             identificator,
             cmd,
