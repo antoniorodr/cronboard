@@ -52,6 +52,7 @@ class CronTable(DataTable):
         self.remote: bool = remote
         self.ssh_client: SSHClient | None = ssh_client
         self.crontab_user: CronTab | None = crontab_user
+        self.is_crontab_user_sudo: bool = False
         self.server_name: str = server_name
         self._rows_data: list[tuple] = []
         self._search_matches: list[int] = []
@@ -318,6 +319,7 @@ class CronTable(DataTable):
             identificator,
             cmd,
             self,
+            self.is_crontab_user_sudo,
         )
 
     def action_edit_cronjob(self) -> None:
@@ -333,7 +335,6 @@ class CronTable(DataTable):
             self.remote,
             self.ssh_client,
             self.cron,
-            self.server_name,
             identificator,
             CronWrapperService.wrap_command(
                 cmd,
@@ -356,7 +357,6 @@ class CronTable(DataTable):
                 self.remote,
                 None,
                 self.cron,
-                self.server_name,
                 identificator,
                 cmd,
             )
@@ -376,7 +376,6 @@ class CronTable(DataTable):
             self.remote,
             self.ssh_client,
             self.cron,
-            self.server_name,
             identificator,
             cmd,
         )

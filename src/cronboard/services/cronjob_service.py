@@ -121,6 +121,7 @@ class CronJobService:
         identificator: str,
         cmd: str,
         crontable,
+        is_crontab_user_sudo: bool,
     ) -> None:
         """Pauses the selected cronjob.
 
