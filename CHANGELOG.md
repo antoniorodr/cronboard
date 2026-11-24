@@ -5,10 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.1] - 25.09.2026
+## [1.3.0] - 24.11.2026
+
+### Added
+- Add `is_crontab_user_sudo` parameter
+- Add is_crontab_user_sudo parameter
+- Add the new `is_crontab_user_sudo` where is needed
+- Add a better description for the crontab user input field
+- Add support for the SSH key path
+- Add SSH key path support
+- Add `_version.py` to gitignore by @antoniorodr
+
+### Changed
+- Bumps version to v1.3.0
+- Use is_crontab_user_sudo when writing
+- Write is now using `is_crontab_user_sudo`
+- Refactor(connect): `connect_to_ssh_server` writes `ssh_key_path` to the
+- Create `is_user_sudo` and `ssh_key_path` helpers
+- Refactor find cronjob function
+- Update `get_version` by @antoniorodr
+- Import `_version.py` from init by @antoniorodr
+- Create hatch hook to update version by @antoniorodr
 
 ### Fixed
-- Fix a bug deleting ssh cronjobs
+- Pass is_crontab_user_sudo where is necessary
+- Use `is_crontab_user_sudo` when showing/refreshing cronjobs
+- `write_remote_crontab` now uses `is_crontab_user_sudo`
+- Refresh the CronTable after switching servers
+- Fix duplicate connection
+- Update test_get_version by @antoniorodr
+
+### Removed
+- Remove unused parameters
+
+## [1.2.1] - 25.09.2026
+
+### Changed
+- Bump version to `v1.2.1` by @antoniorodr
+
+### Fixed
+- Fix a bug deleting ssh cronjobs by @antoniorodr
 
 ## [1.2.0] - 24.09.2026
 
@@ -759,6 +795,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### New Contributors
 * @antoniorodr made their first contribution
 
+[1.3.0]: https://github.com/antoniorodr/cronboard/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/antoniorodr/cronboard/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/antoniorodr/cronboard/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/antoniorodr/cronboard/compare/v1.1.0...v1.1.1
