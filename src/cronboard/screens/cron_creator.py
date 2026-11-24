@@ -56,6 +56,7 @@ class CronCreator(ModalScreen[bool]):
         ssh_client=None,
         crontab_user=None,
         server_name="local",
+        is_crontab_user_sudo=False,
     ) -> None:
         super().__init__()
         self.expression: str | None = expression
@@ -68,6 +69,7 @@ class CronCreator(ModalScreen[bool]):
         self.crontab_user: CronTab | None = crontab_user
         self.notifications_enabled: bool = False
         self.server_name: str = server_name
+        self.is_crontab_user_sudo: bool = is_crontab_user_sudo
 
     def compose(self) -> ComposeResult:
         """Builds the modal UI: cron expression help, expression input,
