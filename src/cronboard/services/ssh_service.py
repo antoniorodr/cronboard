@@ -76,3 +76,20 @@ class SSHService:
 
         stdin.write(content)
         stdin.channel.shutdown_write()
+
+    @staticmethod
+    def is_user_sudo(ssh_client: paramiko.SSHClient) -> bool:
+        """Checks if the user has sudo privileges.
+
+        Args:
+            ssh_client: The SSHClient.
+        """
+        command = "sudo -n true"
+        exit_status, _ = SSHService.execute_ssh_command(ssh_client, command)
+        return exit_status == 0
+
+    @staticmethod
+    def get_ssh_key_path(key_name: str) -> str:
+        """Returns the path to the SSH key file."""
+        ssh_path = Path.home() / ".ssh" / key_name
+        return str(ssh_path)
