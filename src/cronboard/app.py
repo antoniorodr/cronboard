@@ -261,6 +261,7 @@ class CronBoard(App):
         ssh_client=None,
         crontab_user=None,
         server_name="local",
+        is_crontab_user_sudo=False,
     ) -> None:
         """Shows the CronCreator modal.
 
@@ -294,6 +295,7 @@ class CronBoard(App):
                 ssh_client=ssh_client,
                 crontab_user=crontab_user,
                 server_name=server_name,
+                is_crontab_user_sudo=is_crontab_user_sudo,
             ),
             check_save,
         )
@@ -306,6 +308,7 @@ class CronBoard(App):
         ssh_client=None,
         crontab_user=None,
         server_name="local",
+        is_crontab_user_sudo=False,
     ) -> None:
         """Shows the CronDeleteConfirmation modal.
 
@@ -341,6 +344,7 @@ class CronBoard(App):
                 ssh_client=ssh_client,
                 crontab_user=crontab_user,
                 server_name=server_name,
+                is_crontab_user_sudo=is_crontab_user_sudo,
             ),
             check_delete,
         )
@@ -355,6 +359,7 @@ class CronBoard(App):
         ssh_client=None,
         crontab_user=None,
         server_name="local",
+        is_crontab_user_sudo=False,
     ) -> None:
         """Shows the CronCreator modal to edit a cronjob.
 
@@ -394,6 +399,7 @@ class CronBoard(App):
                 ssh_client=ssh_client,
                 crontab_user=crontab_user,
                 server_name=server_name,
+                is_crontab_user_sudo=is_crontab_user_sudo,
             ),
             check_save,
         )
