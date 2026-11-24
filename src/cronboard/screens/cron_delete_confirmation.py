@@ -11,7 +11,7 @@ from cronboard.config import CONFIG_REL_PATH, CRONBOARD_NOTIFICATIONS_FILE
 from cronboard.services.config_service import ConfigService
 from cronboard.services.cron_messages import CronJobDeleted
 from cronboard.services.cron_wrapper_service import CronWrapperService
-from cronboard.services.ssh_service import SSHService
+from cronboard.services.cronjob_service import CronJobService
 
 
 class CronDeleteConfirmation(ModalScreen[bool]):
@@ -112,7 +112,13 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             self.cron.remove(self.job)
 
             if self.remote and self.ssh_client:
-                self.write_remote_crontab()
+                CronJobService.write_remote_crontab(
+                    self.remote,
+                    self.ssh_client,
+                    self.cron,
+                    self.crontab_user,
+                    is_crontab_user_sudo=self.is_crontab_user_sudo,
+                )
             else:
                 self.cron.write()
 
@@ -173,52 +179,3 @@ class CronDeleteConfirmation(ModalScreen[bool]):
 
         except Exception as e:
             print(f"Warning: Failed to sync notifications.toml to remote: {e}  ")
-
-    def write_remote_crontab(self) -> bool:
-        """Writes the current SSH cron table back to the remote server.
-
-        Returns:
-            True if success. Else False.
-
-        """
-
-        if not (self.remote and self.ssh_client):
-            return False
-
-        try:
-            if self.cron:
-                new_crontab_content: str = self.cron.render() or ""
-
-            if self.is_crontab_user_sudo:
-                crontab_cmd: str = (
-                    f"sudo crontab -u {self.crontab_user} -"
-                    if self.crontab_user
-                    else "sudo crontab -"
-                )
-            else:
-                crontab_cmd: str = (
-                    f"crontab -u {self.crontab_user} -"
-                    if self.crontab_user
-                    else "crontab -"
-                )
-
-            stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
-            SSHService.ssh_write(stdin, new_crontab_content)
-
-            exit_status: str = stdin.channel.recv_exit_status()
-            errors: str = stderr.read().decode().strip()
-
-            if errors:
-                print(f"❌ Failed to write remote crontab: {errors}")
-                return False
-
-            if exit_status != 0:
-                print(f"❌ Command failed with exit status: {exit_status}")
-                return False
-
-            print("✅ Remote crontab updated successfully")
-            return True
-
-        except Exception as e:
-            print(f"❌ Error writing remote crontab: {e}")
-            return False
