@@ -62,7 +62,9 @@ class CronJobService:
         return None
 
     @staticmethod
-    def write_remote_crontab(remote, ssh_client, ssh_cron, crontab_user) -> bool:
+    def write_remote_crontab(
+        remote, ssh_client, ssh_cron, crontab_user, is_crontab_user_sudo: bool
+    ) -> bool:
         """Writes the current SSH cron table back to the remote server.
 
         Returns:
@@ -75,9 +77,17 @@ class CronJobService:
         try:
             new_crontab_content: CronSSHModal = ssh_cron.render()
 
-            crontab_cmd: str = (
-                f"crontab -u {crontab_user} -" if crontab_user else "crontab -"
-            )
+            if is_crontab_user_sudo:
+                crontab_cmd: str = (
+                    f"sudo crontab -u {crontab_user} -"
+                    if crontab_user
+                    else "sudo crontab -"
+                )
+            else:
+                crontab_cmd: str = (
+                    f"crontab -u {crontab_user} -" if crontab_user else "crontab -"
+                )
+
             stdin, _, stderr = ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
             stdin.channel.shutdown_write()
