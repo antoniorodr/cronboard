@@ -189,11 +189,19 @@ class CronDeleteConfirmation(ModalScreen[bool]):
             if self.cron:
                 new_crontab_content: str = self.cron.render() or ""
 
-            crontab_cmd: str = (
-                f"crontab -u {self.crontab_user} -"
-                if self.crontab_user
-                else "crontab -"
-            )
+            if self.is_crontab_user_sudo:
+                crontab_cmd: str = (
+                    f"sudo crontab -u {self.crontab_user} -"
+                    if self.crontab_user
+                    else "sudo crontab -"
+                )
+            else:
+                crontab_cmd: str = (
+                    f"crontab -u {self.crontab_user} -"
+                    if self.crontab_user
+                    else "crontab -"
+                )
+
             stdin, _, stderr = self.ssh_client.exec_command(crontab_cmd)
             SSHService.ssh_write(stdin, new_crontab_content)
 
