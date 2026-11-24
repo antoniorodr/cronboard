@@ -30,7 +30,6 @@ class CronJobService:
         remote: bool,
         ssh_client: SSHClient | None,
         cron: CronTab,
-        server_name: str,
         identificator: str,
         cmd: str,
     ) -> CronTab | None:
@@ -51,19 +50,14 @@ class CronJobService:
         """
         cron_to_use: CronTab | None = ssh_cron if (remote and ssh_client) else cron
 
-        cmd_variants: set = {
-            cmd,
-            CronWrapperService.wrap_command(
-                cmd,
-                identificator,
-                ssh_client if remote and ssh_client else None,
-                server_name,
-            ),
-            CronWrapperService.command_without_wrapper(cmd),
-        }
+        if cron_to_use is None:
+            return None
+
+        requested_command = CronWrapperService.command_without_wrapper(cmd)
 
         for job in cron_to_use:
-            if job.comment == identificator and job.command in cmd_variants:
+            stored_command = CronWrapperService.command_without_wrapper(job.command)
+            if job.comment == identificator and stored_command == requested_command:
                 return job
         return None
 
@@ -138,7 +132,6 @@ class CronJobService:
             remote,
             ssh_client,
             cron,
-            server_name,
             identificator,
             cmd,
         )
@@ -150,7 +143,7 @@ class CronJobService:
 
             if remote and ssh_client:
                 CronJobService.write_remote_crontab(
-                    remote, ssh_client, ssh_cron, crontab_user
+                    remote, ssh_client, ssh_cron, crontab_user, is_crontab_user_sudo
                 )
             else:
                 cron_to_use.write()
