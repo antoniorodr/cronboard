@@ -126,6 +126,10 @@ class CronServers(Widget):
             self.current_cron_table.ssh_client = ssh_client
             self.current_cron_table.remote = True
             self.current_cron_table.crontab_user = crontab_user
+            self.current_cron_table.server_name = server_info["name"]
+            self.current_cron_table.is_crontab_user_sudo = SSHService.is_user_sudo(
+                ssh_client
+            )
             self.current_cron_table.action_refresh()
             self.notify(f"Switched to {server_info['name']}")
             return
