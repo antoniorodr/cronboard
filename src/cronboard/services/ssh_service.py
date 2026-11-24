@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import paramiko
@@ -46,13 +47,21 @@ class SSHService:
         host = server_info["host"]
         port = server_info["port"]
         username = server_info["username"]
+        ssh_key_name = server_info["ssh_key_name"]
+        ssh_key_path = SSHService.get_ssh_key_path(ssh_key_name)
         password = server_info["password"]
 
         if server_info["ssh_key"]:
-            ssh_client.connect(hostname=host, port=port, username=username)
+            ssh_client.connect(
+                hostname=host, port=port, username=username, key_filename=ssh_key_path
+            )
         else:
             ssh_client.connect(
-                hostname=host, port=port, username=username, password=password
+                hostname=host,
+                port=port,
+                username=username,
+                password=password,
+                key_filename=ssh_key_path,
             )
 
         return ssh_client, host, port, username, password
