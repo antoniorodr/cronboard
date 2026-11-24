@@ -45,6 +45,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         message=None,
         crontab_user=None,
         server_name="local",
+        is_crontab_user_sudo=False,
     ) -> None:
         super().__init__()
         self.server = server
@@ -55,6 +56,7 @@ class CronDeleteConfirmation(ModalScreen[bool]):
         self.message: str | None = message
         self.crontab_user: CronTab | None = crontab_user
         self.server_name: str = server_name
+        self.is_crontab_user_sudo: bool = is_crontab_user_sudo
 
     def compose(self) -> ComposeResult:
         """Builds the modal UI: message to display and two buttons (Delete and Cancel)"""
