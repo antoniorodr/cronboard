@@ -116,7 +116,6 @@ class CronJobService:
         remote,
         ssh_client,
         cron,
-        server_name,
         crontab_user,
         identificator: str,
         cmd: str,
@@ -328,11 +327,20 @@ class CronJobService:
         if cron_creator.remote and cron_creator.ssh_client:
             try:
                 new_crontab_content = cron_creator.cron.render()
-                crontab_cmd: str = (
-                    f"crontab -u {cron_creator.crontab_user} -"
-                    if cron_creator.crontab_user
-                    else "crontab -"
-                )
+
+                if cron_creator.is_crontab_user_sudo:
+                    crontab_cmd: str = (
+                        f"sudo crontab -u {cron_creator.crontab_user} -"
+                        if cron_creator.crontab_user
+                        else "sudo crontab -"
+                    )
+                else:
+                    crontab_cmd: str = (
+                        f"crontab -u {cron_creator.crontab_user} -"
+                        if cron_creator.crontab_user
+                        else "crontab -"
+                    )
+
                 stdin, _, stderr = cron_creator.ssh_client.exec_command(crontab_cmd)
                 stdin.write(new_crontab_content)
                 stdin.channel.shutdown_write()
