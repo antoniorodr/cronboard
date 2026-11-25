@@ -7,21 +7,11 @@ from textual.screen import ModalScreen
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label, RadioButton, RadioSet
 
+from cronboard.config import CRON_ALIASES
 from cronboard.services.cron_autocomplete import CronAutoComplete
 from cronboard.services.cron_wrapper_service import CronWrapperService
 from cronboard.services.cronjob_service import CronJobService
 from cronboard.widgets.cron_vim_keys_radio_set import VimKeysRadioSet
-
-CRON_ALIASES: dict[str, None | str] = {
-    "@reboot": None,
-    "@hourly": "0 * * * *",
-    "@daily": "0 0 * * *",
-    "@weekly": "0 0 * * 0",
-    "@monthly": "0 0 1 * *",
-    "@yearly": "0 0 1 1 *",
-    "@annually": "0 0 1 1 *",
-    "@midnight": "0 0 * * *",
-}
 
 
 class CronCreator(ModalScreen[bool]):

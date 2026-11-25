@@ -10,3 +10,13 @@ CONFIG_FILE: Path = CONFIG_DIR / "servers.toml"
 KEY_FILE: Path = CONFIG_DIR / "secret.key"
 LOG_DIR: Path = CONFIG_DIR / "logs"
 WRAPPER_SOURCE: Path = Path(__file__).parent / "logging" / "cron-wrapper.sh"
+CRON_ALIASES: dict[str, None | str] = {
+    "@reboot": None,
+    "@hourly": "0 * * * *",
+    "@daily": "0 0 * * *",
+    "@weekly": "0 0 * * 0",
+    "@monthly": "0 0 1 * *",
+    "@yearly": "0 0 1 1 *",
+    "@annually": "0 0 1 1 *",
+    "@midnight": "0 0 * * *",
+}
