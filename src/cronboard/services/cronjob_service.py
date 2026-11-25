@@ -62,6 +62,31 @@ class CronJobService:
         return None
 
     @staticmethod
+    def define_crontab_cmd(
+        is_crontab_user_sudo: bool, crontab_user: str | None, list_flag: str = ""
+    ) -> str:
+        """Defines the crontab command based on whether sudo is required and the user.
+
+        Args:
+            is_crontab_user_sudo: Whether sudo is required for the crontab command.
+            crontab_user: The user for the crontab command.
+        """
+
+        if is_crontab_user_sudo:
+            crontab_cmd: str = (
+                f"sudo crontab -u {crontab_user} -{list_flag}"
+                if crontab_user
+                else f"sudo crontab -{list_flag}"
+            )
+        else:
+            crontab_cmd: str = (
+                f"crontab -u {crontab_user} -{list_flag}"
+                if crontab_user
+                else f"crontab -{list_flag}"
+            )
+
+        return crontab_cmd
+
     def write_remote_crontab(
         remote, ssh_client, ssh_cron, crontab_user, is_crontab_user_sudo: bool
     ) -> bool:
