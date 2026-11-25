@@ -20,3 +20,4 @@ CRON_ALIASES: dict[str, None | str] = {
     "@annually": "0 0 1 1 *",
     "@midnight": "0 0 * * *",
 }
+_LOG_LIST_SELECTION_DEBOUNCE_SEC: float = 0.3
