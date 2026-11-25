@@ -102,16 +102,9 @@ class CronJobService:
         try:
             new_crontab_content: CronSSHModal = ssh_cron.render()
 
-            if is_crontab_user_sudo:
-                crontab_cmd: str = (
-                    f"sudo crontab -u {crontab_user} -"
-                    if crontab_user
-                    else "sudo crontab -"
-                )
-            else:
-                crontab_cmd: str = (
-                    f"crontab -u {crontab_user} -" if crontab_user else "crontab -"
-                )
+            crontab_cmd: str = CronJobService.define_crontab_cmd(
+                is_crontab_user_sudo, crontab_user
+            )
 
             stdin, _, stderr = ssh_client.exec_command(crontab_cmd)
             stdin.write(new_crontab_content)
@@ -353,18 +346,9 @@ class CronJobService:
             try:
                 new_crontab_content = cron_creator.cron.render()
 
-                if cron_creator.is_crontab_user_sudo:
-                    crontab_cmd: str = (
-                        f"sudo crontab -u {cron_creator.crontab_user} -"
-                        if cron_creator.crontab_user
-                        else "sudo crontab -"
-                    )
-                else:
-                    crontab_cmd: str = (
-                        f"crontab -u {cron_creator.crontab_user} -"
-                        if cron_creator.crontab_user
-                        else "crontab -"
-                    )
+                crontab_cmd: str = CronJobService.define_crontab_cmd(
+                    cron_creator.is_crontab_user_sudo, str(cron_creator.crontab_user)
+                )
 
                 stdin, _, stderr = cron_creator.ssh_client.exec_command(crontab_cmd)
                 stdin.write(new_crontab_content)

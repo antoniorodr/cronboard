@@ -75,21 +75,12 @@ class CronTable(DataTable):
         )
 
         if self.remote and self.ssh_client:
-            # NOTE:  For this to work, the sudo should be paswordless, otherwise it will fail.
             self.is_crontab_user_sudo = SSHService.is_user_sudo(self.ssh_client)
 
-            if self.is_crontab_user_sudo:
-                crontab_cmd: str = (
-                    f"sudo crontab -u {self.crontab_user} -l"
-                    if self.crontab_user
-                    else "sudo crontab -l"
-                )
-            else:
-                crontab_cmd: str = (
-                    f"crontab -u {self.crontab_user} -l"
-                    if self.crontab_user
-                    else "crontab -l"
-                )
+            crontab_cmd: str = CronJobService.define_crontab_cmd(
+                self.is_crontab_user_sudo, str(self.crontab_user), "l"
+            )
+
             _, stdout, _ = self.ssh_client.exec_command(crontab_cmd)
             exit_status: str = stdout.channel.recv_exit_status()
 
@@ -209,18 +200,9 @@ class CronTable(DataTable):
         """Refreshes the cronjob list."""
 
         if self.remote and self.ssh_client:
-            if self.is_crontab_user_sudo:
-                crontab_cmd: str = (
-                    f"sudo crontab -u {self.crontab_user} -l"
-                    if self.crontab_user
-                    else "sudo crontab -l"
-                )
-            else:
-                crontab_cmd: str = (
-                    f"crontab -u {self.crontab_user} -l"
-                    if self.crontab_user
-                    else "crontab -l"
-                )
+            crontab_cmd: str = CronJobService.define_crontab_cmd(
+                self.is_crontab_user_sudo, str(self.crontab_user), "l"
+            )
 
             exit_status, stdout = SSHService.execute_ssh_command(
                 self.ssh_client, crontab_cmd
@@ -234,6 +216,7 @@ class CronTable(DataTable):
             self.ssh_cron = CronTab(tab=self.crontab_content)
         else:
             self.cron = CronTab(user=True)
+
         CronJobService.load_crontabs(self)
         self.refresh_bindings()
 
