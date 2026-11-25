@@ -1,3 +1,4 @@
+import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -148,3 +149,8 @@ class CronLogger:
             return ""
 
         return identificator
+
+    @staticmethod
+    def _process_log_line(line: str) -> str:
+        _sub_escape = re.compile("[\u0000-\u0014]").sub
+        return _sub_escape("", line.expandtabs())

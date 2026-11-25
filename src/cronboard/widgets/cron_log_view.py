@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from typing import ClassVar
 
 from paramiko.client import SSHClient
@@ -19,16 +18,8 @@ from textual.timer import Timer
 from textual.widget import Widget
 from textual.widgets import Button
 
+from cronboard.config import _LOG_LIST_SELECTION_DEBOUNCE_SEC
 from cronboard.services.cron_logger_service import CronLogger
-
-_sub_escape = re.compile("[\u0000-\u0014]").sub
-
-
-def _process_log_line(line: str) -> str:
-    return _sub_escape("", line.expandtabs())
-
-
-_LOG_LIST_SELECTION_DEBOUNCE_SEC: float = 0.3
 
 
 class VirtualLogFileList(ScrollView, can_focus=True):
@@ -242,7 +233,7 @@ class VirtualLogLines(ScrollView, can_focus=True):
             lines: List of log lines.
         """
 
-        self._lines: list[str] = [_process_log_line(line) for line in lines]
+        self._lines: list[str] = [CronLogger._process_log_line(line) for line in lines]
         self._max_cell_len: int = self._compute_max_cell_len(self._lines)
         self._apply_virtual_size()
         self.scroll_to(y=0.0, animate=False, immediate=True)
@@ -255,7 +246,7 @@ class VirtualLogLines(ScrollView, can_focus=True):
             message: The placeholder text.
         """
 
-        self._lines: list[str] = [_process_log_line(message)]
+        self._lines: list[str] = [CronLogger._process_log_line(message)]
         self._max_cell_len: int = self._compute_max_cell_len(self._lines)
         self._apply_virtual_size()
         self.scroll_to(y=0.0, animate=False, immediate=True)
