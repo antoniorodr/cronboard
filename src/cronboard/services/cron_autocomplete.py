@@ -50,7 +50,11 @@ class CronAutoComplete(PathAutoComplete):
 
         """
 
-        if self.ssh_client:
+        if self.ssh_key_mode:
+            home_path: Path = Path.home() / ".ssh"
+            if not home_path.is_dir():
+                return []
+        elif self.ssh_client:
             if not self._remote_home:
                 self._remote_home: str | None = CronWrapperService.get_remote_home(
                     self.ssh_client
