@@ -5,6 +5,8 @@ from textual.screen import ModalScreen
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label
 
+from cronboard.services.cron_autocomplete import CronAutoComplete
+
 
 class CronSSHModal(ModalScreen):
     @staticmethod
@@ -30,6 +32,11 @@ class CronSSHModal(ModalScreen):
     def compose(self) -> ComposeResult:
         """Builds the modal UI: hostname, username, password, crontab user."""
 
+        ssh_key_input = Input(
+            placeholder="SSH Key Name (e.g. id_rsa). Default is id_ed25519",
+            id="ssh_key_name",
+        )
+
         yield Grid(
             Vertical(
                 Label(
@@ -44,10 +51,8 @@ class CronSSHModal(ModalScreen):
                     placeholder="Username",
                     id="username",
                 ),
-                Input(
-                    placeholder="SSH Key Name (e.g. id_rsa). Default is id_ed25519",
-                    id="ssh_key_name",
-                ),
+                ssh_key_input,
+                CronAutoComplete(target=ssh_key_input, ssh_key_mode=True),
                 Label(
                     "Use password if you are not using SSH key",
                     id="label_andor",
