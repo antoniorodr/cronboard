@@ -24,12 +24,14 @@ class CronAutoComplete(PathAutoComplete):
 
     Attributes:
         ssh_client: SSH client for remote operations.
+        ssh_key_mode: If True, candidates are listed from the local '~/.ssh' directory.
         target_state: Target state of the input.
         directory_cache: Directory cache for caching directory entries.
     """
 
-    def __init__(self, target, ssh_client=None):
+    def __init__(self, target, ssh_client=None, ssh_key_mode: bool = False):
         super().__init__(target)
+        self.ssh_key_mode: bool = ssh_key_mode
         self.ssh_client: SSHClient | None = ssh_client
         self.target_state: TargetState = target
         self.directory_cache: dict[str, list[CronDirEntry]] = {}
