@@ -111,6 +111,9 @@ class CronSSHModal(ModalScreen):
             content: Vertical = self.query_one("#content", Vertical)
             crontab_user: str = self.query_one("#crontab_user", Input).value.strip()
 
+            if ".pub" in ssh_key_name:
+                ssh_key_name = ssh_key_name.replace(".pub", "")
+
             try:
                 hostname, port = self._parse_host_info(host_info)
             except ValueError as exc:
